@@ -1,14 +1,26 @@
 'use strict'
-var express = require('express');
+const express = require('express');
+const mongoose = require('mongoose');
+const config = require("./config");
 
-var notificationRouter = require('./controllers/notificationRouter');
-var profileRouter = require('./controllers/profileRouter');
-var vacancyRouter = require('./controllers/vacancyRouter');
-var eventRouter = require('./controllers/eventRouter');
+const port = process.env.PORT || config.getDevelopmentPort();
+mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+
+const notificationRouter = require('./routers/notificationRouter');
+const profileRouter = require('./routers/profileRouter');
+const vacancyRouter = require('./routers/vacancyRouter');
+const eventRouter = require('./routers/eventRouter');
+
+const app = express();
+
+
+
 
 app.use('/api/notification', notificationRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/vacancy', vacancyRouter);
 app.use('/api/event', eventRouter);
 
-var app = express();
+
+
+console.log("app is up and running ... ");
