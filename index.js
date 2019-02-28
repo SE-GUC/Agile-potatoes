@@ -1,24 +1,12 @@
-'use strict'
-const express = require('express');
-const mongoose = require('mongoose');
-const config = require("./config");
+const getDbConnectionString = function () { // Set your connection string to mongoDB 
+    return "mongodb+srv://manar:manar-28@model-nz4dm.mongodb.net/test?retryWrites=true"
+}
 
-const port = process.env.PORT || config.getDevelopmentPort();
-mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+const getDevelopmentPort = function () {
+    return 3000 ;
+}
 
-const notificationRouter = require('./routers/notificationRouter');
-const profileRouter = require('./routers/profileRouter');
-const vacancyRouter = require('./routers/vacancyRouter');
-const eventRouter = require('./routers/eventRouter');
-
-const app = express();
-
-
-app.use('/api/notification', notificationRouter);
-app.use('/api/profile', profileRouter);
-app.use('/api/vacancy', vacancyRouter);
-app.use('/api/event', eventRouter);
-
-
-console.log("app is up and running ... ");
-app.listen(port);
+module.exports = {
+    getDbConnectionString,
+    getDevelopmentPort
+};
