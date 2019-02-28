@@ -14,13 +14,11 @@ const eventRouter = require('./routers/eventRouter');
 const app = express();
 
 
-
-
 app.use('/api/notification', notificationRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/vacancy', vacancyRouter);
 app.use('/api/event', eventRouter);
 
 
-
 console.log("app is up and running ... ");
+app.listen(port);
