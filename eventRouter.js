@@ -9,8 +9,6 @@ router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
 
 
-
-
 router.post('/:id/CreateEvent', function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.params.id;    //should come from session
