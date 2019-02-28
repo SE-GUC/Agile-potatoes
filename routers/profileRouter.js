@@ -11,8 +11,6 @@ router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
 router.get('/:id',function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId; //should come from session
-        
-
     var profId = req.params.id;
     if (profId == userId){       //user viewing his profile
         if (userType == 'Admin') {
