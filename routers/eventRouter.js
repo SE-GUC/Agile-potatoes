@@ -27,7 +27,7 @@ var express = require('express');
 	        Admin.findById(userId).exec(function(err,admin){
 	            console.log(Admin.event);
 	            admin.events.push(eventId)
-	
+				admin.save();
 	        });
 	        
 	        var event = new Event({
@@ -47,7 +47,7 @@ var express = require('express');
 	            if(err) throw err;
 	            console.log(vac);
 			})
-			admin.save();
+			
 	    } 
 	    else if (userType == 'Partner') {
 	        Partner.findById(userId).exec(function(err,partner){
