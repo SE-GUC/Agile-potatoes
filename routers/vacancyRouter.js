@@ -21,7 +21,7 @@ router.post('/:id/comment', function (req,res) {
                     author: userId
                 });
                 vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
-            });
+            });       
     } 
     else if (userType == 'Partner') {
         Vacancy.findById(vacId)
@@ -53,4 +53,28 @@ router.get('/:id/applicants', function (req, res) {
                 return res.send('you are not allowed to view this')
         })
 })
+
+
+router.put('/:id/status', function(req,res){
+    var userType = req.body.userType;
+    var vacId = req.params.id;
+    var vacStatus = req.body.status;
+    if (userType == 'Admin'&&  Vacancy.status== 'Submitted'){
+        Vacancy.findByIdAndUpdate(vacId, {status: vacStatus}, 
+          function(err, response){
+          console.log(response);
+        });
+                    
+    }
+    else if (userType == 'Partner' &&  Vacancy.status== 'Open'){
+        Vacany.findByIdAndUpdate(vacId, {status: vacStatus}, 
+        function(err, response){
+           console.log(response);
+         });
+    }        
+    return res.send("Status Updated");
+});
+
+
 module.exports = router;
+router.listen(3000);
