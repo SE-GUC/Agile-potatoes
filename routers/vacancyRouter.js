@@ -21,7 +21,15 @@ router.post('/:id/comment', function (req,res) {
                     author: userId
                 });
                 vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
-            });
+            })
+        Vacancy.findById(vacId).populate('partner') //notifying partner
+            .exec(function (err, vacancy) {
+                vacancy.partner.notifications.push({
+                    srcURL: '/api/vacancy/' + vacId,
+                    description: 'Admin commented on your vacancy request'
+                });
+                vacancy.partner.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
+            })
     } 
     else if (userType == 'Partner') {
         Vacancy.findById(vacId)
@@ -31,8 +39,16 @@ router.post('/:id/comment', function (req,res) {
                     text: comment,
                     author: userId
                 });
-                vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
+                vacancy.save(); 
             });
+        Vacancy.findById(vacId).populate('admin') //notifying admin
+            .exec(function (err, vacancy) {
+                vacancy.admin.notifications.push({
+                    srcURL: '/api/vacancy/' + vacId,
+                    description: 'Partner commented on your vacancy request'
+                });
+                vacancy.admin.save(); 
+            })
     }
     return res.send("updated");
 });
