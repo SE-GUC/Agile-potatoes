@@ -80,12 +80,40 @@ router.post('/:id/feedback', function (req,res) {
 //still not done
 router.put('/:id',function (req, res) {
     var userType = req.body.userType; //should come from session
-    var userId = req.body.userId; //should come from session
-    var profId = req.params.id;
-    if(userType == 'Partner')
-        if(profId == userId){
-            Partner.updateOne(req.body);
+    var userID = req.body.userID; //should come from session (person logged in)
+    var partnerID = req.params.id; //the ID of the partner I want to update
+    if(req.body.boardMembers){
+        var members = req.body.boardMembers;
+    }
+    if(req.body.vacancies){
+        var vac = req.body.vacancies;
+    }
+    if(req.body.password){
+        var pwd = req.body.password;
+    }
+    if(req.body.events){
+        var evs = req.body.events;
+    }
+    if(userType == 'Partner'){
+        if(partnerID == userID){
+            Partner.findById(partnerID).exec(function (err, partner) {
+                if(members){
+                    console.log("yes fe members to push");
+                    partner.boardMembers.push(members);
+                }
+                if(vac){
+                    partner.vacancies.push(vac);
+                }
+                if(evs){
+                    partner.events.push(evs);
+                }
+                if(pwd){
+                    partner.password = pwd;
+                }
+                partner.save();
+            });
         }
+    }
 });
         
 
