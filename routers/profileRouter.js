@@ -56,4 +56,35 @@ router.get('/:id',function (req,res) {
     return ;
 })
 
+
+//user story: As a Member I can post feedback to a partner I previously worked with
+router.post('/:id/feedback', function (req,res) {
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId;    //should come from session
+    var feedback = req.body.feedback;
+    var partnerId = req.params.id;
+    Partner.findById(partnerId)
+        .exec(function (err, partner) {
+            partner.feedbacks.push({
+                text: comment,
+                author: userId
+                });
+            partner.save();
+        });
+    return res.send("Feedback added");
+});
+
+//user story: As a Partner I can update my profile (Board Members, Pending vacancies, Password, Pending events).
+//still not done
+router.put('/:id',function (req, res) {
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId; //should come from session
+    var profId = req.params.id;
+    if(userType == 'Partner')
+        if(profId == userId){
+            Partner.updateOne(req.body);
+        }
+});
+        
+
 module.exports = router;
