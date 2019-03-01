@@ -42,10 +42,10 @@ var express = require('express');
 	                speakers: speakers,
 	                topics: topics
 	        });
-	        event.save(function(err,vac)
+	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
-	            console.log(vac);
+	            console.log(eve);
 			})
 			
 	    } 
@@ -68,10 +68,10 @@ var express = require('express');
 	                speakers: speakers,
 	                topics: topics
 	        });
-	        event.save(function(err,vac)
+	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
-	            console.log(vac);
+	            console.log(eve);
 	        })
 			
 	
@@ -92,7 +92,8 @@ var express = require('express');
 	    else
 	    {
 	        console.log('This Information is not accessible!');
-	    }
-	})
+		}
+		return res.send("pending events loaded successfully");
+	});
 	
 	module.exports = router;
