@@ -92,5 +92,21 @@ router.put('/:id/status', function(req,res){
 });
 
 
+router.get('/:id/comment', function (req,res) { 
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId;    //should come from session
+    var vacId = req.params.id;
+     if (userType == 'Admin' || userType == 'Partner'){  //only partners and admins can access vacancies' comments section
+
+         Vacancy.findById(vacId)
+          .exec(function(err,vacancy){
+             vacancy.commentsByPartner.populate('author');
+             vacancy.commentsByAdmin.populate('author');
+             var Allcomments = vacancy.commentsByAdmin.concat(vacancy.commentsByPartner); // putting all comments in one object
+             res.send(Allcomments);
+          })
+     }
+    })
+
 module.exports = router;
 

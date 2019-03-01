@@ -95,5 +95,21 @@ var express = require('express');
 		}
 		return res.send("pending events loaded successfully");
 	});
+
+	router.get('/:id/comment', function (req,res) {
+		var userType = req.body.userType; //should come from session
+		var userId = req.body.userId;    //should come from session
+		var eveId = req.params.id;
+		 if (userType == 'Admin' || userType == 'Partner'){ //only partners and admins can access events' comments section
+	
+			 Event.findById(eveId)
+			  .exec(function(err,ev){
+				 event.commentsByPartner.populate('author');
+				 event.commentsByAdmin.populate('author');
+				 var Allcomments = Event.commentsByAdmin.concat(Event.commentsByPartner); // putting all comments in one object
+				 res.send(Allcomments);
+			  })
+		 }
+		})
 	
 	module.exports = router;
