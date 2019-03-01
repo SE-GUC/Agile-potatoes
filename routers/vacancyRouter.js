@@ -7,7 +7,7 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
 
-
+/////////// 7
 router.post('/:id/comment', function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId;    //should come from session
@@ -53,7 +53,7 @@ router.post('/:id/comment', function (req,res) {
     return res.send("updated");
 });
 
-
+////////// 16
 router.get('/:id/applicants', function (req, res) {
     var userId = req.body.userId; //should come from session
     var vacId = req.params.id;
