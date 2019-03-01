@@ -1,24 +1,24 @@
-var express = require('express');
-var router = express.Router();
-var Eventt = require('../models/eventModel');
+const express = require('express');
+const bodyParser = require('body-parser');
+const router = express.Router();
+router.use(bodyParser.json()); //parsing out json out of the http request body
+router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
+const Events = require('../models/eventModel');
 
-//user story: As a partner I can update my pending events
-router.put('/:id', async (req,res) => {
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userId; //should come from session
-    var profId = req.params.id;
-    if (profId == userId){       //user viewing his profile
-        if (userType == 'Partner') { 
-            const id = req.params.id;
-            const event = await Eventt.findOne({id});
-            if(!event) 
-                return res.status(404).send({error: 'Event does not exist'});
-            await Eventt.updateOne(req.body);
-            res.json({msg: 'Event updated successfully'});
-        }
+
+//user story 21: As a partner I can update my pending events
+ router.put('/:id', async (req,res) => {
+    var userType =  'Partner' //should come from session
+    var userID =  '5c7945fe1c9d440000ec7811' //should come from session
+    var creatorID = '5c7945fe1c9d440000ec7811'; //should come from event itself
+    var id = req.params.id;
+    if (userType == 'Partner' && creatorID == userID){     //partner updating HIS event
+        var values = req.body;
+        await Events.update({_id: id}, values);
+        res.json({msg: 'Event updated successfully'});
     }
     else 
-        return res.status(400).send({error: 'Cannot edit this event as it is not yours'});
+        return res.status(400).send({error: 'Cannot edit this event as it is NOT yours'});
  });
 
 module.exports = router;

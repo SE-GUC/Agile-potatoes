@@ -28,6 +28,7 @@ router.get('/:id',function (req,res) {
         else if (userType == 'Member'){
             Member.findById({_id: profId}, function (err, memberDoc) {
                 if (err) throw err;
+                console.log("I am heeerrreeee");
                 res.send(memberDoc);
             })
         }
@@ -57,21 +58,22 @@ router.get('/:id',function (req,res) {
 })
 
 
-//user story: As a Member I can post feedback to a partner I previously worked with
+//user story 8: As a Member I can post feedback to a Partner I previously worked with
 router.post('/:id/feedback', function (req,res) {
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userId;    //should come from session
-    var feedback = req.body.feedback;
-    var partnerId = req.params.id;
-    Partner.findById(partnerId)
-        .exec(function (err, partner) {
+    var userType = req.body.userType; //should come from session (has to be Member)
+    var userID = req.body.userID;    //should come from session (the writer of the feedback comment)
+    var partnerID = req.params.id;
+    var comment = req.body.comment;
+    if(userType == 'Member') {
+        Partner.findById(partnerID).exec(function (err, partner) {
             partner.feedbacks.push({
                 text: comment,
-                author: userId
+                author: userID
                 });
             partner.save();
         });
-    return res.send("Feedback added");
+        return res.send("Feedback added");
+    }
 });
 
 //user story: As a Partner I can update my profile (Board Members, Pending vacancies, Password, Pending events).

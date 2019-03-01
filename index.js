@@ -20,5 +20,13 @@ app.use('/api/vacancy', vacancyRouter);
 app.use('/api/event', eventRouter);
 
 
-console.log("app is up and running ... ");
+// var partnerrr = require('./models/partnerModel');
+// var pr1 = new partnerrr({username: 'uncle', password: '1234', name: 'uncleX', email: 'uncle@potato.com'});
+// pr1.save(function (err, evv) {
+//     if (err) console.log('some error occured');
+//     console.log(evv);
+// });
+
+
+console.log(`app is up and running ... on http://localhost:${port}`);
 app.listen(port);
