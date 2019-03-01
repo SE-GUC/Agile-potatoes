@@ -117,4 +117,34 @@ router.put('/:id',function (req, res) {
 });
         
 
+
+router.put('/:id/name', function(req,res){
+    var userType = req.body.userType;
+    var userId = req.body.userId;
+    var fname = req.body.name;
+    var lname = req.body.name;
+    if (userType == 'Admin'){
+        Admin.findByIdAndUpdate(userId, {fname: fname, lname: lname}, 
+        function(err, response){
+           console.log(response);
+         });
+    }
+    return res.send("Name Updated");
+});
+
+
+router.put('/:id/password', function(req,res){
+    var userType = req.body.userType;
+    var userId = req.body.userId;
+    var password = req.body.password;
+    if (userType == 'Admin'){
+        Admin.findByIdAndUpdate(userId, {password: password}, 
+        function(err, response){
+           console.log(response);
+         });
+    }
+    return res.send("Password Updated");
+});
+
+
 module.exports = router;
