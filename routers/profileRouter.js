@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
-
+///////////////// 12
 router.get('/:id',function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId; //should come from session
