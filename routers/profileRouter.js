@@ -87,4 +87,3 @@ router.put('/:id/password', function(req,res){
 
 
 module.exports = router;
-router.listen(3000);
