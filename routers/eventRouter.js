@@ -91,7 +91,7 @@ var express = require('express');
 	    }
 	    else
 	    {
-	        console.log('This Information is not accessible!');
+	        return res.send('This Information is not accessible!');
 		}
 		return res.send("pending events loaded successfully");
 	});
