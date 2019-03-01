@@ -52,9 +52,10 @@ var express = require('express');
 	    else if (userType == 'Partner') {
 	        Partner.findById(userId).exec(function(err,partner){
 	            console.log(Partner.event);
-	            partner.events.push(eventID)
+				partner.events.push(eventID)
+				partner.save();
 	        });
-	        partner.save();
+	        
 	        var event = new Event({
 	            description: description,
 	                price: price,
@@ -72,13 +73,13 @@ var express = require('express');
 	            if(err) throw err;
 	            console.log(vac);
 	        })
-			partner.save();
+			
 	
 	    }
 	    return res.send("created event successfully");
 	});
 	
-	outer.get('/PendingEvents', function (req, res) {
+	router.get('/PendingEvents', function (req, res) {
 	    var usertype = req.body.usertype
 	   if(usertype == 'Admin')
 	    {
@@ -95,8 +96,3 @@ var express = require('express');
 	})
 	
 	module.exports = router;var express = require('express');
-var router = express.Router();
-
-
-
-module.exports = router;
