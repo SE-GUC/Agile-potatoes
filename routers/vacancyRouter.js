@@ -62,7 +62,7 @@ router.post('/CreateVacancy', function (req, res) {
     var salary = req.body.salary;    
     var dailyHours = req.body.dailyHours; 
     var partner = req.body.partner; 
-    var vacancy = new Vacancy({description:description},{duration:duration},{location:location},{salary:salary},{dailyHours:dailyHours},{partner:partner});
+    var vacancy = new Vacancy({description:description,duration:duration,location:location,salary:salary,dailyHours:dailyHours,partner:partner});
     vacancy.url= '/api/vacancy/' + vacancy._id;
     vacancy.save(function(err){
         if(err) return handleError(err);
