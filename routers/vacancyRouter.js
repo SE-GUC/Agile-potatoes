@@ -92,5 +92,62 @@ router.put('/:id/status', function(req,res){
 });
 
 
+
+
+
+
+
+
+////////////// Story 22.1 : A partner can view his vacancy
+router.get('/:id/', function(req, res){  //showing non approved vacancy to be updated and checking if its pending
+
+    var userType = req.body.userType ;  //should come from session
+    var userId = req.body.id ;      //should come from session
+    var vacId = req.params.id ;
+
+    Vacancy.findById(vacId, 'duration location description salary dailyHours').exec(function (err, vacancy){
+
+        if(userType === 'Partner' && userId === vacancy.partner && vacancy.status === 'Submitted')
+        {
+            return res.send(vacancy) ;
+        }
+        else{
+            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited") ;
+        }
+    })
+})
+
+////////////// Story 22.2 : A partner can update his vacancy
+router.post('/:id/', function(req, res){  //submitting edited vacancy
+    
+    var vacId = req.params.id ;
+    var duration = req.body.duration ;
+    var location = req.body.location ;
+    var description = req.body.description ;
+    var salary = req.body.salary ;
+    var dailyhours = req.body.dailyHours ;
+
+    Vacancy.findById(vacId).exec(function(err,vacancy){
+
+        if(err)
+        {
+            return res.send(err) ;
+        }        
+        if(vacancy.status === 'Submitted')
+        {
+        
+            vacancy.duration = duration ;
+            vacancy.location = location ;
+            vacancy.description = description ;
+            vacancy.salary = salary ;
+            vacancy.dailyhours = dailyhours ;
+
+            vacancy.save();
+        }
+        else{
+            res.send('Vacancy cannot be edited after being approved') ;
+        }
+    })
+})
 module.exports = router;
 
