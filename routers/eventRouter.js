@@ -99,31 +99,16 @@ var express = require('express');
 
 
 /////////////// 14
-	router.get('/events', function (req, res) {
+router.get('/events', function (req, res) {
 
-		Event.find({'eventStatus.type': 'Approved'} ,function(err,events){
-		  if(err)
-		  {
-			  return console.log(err.message) ;
-		  }
-		  // events.forEach(function(event) {
-		  //     eventMap[event.id] = event ;
-		  //   });
-		
-		  //   return (eventMap) ;
-		  return (events) ;
-	  })
-  })
-  
-	  router.get('/events/:id/', function (req, res) {
-		  var eventId = req.params.id ;
-  
-		  Event.findById(eventId).exec(function (err, event){
-			  if(err)
-			  {
-				  return console.log(err.message) ;
-			  }
-			  res.send(event) ;
-		  })
-	  })
-	module.exports = router;
+	Event.find({'eventStatus.type': 'Approved'} ,function(err,events){
+		if(err)
+	    {
+		    return console.log(err) ;
+	    }
+	  return (events) ;
+    })
+})
+
+
+module.exports = router;

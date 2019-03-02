@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-
+const Partner = require('../models/partnerModel');
+const Admin = require('../models/adminModel');
+const Member = require('../models/memberModel');
 
 
 
@@ -11,68 +13,39 @@ router.get('/:id/notifications', function (req, res) {
     
     if (userType == 'Admin')
     {
-        Admin.findById(userId).exec(
-        function (err, admin)
+        Admin.findByIdAndUpdate(userId, {'notifications.seen': true}, 
+            function(err, admin)
         {
-            if(err)
-            {
-                console.log('wrong query!') ;
-                next() ; //end as return
-            }
             if(admin)
             {
                 res.send(admin.notifications) ;
-
-                for(var i = 0 ; i < admin.notifications.length ; i++)
-                    if(admin.notifications.seen === false)
-                        break ;
-                if(i < admin.notifications.length)
-                    admin.notifications[i].seen = true ;
-                admin.save() ;
-                            
-                // Admin.update({"_id": userId,'notifications.seen': false}, {'$set': {'notifications.$.seen': true}},
-                //             function(err) {console.log('ERROR!')})
             }
 
-            }) ;
+        })
     }
     else{
         if(userType === 'Member'){
-            Member.findById(userId)
-            .exec(function (err, member)
+            Member.findByIdAndUpdate(userId, {'notifications.seen': true}, 
+            function(err, member)
+        {
+            if(member)
             {
-                if(member)
-                {
-                    // member.notifications.seen = true ;
-                    member.notifications.$.seen = true ;
-                    member.save() ;
-                    return res.send(member.notifications) ;
-                }
-/*                if(err)
-                {
-                    console.log(err.message) ;
-                    return ;
-                }
-*/
-            }) ;
+                res.send(member.notifications) ;
+            }
+
+            })
         }
         else{
             if(userType === 'Partner'){
-                Partner.findById(userId)
-                .exec(function (err, partner)
+                Partner.findByIdAndUpdate(userId, {'notifications.seen': true}, 
+                function(err, partner)
                 {
-                    if(member)
+                    if(partner)
                     {
-                        partner.notifications.seen = true ;
-                        partner.save() ;
-                        return res.send(member.notifications) ;
+                        res.send(partner.notifications) ;
                     }
-                    // if(err)
-                    // {
-                    //     console.log(err.message) ;
-                    //     return ;
-                    // }
-                }) ;
+
+                })
             }
         }
     }
