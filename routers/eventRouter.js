@@ -119,7 +119,7 @@ router.put('/:id', async (req, res) => {
 	var id = req.params.id;
 	if (userType == 'Partner' && creatorID == userID) {     //partner updating HIS event
 		var values = req.body;
-		await Events.update({ _id: id }, values);
+		await Event.update({ _id: id }, values);
 		res.json({ msg: 'Event updated successfully' });
 	}
 	else
