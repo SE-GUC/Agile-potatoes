@@ -20,5 +20,5 @@ app.use('/api/vacancy', vacancyRouter);
 app.use('/api/event', eventRouter);
 
 
-console.log("app is up and running ... ");
+console.log(`app is up and running ... on http://localhost:${port}`);
 app.listen(port);

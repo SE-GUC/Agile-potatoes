@@ -1,5 +1,6 @@
 const Vacancy = require('../models/vacancyModel');
 const Partner = require('../models/partnerModel');
+const Admin = require('../models/adminModel');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -52,6 +53,38 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
+router.post('/CreateVacancy', function (req, res) {
+    var userId = req.body.id;   //should come from session
+  
+    var description = req.body.description; 
+    var duration = req.body.duration;    
+    var location = req.body.location; 
+    var salary = req.body.salary;    
+    var dailyHours = req.body.dailyHours; 
+    var partner = req.body.partner; 
+    var vacancy = new Vacancy({description:description,duration:duration,location:location,salary:salary,dailyHours:dailyHours,partner:partner});
+    vacancy.url= '/api/vacancy/' + vacancy._id;
+    vacancy.save(function(err){
+        if(err) return handleError(err);
+    });
+
+});
+ //15    
+router.get('/:id/comment', function (req,res) { 
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId;    //should come from session
+    var vacId = req.params.id;
+     if (userType == 'Admin' || userType == 'Partner'){  //only partners and admins can access vacancies' comments section
+
+         Vacancy.findById(vacId)
+          .exec(function(err,vacancy){
+             vacancy.commentsByPartner.populate('author');
+             vacancy.commentsByAdmin.populate('author');
+             var Allcomments = vacancy.commentsByAdmin.concat(vacancy.commentsByPartner); // putting all comments in one object
+             res.send(Allcomments);
+          })
+     }
+    })
 
 ////////// 16
 router.get('/:id/applicants', function (req, res) {
@@ -103,7 +136,7 @@ return res.send("deleted");
 
 );
 
-router.get(('/:id', function(req,res){
+router.get('/:id', function(req,res){
 
     var userType=req.body.userType;
     var pendingVacancies=[];
@@ -126,4 +159,84 @@ return  res.send(pendingVacancies);
 });
 
 
+
+router.put('/:id/status', function(req,res){
+    var userType = req.body.userType;
+    var vacId = req.params.id;
+    var vacStatus = req.body.status;
+    if (userType == 'Admin'&&  Vacancy.status== 'Submitted'){
+        Vacancy.findByIdAndUpdate(vacId, {status: vacStatus}, 
+          function(err, response){
+          console.log(response);
+        });
+                    
+    }
+    else if (userType == 'Partner' &&  Vacancy.status== 'Open'){
+        Vacany.findByIdAndUpdate(vacId, {status: vacStatus}, 
+        function(err, response){
+           console.log(response);
+         });
+    }        
+    return res.send("Status Updated");
+});
+
+
+
+
+
+
+
+
+////////////// Story 22.1 : A partner can view his vacancy
+router.get('/:id/', function(req, res){  //showing non approved vacancy to be updated and checking if its pending
+
+    var userType = req.body.userType ;  //should come from session
+    var userId = req.body.id ;      //should come from session
+    var vacId = req.params.id ;
+
+    Vacancy.findById(vacId, 'duration location description salary dailyHours').exec(function (err, vacancy){
+
+        if(userType === 'Partner' && userId === vacancy.partner && vacancy.status === 'Submitted')
+        {
+            return res.send(vacancy) ;
+        }
+        else{
+            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited") ;
+        }
+    })
+})
+
+////////////// Story 22.2 : A partner can update his vacancy
+router.post('/:id/', function(req, res){  //submitting edited vacancy
+    
+    var vacId = req.params.id ;
+    var duration = req.body.duration ;
+    var location = req.body.location ;
+    var description = req.body.description ;
+    var salary = req.body.salary ;
+    var dailyhours = req.body.dailyHours ;
+
+    Vacancy.findById(vacId).exec(function(err,vacancy){
+
+        if(err)
+        {
+            return res.send(err) ;
+        }        
+        if(vacancy.status === 'Submitted')
+        {
+        
+            vacancy.duration = duration ;
+            vacancy.location = location ;
+            vacancy.description = description ;
+            vacancy.salary = salary ;
+            vacancy.dailyhours = dailyhours ;
+
+            vacancy.save();
+        }
+        else{
+            res.send('Vacancy cannot be edited after being approved') ;
+        }
+    })
+})
 module.exports = router;
+

@@ -1,5 +1,5 @@
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
-    return "enter connection string here"
+    return "enter connection string here" ;
 }
 
 const getDevelopmentPort = function () {
