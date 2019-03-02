@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
-
+// story 3 : create event as admin or partner
 router.post('/:id/CreateEvent', function (req, res) {
 	var userType = req.body.userType; //should come from session
 	var userId = req.params.id;    //should come from session
@@ -74,6 +74,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 	return res.send("created event successfully");
 });
 
+// story 18 : view pending events
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
