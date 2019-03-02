@@ -69,4 +69,61 @@ router.get('/:id/applicants', function (req, res) {
                 return res.send('you are not allowed to view this')
         })
 })
+
+router.delete('/', function(req,res){
+    var userType=req.body.userType;
+    var vacId= req.params.id;
+
+    if(userType == 'Partner')
+    {
+        Vacancy.findById(vacId)
+        .exec(function(err,vacancy){
+            if(vacancy.status=='Submitted')
+            {
+                Vacancy.deleteOne(vacancy,function(err,result){
+                    if(err)
+                    {
+                        handleError(err);
+                    }
+                    vacancy.save();
+                })
+            }
+
+
+        }
+        
+        
+        )
+    }
+
+
+return res.send("deleted");
+
+}
+
+);
+
+router.get(('/:id', function(req,res){
+
+    var userType=req.body.userType;
+    var pendingVacancies=[];
+
+
+    if(userType=='Admin')
+    {
+        Vacancy.find().array.forEach(vacancy => {
+            if(vacancy.status=='Submitted')
+            {
+                pendingVacancies.push(vacancy);
+            }
+        });
+    }
+
+
+return  res.send(pendingVacancies);
+
+
+});
+
+
 module.exports = router;
