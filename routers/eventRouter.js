@@ -125,6 +125,44 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 
+router.delete('/', function(req,res){
+    var userType=req.body.userType;
+    var evId= req.params.id;
+
+    if(userType == 'Partner')
+    {
+        Event.findById(vacId)
+        .exec(function(err,event){
+            if(event.status=='Submitted')
+            {
+                Event.deleteOne(event,function(err,result){
+                    if(err)
+                    {
+                        handleError(err);
+                    }
+                    event.save();
+                })
+            }
+
+
+        }
+        
+        
+        )
+    }
+
+
+return res.send("deleted");
+
+}
+
+
+
+
+
+);
+
+
 //user story 21: As a partner I can update my pending events
 router.put('/:id', async (req, res) => {
 	var userType = 'Partner' //should come from session
