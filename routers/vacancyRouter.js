@@ -50,9 +50,9 @@ router.post('/:id', function (req, res) {
     var applicants = req.body.applicants; //should come from session
     var commentsByAdmin = req.body.commentsByAdmin;    //should come from session
     var commentsByPartner = req.body.commentsByPartner; //should come from session
-    var vacancy = new Vacancy({description:'description},{duration:duration},{location:location},{salary:salary},{dailyHours:dailyHours},
+    var vacancy = new Vacancy({description:description},{duration:duration},{location:location},{salary:salary},{dailyHours:dailyHours},
     {postDate:postDate},{status:status},{url:url},{partner:partner},{admin:admin},{applicants:applicants},
-    {commentsByAdmin:commentsByAdmin},{commentsByPartner:commentsByPartner}});
+    {commentsByAdmin:commentsByAdmin},{commentsByPartner:commentsByPartner});
     vacancy.save(function(err){
         if(err) return handleError(err);
     }
