@@ -98,8 +98,7 @@ router.put('/:id/status', function(req,res){
 
 
 
-////////////// 22
-
+////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function(req, res){  //showing non approved vacancy to be updated and checking if its pending
 
     var userType = req.body.userType ;  //should come from session
@@ -118,7 +117,7 @@ router.get('/:id/', function(req, res){  //showing non approved vacancy to be up
     })
 })
 
-
+////////////// Story 22.2 : A partner can update his vacancy
 router.post('/:id/', function(req, res){  //submitting edited vacancy
     
     var vacId = req.params.id ;
