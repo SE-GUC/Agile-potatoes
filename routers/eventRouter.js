@@ -1,13 +1,86 @@
+
+var express = require('express');
+var router = express.Router();
 const Event = require('../models/eventModel');
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
-const express = require('express');
 const bodyParser = require('body-parser');
-const router = express.Router();
 
-	router.use(bodyParser.json()); //parsing out json out of the http request body
-	router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
-	
+router.use(bodyParser.json()); //parsing out json out of the http request body
+router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
+
+
+
+// Story 3, 4: creating events	
+router.post('/:id/CreateEvent', function (req, res) {
+	var userType = req.body.userType; //should come from session
+	var userId = req.params.id;    //should come from session
+	var eventId = req.body.eventId;
+	var description = req.body.description;
+	var price = req.body.price;
+	var location = req.body.location;
+	var eventDate = req.body.date;
+	var remainingPlaces = req.body.places;
+	var eventType = req.body.eventtype;
+	var speakers = req.body.speakers;
+	var topics = req.body.topics;
+	if (userType == 'Admin') {
+		Admin.findById(userId).exec(function (err, admin) {
+			console.log(Admin.event);
+			admin.events.push(eventId)
+			admin.save();
+		});
+
+		var event = new Event({
+			description: description,
+			price: price,
+			location: location,
+			eventDate: eventDate,
+			eventStatus: 'Approved',
+			remainingPlaces: remainingPlaces,
+			eventType: eventType,
+			url: '/api/event/' + eventId,
+			speakers: speakers,
+			topics: topics
+		});
+		event.save(function (err, eve) {
+			if (err) throw err;
+			console.log(eve);
+		})
+
+	}
+	else if (userType == 'Partner') {
+		Partner.findById(userId).exec(function (err, partner) {
+			console.log(Partner.event);
+			partner.events.push(eventID)
+			partner.save();
+		});
+
+		var event = new Event({
+			description: description,
+			price: price,
+			location: location,
+			eventDate: eventDate,
+			eventStatus: 'Submitted',
+			remainingPlaces: remainingPlaces,
+			eventType: eventType,
+			url: '/api/event/' + eventId,
+			speakers: speakers,
+			topics: topics
+		});
+		event.save(function (err, eve) {
+			if (err) throw err;
+			console.log(eve);
+		})
+
+
+	}
+	return res.send("created event successfully");
+});
+
+
+
+
 	//15
 	router.get('/:id/comment', function (req,res) {
 		var userType = req.body.userType; //should come from session
@@ -24,106 +97,31 @@ const router = express.Router();
 			  })
 		 }
 		})	
-	
-// Strory 3, 4: creating events	
-router.post('/CreateEvent', function (req,res) {
-	    var userType = req.body.userType; //should come from session
-	    var userId = req.body.id;    //should come from session
-	
-	    var description = req.body.description;
-	    var price = req.body.price;
-	    var location = req.body.location;
-	    var eventDate = req.body.date;
-	    var remainingPlaces = req.body.places;
-	    var eventType = req.body.eventType;
-	    var speakers = req.body.speakers;
-	    var topics = req.body.topics;
-	    if (userType == 'Admin'){
-	        
-	        
-	        var event = new Event({
-	            description: description,
-	                price: price,
-	                location: location,
-	                eventDate: eventDate,
-	                eventStatus:'Approved', 
-	                remainingPlaces: remainingPlaces,
-	                eventType:eventType,
-	                speakers: speakers,
-	                topics: topics
-	        });
-		event.url;  '/api/event/'+event._id ;
-	        event.save(function(err,eve)
-	        {
-	            if(err) throw err;
-	            console.log(eve);
-		})
-		Admin.findById(userId).exec(function(err,admin){
-	            console.log(Admin.event);
-	            admin.events.push(event._id)
-				admin.save();
-	        });
-			
-	    } 
-	    else if (userType == 'Partner') {
-	        
-	        
-	        var event = new Event({
-	            description: description,
-	                price: price,
-	                location: location,
-	                eventDate: eventDate,
-	                eventStatus:'Submitted',
-	                remainingPlaces: remainingPlaces,
-	                eventType:eventType,
-	                speakers: speakers,
-	                topics: topics
-	        });
-		event.url;  '/api/event/'+event._id ;
-	        event.save(function(err,eve)
-	        {
-	            if(err) throw err;
-	            console.log(eve);
-	        })
-		Partner.findById(userId).exec(function(err,partner){
-	            console.log(Partner.event);
-				partner.events.push(event._id)
-				partner.save();
-	        });	
-	
-	    }
-	    return res.send("created event successfully");
-	});
-	
 
 // Story 18 : viewing pending event requests as admin
-	router.get('/PendingEvents', function (req, res) {
-	    var usertype = req.body.usertype
-	   if(usertype == 'Admin')
-	    {
-	        Event.find({eventStatus: 'Submitted'},function(err,response)
-	        {
-              return res.send(response);
-	            console.log(response);
-	        });
-	    }
-	    else
-	    {
-	        return res.send('This Information is not accessible!');
-		}
+router.get('/PendingEvents', function (req, res) {
+	var usertype = req.body.usertype
+	if (usertype == 'Admin') {
+		Event.find({ eventStatus: 'Submitted' }, function (err, response) {
+			return res.send(response);
+			console.log(response);
+		});
+	}
+	else {
+		return res.send('This Information is not accessible!');
+	}
 });
 
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
 
-	Event.find({'eventStatus.type': 'Approved'} ,function(err,events){
-		if(err)
-	    {
-		    return console.log(err) ;
-	    }
-	  return res.send(events) ;
-    })
+	Event.find({ 'eventStatus.type': 'Approved' }, function (err, events) {
+		if (err) {
+			return console.log(err);
+		}
+		return res.send(events);
+	})
 })
 
 
