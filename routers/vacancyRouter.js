@@ -133,7 +133,7 @@ router.post('/:id/', function(req, res){  //submitting edited vacancy
         if(err)
         {
             return res.send(err) ;
-        }
+        }        
         if(vacancy.status === 'Submitted')
         {
         
@@ -141,7 +141,7 @@ router.post('/:id/', function(req, res){  //submitting edited vacancy
             vacancy.location = location ;
             vacancy.description = description ;
             vacancy.salary = salary ;
-            vaccancy.dailyhours = dailyhours ;
+            vacancy.dailyhours = dailyhours ;
 
             vacancy.save();
         }
