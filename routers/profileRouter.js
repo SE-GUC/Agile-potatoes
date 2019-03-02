@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
-///////////////// 12
+
+//user story 12
 router.get('/:id',function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId; //should come from session
@@ -85,31 +86,20 @@ router.put('/:id',function (req, res) {
     if(req.body.boardMembers){
         var members = req.body.boardMembers;
     }
-    if(req.body.vacancies){
-        var vac = req.body.vacancies;
-    }
     if(req.body.password){
         var pwd = req.body.password;
-    }
-    if(req.body.events){
-        var evs = req.body.events;
     }
     if(userType == 'Partner'){
         if(partnerID == userID){
             Partner.findById(partnerID).exec(function (err, partner) {
                 if(members){
-                    console.log("yes fe members to push");
-                    partner.boardMembers.push(members);
-                }
-                if(vac){
-                    partner.vacancies.push(vac);
-                }
-                if(evs){
-                    partner.events.push(evs);
+                    console.log("yes there's members to push");
+                    partner.boardMembers = members;
                 }
                 if(pwd){
                     partner.password = pwd;
                 }
+                res.send({msg: "updated", members, pwd});
                 partner.save();
             });
         }
