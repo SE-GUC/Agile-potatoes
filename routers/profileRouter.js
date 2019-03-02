@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
-///////////////// 12
+
+//user story 12
 router.get('/:id',function (req,res) {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId; //should come from session
@@ -28,6 +29,7 @@ router.get('/:id',function (req,res) {
         else if (userType == 'Member'){
             Member.findById({_id: profId}, function (err, memberDoc) {
                 if (err) throw err;
+                console.log("I am heeerrreeee");
                 res.send(memberDoc);
             })
         }
@@ -55,6 +57,55 @@ router.get('/:id',function (req,res) {
     }
     return ;
 })
+
+
+//user story 8: As a Member I can post feedback to a Partner I previously worked with
+router.post('/:id/feedback', function (req,res) {
+    var userType = req.body.userType; //should come from session (has to be Member)
+    var userID = req.body.userID;    //should come from session (the writer of the feedback comment)
+    var partnerID = req.params.id;
+    var comment = req.body.comment;
+    if(userType == 'Member') {
+        Partner.findById(partnerID).exec(function (err, partner) {
+            partner.feedbacks.push({
+                text: comment,
+                author: userID
+                });
+            partner.save();
+        });
+        return res.send("Feedback added");
+    }
+});
+
+//user story: As a Partner I can update my profile (Board Members, Pending vacancies, Password, Pending events).
+//still not done
+router.put('/:id',function (req, res) {
+    var userType = req.body.userType; //should come from session
+    var userID = req.body.userID; //should come from session (person logged in)
+    var partnerID = req.params.id; //the ID of the partner I want to update
+    if(req.body.boardMembers){
+        var members = req.body.boardMembers;
+    }
+    if(req.body.password){
+        var pwd = req.body.password;
+    }
+    if(userType == 'Partner'){
+        if(partnerID == userID){
+            Partner.findById(partnerID).exec(function (err, partner) {
+                if(members){
+                    console.log("yes there's members to push");
+                    partner.boardMembers = members;
+                }
+                if(pwd){
+                    partner.password = pwd;
+                }
+                res.send({msg: "updated", members, pwd});
+                partner.save();
+            });
+        }
+    }
+});
+        
 
 
 router.put('/:id/name', function(req,res){
