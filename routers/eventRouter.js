@@ -10,8 +10,8 @@ var express = require('express');
 	
 	
 	
-	
-	router.post('/:id/CreateEvent', function (req,res) {
+// Strory 3, 4: creating events	
+router.post('/:id/CreateEvent', function (req,res) {
 	    var userType = req.body.userType; //should come from session
 	    var userId = req.params.id;    //should come from session
 	    var eventId = req.body.eventId;
@@ -79,36 +79,52 @@ var express = require('express');
 	    return res.send("created event successfully");
 	});
 	
+
+// Story 18 : viewing pending event requests as admin
 	router.get('/PendingEvents', function (req, res) {
 	    var usertype = req.body.usertype
 	   if(usertype == 'Admin')
 	    {
-	        Event.find({eventStatus: 'Submitted'},function(err,respomse)
+	        Event.find({eventStatus: 'Submitted'},function(err,response)
 	        {
+              return res.send(response);
 	            console.log(response);
 	        });
-	
 	    }
 	    else
 	    {
 	        return res.send('This Information is not accessible!');
 		}
-		return res.send("pending events loaded successfully");
-	});
+});
 
 
-
-/////////////// 14
-router.get('/events', function (req, res) {
+// Story 14 : viewing approved events as admin/partner/member
+router.get('/ApprovedEvents', function (req, res) {
 
 	Event.find({'eventStatus.type': 'Approved'} ,function(err,events){
 		if(err)
 	    {
 		    return console.log(err) ;
 	    }
-	  return (events) ;
+	  return res.send(events) ;
     })
 })
+
+
+//user story 21: As a partner I can update my pending events
+router.put('/:id', async (req, res) => {
+	var userType = 'Partner' //should come from session
+	var userID = '5c7945fe1c9d440000ec7811' //should come from session
+	var creatorID = '5c7945fe1c9d440000ec7811'; //should come from event itself
+	var id = req.params.id;
+	if (userType == 'Partner' && creatorID == userID) {     //partner updating HIS event
+		var values = req.body;
+		await Events.update({ _id: id }, values);
+		res.json({ msg: 'Event updated successfully' });
+	}
+	else
+		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
+});
 
 
 module.exports = router;

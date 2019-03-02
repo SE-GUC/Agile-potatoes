@@ -1,5 +1,5 @@
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
-    return "mongodb+srv://Islam98:<1871998>@lirtenhub-qoiuq.mongodb.net/test?retryWrites=true" ;
+    return "enter your connection string here" ;
 }
 
 const getDevelopmentPort = function () {
