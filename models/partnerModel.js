@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const PartnerSchema = new Schema({
     username:{type:String, required:true, unique:true},
-    password:{type:String, required:true, unique:true},
+    password:{type:String, required:true},
     name: {type:String, unique: true},
     email:{type:String, required:true, unique:true},
     boardMembers:[{
@@ -19,7 +19,8 @@ const PartnerSchema = new Schema({
     membershipExpiryDate:Date,
     availability:Boolean,
     workfeild:String,
-    vacancies:[{type: mongoose.ObjectId,
+    vacancies:[{
+        type: mongoose.ObjectId,
         ref: 'Vacancy'
     }],
     membershipState:{

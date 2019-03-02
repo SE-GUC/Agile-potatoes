@@ -23,11 +23,11 @@ const EventSchema = new Schema({
     topics: [String],
     feedbacks: [String],
     partner:{
-        type:mongoose.ObjectId,
+        type: mongoose.ObjectId,
         ref: 'Partner'
     },
     attendees:[{
-        type:mongoose.ObjectId,
+        type: mongoose.ObjectId,
         ref: 'Member'
     }],
     commentsByAdmin: [{
