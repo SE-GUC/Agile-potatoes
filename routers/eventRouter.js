@@ -11,24 +11,20 @@ const router = express.Router();
 	
 	
 // Strory 3, 4: creating events	
-router.post('/:id/CreateEvent', function (req,res) {
+router.post('/CreateEvent', function (req,res) {
 	    var userType = req.body.userType; //should come from session
-	    var userId = req.params.id;    //should come from session
-	    var eventId = req.body.eventId;
+	    var userId = req.body.id;    //should come from session
+	
 	    var description = req.body.description;
 	    var price = req.body.price;
 	    var location = req.body.location;
 	    var eventDate = req.body.date;
 	    var remainingPlaces = req.body.places;
-	    var eventType = req.body.eventtype;
+	    var eventType = req.body.eventType;
 	    var speakers = req.body.speakers;
 	    var topics = req.body.topics;
 	    if (userType == 'Admin'){
-	        Admin.findById(userId).exec(function(err,admin){
-	            console.log(Admin.event);
-	            admin.events.push(eventId)
-				admin.save();
-	        });
+	        
 	        
 	        var event = new Event({
 	            description: description,
@@ -36,25 +32,26 @@ router.post('/:id/CreateEvent', function (req,res) {
 	                location: location,
 	                eventDate: eventDate,
 	                eventStatus:'Approved', 
-	                  remainingPlaces: remainingPlaces,
+	                remainingPlaces: remainingPlaces,
 	                eventType:eventType,
-	                url:  '/api/event/'+eventId,
 	                speakers: speakers,
 	                topics: topics
 	        });
+		event.url:  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
 	            console.log(eve);
-			})
+		})
+		Admin.findById(userId).exec(function(err,admin){
+	            console.log(Admin.event);
+	            admin.events.push(event._id)
+				admin.save();
+	        });
 			
 	    } 
 	    else if (userType == 'Partner') {
-	        Partner.findById(userId).exec(function(err,partner){
-	            console.log(Partner.event);
-				partner.events.push(eventID)
-				partner.save();
-	        });
+	        
 	        
 	        var event = new Event({
 	            description: description,
@@ -64,16 +61,20 @@ router.post('/:id/CreateEvent', function (req,res) {
 	                eventStatus:'Submitted',
 	                remainingPlaces: remainingPlaces,
 	                eventType:eventType,
-	                url:  '/api/event/'+eventId,
 	                speakers: speakers,
 	                topics: topics
 	        });
+		event.url:  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
 	            console.log(eve);
 	        })
-			
+		Partner.findById(userId).exec(function(err,partner){
+	            console.log(Partner.event);
+				partner.events.push(event._id)
+				partner.save();
+	        });	
 	
 	    }
 	    return res.send("created event successfully");
