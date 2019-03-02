@@ -1,34 +1,30 @@
-var express = require('express');
-	var router = express.Router();
-	const Event = require('../models/eventModel');
-	const Partner = require('../models/partnerModel');
-	const Admin = require('../models/adminModel');
-	const bodyParser = require('body-parser');
-	
+const Event = require('../models/eventModel');
+const Partner = require('../models/partnerModel');
+const Admin = require('../models/adminModel');
+const express = require('express');
+const bodyParser = require('body-parser');
+const router = express.Router();
+
 	router.use(bodyParser.json()); //parsing out json out of the http request body
 	router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
 	
 	
 	
 // Strory 3, 4: creating events	
-router.post('/:id/CreateEvent', function (req,res) {
+router.post('/CreateEvent', function (req,res) {
 	    var userType = req.body.userType; //should come from session
-	    var userId = req.params.id;    //should come from session
-	    var eventId = req.body.eventId;
+	    var userId = req.body.id;    //should come from session
+	
 	    var description = req.body.description;
 	    var price = req.body.price;
 	    var location = req.body.location;
 	    var eventDate = req.body.date;
 	    var remainingPlaces = req.body.places;
-	    var eventType = req.body.eventtype;
+	    var eventType = req.body.eventType;
 	    var speakers = req.body.speakers;
 	    var topics = req.body.topics;
 	    if (userType == 'Admin'){
-	        Admin.findById(userId).exec(function(err,admin){
-	            console.log(Admin.event);
-	            admin.events.push(eventId)
-				admin.save();
-	        });
+	        
 	        
 	        var event = new Event({
 	            description: description,
@@ -36,25 +32,26 @@ router.post('/:id/CreateEvent', function (req,res) {
 	                location: location,
 	                eventDate: eventDate,
 	                eventStatus:'Approved', 
-	                  remainingPlaces: remainingPlaces,
+	                remainingPlaces: remainingPlaces,
 	                eventType:eventType,
-	                url:  '/api/event/'+eventId,
 	                speakers: speakers,
 	                topics: topics
 	        });
+		event.url:  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
 	            console.log(eve);
-			})
+		})
+		Admin.findById(userId).exec(function(err,admin){
+	            console.log(Admin.event);
+	            admin.events.push(event._id)
+				admin.save();
+	        });
 			
 	    } 
 	    else if (userType == 'Partner') {
-	        Partner.findById(userId).exec(function(err,partner){
-	            console.log(Partner.event);
-				partner.events.push(eventID)
-				partner.save();
-	        });
+	        
 	        
 	        var event = new Event({
 	            description: description,
@@ -64,16 +61,20 @@ router.post('/:id/CreateEvent', function (req,res) {
 	                eventStatus:'Submitted',
 	                remainingPlaces: remainingPlaces,
 	                eventType:eventType,
-	                url:  '/api/event/'+eventId,
 	                speakers: speakers,
 	                topics: topics
 	        });
+		event.url:  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
 	            console.log(eve);
 	        })
-			
+		Partner.findById(userId).exec(function(err,partner){
+	            console.log(Partner.event);
+				partner.events.push(event._id)
+				partner.save();
+	        });	
 	
 	    }
 	    return res.send("created event successfully");
@@ -126,5 +127,35 @@ router.put('/:id', async (req, res) => {
 		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
 });
 
+router.use(bodyParser.json()); 
+router.use(bodyParser.urlencoded({extended: true})) 
 
+router.post('/:id/comment', function (req,res) {
+    var userType = req.body.userType; 
+    var userId = req.body.userId;   
+    var comment = req.body.comment;
+    var evId = req.params.id;
+    if (userType == 'Admin'){
+        Event.findById(evId)
+            .exec(function (err, event) {
+                event.commentsByAdmin.push({
+                    text: comment,
+                    author: userId
+                });
+                event.save(); 
+            });
+    } 
+    else if (userType == 'Partner') {
+        Event.findById(evId)
+            .exec(function (err, event) {
+                console.log(event.commentsByPartner);
+                event.commentsByPartner.push({
+                    text: comment,
+                    author: userId
+                });
+                event.save(); 
+            });
+    }
+    return res.send("updated");
+});
 module.exports = router;
