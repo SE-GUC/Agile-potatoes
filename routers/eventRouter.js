@@ -78,6 +78,26 @@ router.post('/:id/CreateEvent', function (req, res) {
 	return res.send("created event successfully");
 });
 
+
+
+
+	//15
+	router.get('/:id/comment', function (req,res) {
+		var userType = req.body.userType; //should come from session
+		var userId = req.body.userId;    //should come from session
+		var eveId = req.params.id;
+		 if (userType == 'Admin' || userType == 'Partner'){ //only partners and admins can access events' comments section
+	
+			 Event.findById(eveId)
+			  .exec(function(err,event){
+				 event.commentsByPartner.populate('author');
+				 event.commentsByAdmin.populate('author');
+				 var Allcomments = event.commentsByAdmin.concat(event.commentsByPartner); // putting all comments in one object
+				 res.send(Allcomments);
+			  })
+		 }
+		})	
+
 // Story 18 : viewing pending event requests as admin
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
