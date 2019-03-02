@@ -92,5 +92,91 @@ router.put('/:id/status', function(req,res){
 });
 
 
+
+
+
+
+
+
+////////////// 22
+router.get('/:id/updateVacancy/',function(req, res){    //showing all vacancies owned by partner
+    var userType = req.body.userType ;  //should come from session
+    var userId = req.params.id ;      //should come from session
+
+    if(userType === 'Partner')
+    {
+        Vacancy.find({'partner': userId},function(err,vacancies){
+            if(vacancies)
+            {
+                return res.send(vacancies) ;
+            }
+            else
+            {
+                return res.send("You don't have vacancies yet") ;
+            }
+        
+        })
+    }
+    else
+    {
+       return res.send('You cannot update vacancies without being partner');
+    }
+
+})
+
+router.get('/:id1/updateVacancy/:id2/', function(req, res){  //showing specific vacancy to be updated and checking if its pending
+
+    var userType = req.body.userType ;  //should come from session
+    var userId = req.params.id1 ;      //should come from session
+    var vacId = req.params.id2 ;
+
+    Vacancy.findById(vacId).exec(function (err, vacancy){
+
+        if(userType === 'Partner' && userId === vacancy.partner && vacancy.status === 'Submitted')
+        {
+            return res.send(vacancy) ;
+        }
+        else{
+            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited") ;
+        }
+    })
+
+})
+
+
+router.post('/:id1/updateVacancy/:id2/', function(req, res){  //submitting edited vacancy
+
+    var userType = req.body.userType ;
+    var userId = req.params.id1 ;
+    
+    var vacId = req.params.id2 ;
+    var duration = req.body.duration ;
+    var location = req.body.location ;
+    var description = req.body.description ;
+    var salary = req.body.salary ;
+    var dailyhours = req.body.dailyhours ;
+
+    Vacancy.findById(vacId).exec(function(err,vacancy){
+
+        if(err)
+        {
+            return res.send(err) ;
+        }
+        if(vacancy.status === 'Submitted')
+        {
+        
+            vacancy.duration = duration ;
+            vacancy.location = location ;
+            vacancy.description = description ;
+            vacancy.salary = salary ;
+            vaccancy.dailyhours = dailyhours ;
+
+            vacancy.save();
+        }
+        else{
+            res.send('vacancy cannot be edited after being approved') ;
+        }
+    })
+})
 module.exports = router;
 
