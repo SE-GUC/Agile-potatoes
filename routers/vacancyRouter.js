@@ -1,5 +1,6 @@
 const Vacancy = require('../models/vacancyModel');
 const Partner = require('../models/partnerModel');
+const Admin = require('../models/adminModel');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -59,6 +60,10 @@ router.post('/:id', function (req, res) {
     );
 
 });
+
+
+
+
      
 
 
