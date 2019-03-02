@@ -193,4 +193,122 @@ router.post('/create', function (req, res) {
 });
 
 
+
+//add feedback to partner
+router.put('/:id/feedback', function (req,res) {
+
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId;    //should come from session
+    var feedback = req.body.feedback;
+    var memberId = req.params.id;
+    console.log(memberId);
+    if (userType == 'Partner'){
+        
+
+        Member.findById(memberId)
+            .exec(function (err, member) {    
+               
+                    member.reviews.push({
+                        text: feedback,
+                        partner: userId
+                    });
+                    member.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
+                console.log(member);
+            });
+        Member.findById(memberId) //notify the member
+            .exec(function (err, member) {
+                member.notifications.push({
+                    srcURL: '/api/feedback/' + memberId,
+                    description: 'Partner reviewed your performance in his vacancy'
+                });
+                console.log(member)
+               member.save(); 
+            });
+    } else{res.send("only partners can add feedback");}
+
+res.send("finished");
+
+});
+
+router.put('/:id/update',function(req,res){
+    var userTypeU = req.body.userType; //should come from session
+    var userId = req.body.userId;    //should come from session
+    var memberId = req.params.id;
+
+    var addressU = req.body.address;
+    var lnameU = req.body.lname;
+    var fnameU = req.body.fname;
+    var passwordU = req.body.password;
+    var interestsU = req.body.interests;
+    var skillsU = req.body.skills;
+    var memberStateU = req.body.memberState;
+    var membershipExpiryDateU = req.body.membershipExpiryDate;
+    
+  //Address, Name, Password, Skills, Interests
+
+
+  if(userTypeU=='Member'&&userId==memberId){
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.address = addressU;
+        doc.save();
+    });
+   
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.lname = lnameU;
+        doc.save();
+    });
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.fname = fnameU;
+        doc.save();
+    });
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.password = passwordU;c
+        doc.save();
+    });
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.interests = interestsU;
+        doc.save();
+    });
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.skills = skillsU;
+        doc.save();
+    });
+
+}
+//Membership Expiry Date, Member State
+else if(userTypeU=='Admin'){
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.membershipExpiryDate = membershipExpiryDateU;
+        doc.save();
+    });
+
+    Member.findById(memberId)
+    .exec(function(err,doc){         
+        
+        doc.userType = userTypeU;
+        doc.save();
+    });
+}
+else {res.send("not your profile")}
+
+
+res.send('updated');
+    
+});
+
+
 module.exports = router;
