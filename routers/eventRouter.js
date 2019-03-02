@@ -1,3 +1,4 @@
+
 var express = require('express');
 var router = express.Router();
 const Event = require('../models/eventModel');
@@ -77,7 +78,6 @@ router.post('/:id/CreateEvent', function (req, res) {
 	return res.send("created event successfully");
 });
 
-
 // Story 18 : viewing pending event requests as admin
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
@@ -120,5 +120,35 @@ router.put('/:id', async (req, res) => {
 		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
 });
 
+router.use(bodyParser.json()); 
+router.use(bodyParser.urlencoded({extended: true})) 
 
+router.post('/:id/comment', function (req,res) {
+    var userType = req.body.userType; 
+    var userId = req.body.userId;   
+    var comment = req.body.comment;
+    var evId = req.params.id;
+    if (userType == 'Admin'){
+        Event.findById(evId)
+            .exec(function (err, event) {
+                event.commentsByAdmin.push({
+                    text: comment,
+                    author: userId
+                });
+                event.save(); 
+            });
+    } 
+    else if (userType == 'Partner') {
+        Event.findById(evId)
+            .exec(function (err, event) {
+                console.log(event.commentsByPartner);
+                event.commentsByPartner.push({
+                    text: comment,
+                    author: userId
+                });
+                event.save(); 
+            });
+    }
+    return res.send("updated");
+});
 module.exports = router;
