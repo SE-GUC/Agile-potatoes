@@ -36,7 +36,42 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
+router.post('/:id', function (req, res) {
+    var description = req.body.description; //should come from session
+    var duration = req.body.duration;    //should come from session
+    var location = req.body.location; //should come from session
+    var salary = req.body.salary;    //should come from session
+    var dailyHours = req.body.dailyHours; //should come from session
+    var postDate = req.body.postDate;    //should come from session
+    var status = req.body.status; //should come from session
+    var url = req.body.url;    //should come from session
+    var partner = req.body.partner; //should come from session
+    var admin = req.body.admin;    //should come from session
+    var applicants = req.body.applicants; //should come from session
+    var commentsByAdmin = req.body.commentsByAdmin;    //should come from session
+    var commentsByPartner = req.body.commentsByPartner; //should come from session
+    var vacancy = new Vacancy({description:'description},{duration:duration},{location:location},{salary:salary},{dailyHours:dailyHours},
+    {postDate:postDate},{status:status},{url:url},{partner:partner},{admin:admin},{applicants:applicants},
+    {commentsByAdmin:commentsByAdmin},{commentsByPartner:commentsByPartner}});
+    vacancy.save(function(err){
+        if(err) return handleError(err);
+    }
+    );
 
+});
+     
+
+
+
+
+
+
+
+
+
+
+
+)
 
 router.get('/:id/applicants', function (req, res) {
     var userId = req.body.userId; //should come from session
