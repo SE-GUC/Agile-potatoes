@@ -8,7 +8,22 @@ const router = express.Router();
 	router.use(bodyParser.json()); //parsing out json out of the http request body
 	router.use(bodyParser.urlencoded({extended: true})) //handle url encoded data
 	
+	//15
+	router.get('/:id/comment', function (req,res) {
+		var userType = req.body.userType; //should come from session
+		var userId = req.body.userId;    //should come from session
+		var eveId = req.params.id;
+		 if (userType == 'Admin' || userType == 'Partner'){ //only partners and admins can access events' comments section
 	
+			 Event.findById(eveId)
+			  .exec(function(err,event){
+				 event.commentsByPartner.populate('author');
+				 event.commentsByAdmin.populate('author');
+				 var Allcomments = event.commentsByAdmin.concat(event.commentsByPartner); // putting all comments in one object
+				 res.send(Allcomments);
+			  })
+		 }
+		})	
 	
 // Strory 3, 4: creating events	
 router.post('/CreateEvent', function (req,res) {
@@ -37,7 +52,7 @@ router.post('/CreateEvent', function (req,res) {
 	                speakers: speakers,
 	                topics: topics
 	        });
-		event.url:  '/api/event/'+event._id ;
+		event.url;  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
@@ -64,7 +79,7 @@ router.post('/CreateEvent', function (req,res) {
 	                speakers: speakers,
 	                topics: topics
 	        });
-		event.url:  '/api/event/'+event._id ;
+		event.url;  '/api/event/'+event._id ;
 	        event.save(function(err,eve)
 	        {
 	            if(err) throw err;
