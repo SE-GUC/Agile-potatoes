@@ -136,7 +136,7 @@ return res.send("deleted");
 
 );
 
-router.get('/:id', function(req,res){
+router.get('/pendingVacancies', function(req,res){
 
     var userType=req.body.userType;
     var pendingVacancies=[];
@@ -194,9 +194,9 @@ router.get('/:id/', function(req, res){  //showing non approved vacancy to be up
     var userId = req.body.id ;      //should come from session
     var vacId = req.params.id ;
 
-    Vacancy.findById(vacId, 'duration location description salary dailyHours').exec(function (err, vacancy){
+    Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy){
 
-        if(userType === 'Partner' && userId === vacancy.partner && vacancy.status === 'Submitted')
+        if(userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted')
         {
             return res.send(vacancy) ;
         }
