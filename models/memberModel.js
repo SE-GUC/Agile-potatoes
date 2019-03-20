@@ -8,7 +8,7 @@ const MemberSchema = new Schema({
     fname:{type:String, required:true},
     lname:{type:String, required:true},
     email:{type:String, required:true, unique:true},
-    address:{type:String, required:true},
+    address:{type:String,lowercase:true, required:true},
     notifications: [{
         seen:{type:Boolean, default:false},
         srcURL:String,
@@ -19,7 +19,11 @@ const MemberSchema = new Schema({
         type:Boolean,
         default:true
     },
-    skills: [String],
+    skills: [{
+        type: String,
+        lowercase: true,
+        trim: true
+    }],
     masterClasses: [String],
     certificates: [String],
     membershipState:{
@@ -32,7 +36,11 @@ const MemberSchema = new Schema({
         type: String,
         trim: true  
     },
-    interests: [String],  
+    interests: [{
+        type: String,
+        lowercase: true,
+        trim: true
+    }],
     events: [{
         type: mongoose.ObjectId,
         ref: 'Event'

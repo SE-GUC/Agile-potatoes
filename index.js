@@ -21,7 +21,6 @@ app.use('/api/event', eventRouter);
 
 //inserting an event id into a member doc
 
-
 console.log(`app is up and running ... on http://localhost:${port}`);
 app.listen(port);
 

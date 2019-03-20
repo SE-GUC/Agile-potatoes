@@ -145,24 +145,19 @@ router.get('/RecommendedEvents', function (req, res) {
 				.exec((err,events) => {
 					if(err) console.log(err);
 					for(event of events){
-						if ((event.city) && (member.address.toLocaleLowerCase()).includes(event.city.toLocaleLowerCase())) {
+						if ((event.city) && (member.address.includes(event.city))) {
 							recommendedEvents.push(event);
-							console.log('hi')
 						}
 						else if (member.interests.includes(event.eventType)) {
 							recommendedEvents.push(event);
-							console.log('hi')
 						}
 						else if (memberPastEventsTypes.includes(event.eventType)) {
 							recommendedEvents.push(event);
-							console.log('hi')
 						}
 					}
 					res.send(recommendedEvents);
 				})
 		})
-
-
 })
 
 router.delete('/', function(req,res){
