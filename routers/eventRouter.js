@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const Event = require('../models/eventModel');
+const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
 const bodyParser = require('body-parser');
@@ -17,8 +18,10 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var userId = req.params.id;    //should come from session
 	var eventId = req.body.eventId;
 	var description = req.body.description;
+	var name = req.body.name;
 	var price = req.body.price;
 	var location = req.body.location;
+	var city = req.body.city;
 	var eventDate = req.body.date;
 	var remainingPlaces = req.body.places;
 	var eventType = req.body.eventtype;
@@ -32,9 +35,11 @@ router.post('/:id/CreateEvent', function (req, res) {
 		});
 
 		var event = new Event({
+			name:name,
 			description: description,
 			price: price,
 			location: location,
+			city:city,
 			eventDate: eventDate,
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
@@ -116,7 +121,7 @@ router.get('/PendingEvents', function (req, res) {
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
 
-	Event.find({ 'eventStatus.type': 'Approved' }, function (err, events) {
+	Event.find({ 'eventStatus': 'Approved' }, function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -124,6 +129,41 @@ router.get('/ApprovedEvents', function (req, res) {
 	})
 })
 
+// Story 22.1 : viewing recommended events as a member (sprint 2)
+router.get('/RecommendedEvents', function (req, res) {
+	var userId = req.body.userId;
+	var memberPastEventsTypes = [];
+	var recommendedEvents = [];
+	Member.findById(userId)
+		.populate('events', 'eventType')
+		.exec((err,member)=>{	
+			if (err) console.log(err); // getting recommended events
+			member.events.map((event) => {
+				memberPastEventsTypes.push(event.eventType);
+			})
+			Event.find({'eventStatus': 'Approved'})
+				.exec((err,events) => {
+					if(err) console.log(err);
+					for(event of events){
+						if ((event.city) && (member.address.toLocaleLowerCase()).includes(event.city.toLocaleLowerCase())) {
+							recommendedEvents.push(event);
+							console.log('hi')
+						}
+						else if (member.interests.includes(event.eventType)) {
+							recommendedEvents.push(event);
+							console.log('hi')
+						}
+						else if (memberPastEventsTypes.includes(event.eventType)) {
+							recommendedEvents.push(event);
+							console.log('hi')
+						}
+					}
+					res.send(recommendedEvents);
+				})
+		})
+
+
+})
 
 router.delete('/', function(req,res){
     var userType=req.body.userType;

@@ -19,9 +19,9 @@ const MemberSchema = new Schema({
         type:Boolean,
         default:true
     },
-    skills: [{text:String}],
-    masterClasses: [{text:String}],
-    certificates: [{text:String}],
+    skills: [String],
+    masterClasses: [String],
+    certificates: [String],
     membershipState:{
         type: String,
         trim: true,
@@ -32,7 +32,7 @@ const MemberSchema = new Schema({
         type: String,
         trim: true  
     },
-    interests: [{text:String}],  
+    interests: [String],  
     events: [{
         type: mongoose.ObjectId,
         ref: 'Event'
