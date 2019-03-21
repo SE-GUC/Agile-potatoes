@@ -16,7 +16,6 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 router.post('/:id/CreateEvent', function (req, res) {
 	var userType = req.body.userType; //should come from session
 	var userId = req.params.id;    //should come from session
-	var eventId = req.body.eventId;
 	var description = req.body.description;
 	var name = req.body.name;
 	var price = req.body.price;
@@ -28,12 +27,6 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
 	if (userType == 'Admin') {
-		Admin.findById(userId).exec(function (err, admin) {
-			console.log(Admin.event);
-			admin.events.push(eventId)
-			admin.save();
-		});
-
 		var event = new Event({
 			name:name,
 			description: description,
@@ -44,24 +37,24 @@ router.post('/:id/CreateEvent', function (req, res) {
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
-			url: '/api/event/' + eventId,
 			speakers: speakers,
 			topics: topics
 		});
+		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
 		})
-
+		Admin.findById(userId).exec(function (err, admin) {
+			console.log(Admin.event);
+			admin.events.push(event._id)
+			admin.save();
+		});
+		return res.send("created event successfully" + " " + event._id);
 	}
 	else if (userType == 'Partner') {
-		Partner.findById(userId).exec(function (err, partner) {
-			console.log(Partner.event);
-			partner.events.push(eventID)
-			partner.save();
-		});
-
 		var event = new Event({
+			name:name,
 			description: description,
 			price: price,
 			location: location,
@@ -69,18 +62,24 @@ router.post('/:id/CreateEvent', function (req, res) {
 			eventStatus: 'Submitted',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
-			url: '/api/event/' + eventId,
 			speakers: speakers,
 			topics: topics
 		});
+
+		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
 		})
+		Partner.findById(userId).exec(function (err, partner) {
+					console.log(Partner.event);
+					partner.events.push(event._id)
+					partner.save();
+				});
 
-
+		return res.send("created event successfully" + " " + event._id);
 	}
-	return res.send("created event successfully");
+	
 });
 
 
@@ -107,11 +106,14 @@ router.post('/:id/CreateEvent', function (req, res) {
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }, function (err, response) {
-			return res.send(response);
-			console.log(response);
-		});
-	}
+		Event.find({ eventStatus: 'Submitted' }).exec(function (err, response) {
+			if(err) 
+			{	return res.send(err);}
+			else
+			{	return res.send(response);}
+		})
+		
+		}
 	else {
 		return res.send('This Information is not accessible!');
 	}
@@ -243,4 +245,5 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
+
 module.exports = router;
