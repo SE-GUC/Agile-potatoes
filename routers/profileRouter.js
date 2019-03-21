@@ -106,12 +106,11 @@ router.put('/:id', function (req, res) {
 });
 
 
-
 router.put('/:id/name', function (req, res) {
     var userType = req.body.userType;
-    var userId = req.body.userId;
-    var fname = req.body.name;
-    var lname = req.body.name;
+    var userId = req.params.id;
+    var fname = req.body.fname;
+    var lname = req.body.lname;
     if (userType == 'Admin') {
         Admin.findByIdAndUpdate(userId, { fname: fname, lname: lname },
             function (err, response) {
@@ -124,7 +123,7 @@ router.put('/:id/name', function (req, res) {
 
 router.put('/:id/password', function (req, res) {
     var userType = req.body.userType;
-    var userId = req.body.userId;
+    var userId = req.params.id;
     var password = req.body.password;
     if (userType == 'Admin') {
         Admin.findByIdAndUpdate(userId, { password: password },
