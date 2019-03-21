@@ -138,10 +138,10 @@ router.put('/:id/password', function (req, res) {
 
 //user stories 1 & 2: creating member or partner profiles
 router.post('/create', function (req, res) {
-    console.log("entered");
+   
     var userType = req.body.userType;
     if (userType == 'Partner') {
-        console.log("enetred Partner");
+        
         var usern = req.body.username;
         var pwd = req.body.password;
         var n = req.body.name;
@@ -155,7 +155,7 @@ router.post('/create', function (req, res) {
             workfield: wf
         });
         newPartner.ProfileURL= '/api/profile/' + newPartner._id;
-        console.log(newPartner);
+        
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
