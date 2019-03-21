@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
+
 //user story 12
 router.get('/:id', function (req, res) {
     var userType = req.body.userType; //should come from session
@@ -137,8 +138,10 @@ router.put('/:id/password', function (req, res) {
 
 //user stories 1 & 2: creating member or partner profiles
 router.post('/create', function (req, res) {
+   
     var userType = req.body.userType;
     if (userType == 'Partner') {
+        
         var usern = req.body.username;
         var pwd = req.body.password;
         var n = req.body.name;
@@ -151,11 +154,15 @@ router.post('/create', function (req, res) {
             email: em,
             workfield: wf
         });
+        newPartner.ProfileURL= '/api/profile/' + newPartner._id;
+        
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
-            res.send("Added a partner")
+           
         });
+       
+        res.send("Added a partner" + " "+ newPartner._id)
     }
     if (userType == 'Member') {
         var usern = req.body.username;
@@ -184,11 +191,13 @@ router.post('/create', function (req, res) {
             //tasks: tsks,
             // projects: prjs
         });
+        newMember.ProfileURL= '/api/profile/' + newMember._id;
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
-            res.send("Added a member");
+            
         });
+        res.send("Added a member");
     }
 });
 

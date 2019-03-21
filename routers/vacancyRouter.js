@@ -68,7 +68,7 @@ router.post('/CreateVacancy', function (req, res) {
     vacancy.save(function(err){
         if(err) return handleError(err);
     });
-
+    return res.send("created vacancy succefully");
 });
  //15    
 router.get('/:id/comment', function (req,res) { 
