@@ -128,6 +128,20 @@ router.get('/ApprovedEvents', function (req, res) {
 	})
 })
 
+// Story 21.2 display an event post for partner/admin/member
+
+router.get('/Events/:id', function (req, res) {
+    var eveId = req.params.id;
+
+        Event.findById(eveId,'-_id').exec(
+            function (err, response) {
+                if(err)return res.send("event not found");
+				return res.send(response);
+            });
+
+    
+});
+
 // Story 22.1 : viewing recommended events as a member (sprint 2)
 router.get('/RecommendedEvents', function (req, res) {
 	var userId = req.body.userId;
