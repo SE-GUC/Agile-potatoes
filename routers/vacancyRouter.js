@@ -1,6 +1,7 @@
 const Vacancy = require('../models/vacancyModel');
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
+const Member = require('../models/memberModel');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -158,6 +159,33 @@ return  res.send(pendingVacancies);
 
 });
 
+// Story 22.2 : viewing recommended vacancies as a member (sprint 2)
+router.get('/RecommendedVacancies', function (req, res) {
+    var userId = req.body.userId;
+    var RecommendedVacancies = [];
+    Member.findById(userId)
+        .exec((err, member) => {
+            if (err) console.log(err); // getting recommended events
+            if (member.availability !== true) return res.send('member is not available to be hired')
+            Vacancy.find({'status': 'Open'})
+                .exec((err, vacs) => {
+                    if (err) console.log(err);
+                    for (vac of vacs) {
+                        if ((vac.city) && (member.address.includes(vac.city))) {
+                            RecommendedVacancies.push(vac);
+                        } else{
+                            for (skill of member.skills ){
+                                if (skill.includes(vac.name) || vac.name.includes(skill)){
+                                    RecommendedVacancies.push(vac);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    res.send(RecommendedVacancies);
+                })
+        })
+})
 
 
 router.put('/:id/status', function(req,res){
