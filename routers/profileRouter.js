@@ -8,7 +8,6 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-
 //user story 12
 router.get('/:id', function (req, res) {
     var userType = req.body.userType; //should come from session
@@ -108,40 +107,11 @@ router.put('/:id', function (req, res) {
 
 
 
-router.put('/:id/name', function (req, res) {
-    var userType = req.body.userType;
-    var userId = req.body.userId;
-    var fname = req.body.name;
-    var lname = req.body.name;
-    if (userType == 'Admin') {
-        Admin.findByIdAndUpdate(userId, { fname: fname, lname: lname },
-            function (err, response) {
-                console.log(response);
-            });
-    }
-    return res.send("Name Updated");
-});
-
-
-router.put('/:id/password', function (req, res) {
-    var userType = req.body.userType;
-    var userId = req.body.userId;
-    var password = req.body.password;
-    if (userType == 'Admin') {
-        Admin.findByIdAndUpdate(userId, { password: password },
-            function (err, response) {
-                console.log(response);
-            });
-    }
-    return res.send("Password Updated");
-});
 
 //user stories 1 & 2: creating member or partner profiles
 router.post('/create', function (req, res) {
-   
     var userType = req.body.userType;
     if (userType == 'Partner') {
-        
         var usern = req.body.username;
         var pwd = req.body.password;
         var n = req.body.name;
@@ -154,15 +124,11 @@ router.post('/create', function (req, res) {
             email: em,
             workfield: wf
         });
-        newPartner.ProfileURL= '/api/profile/' + newPartner._id;
-        
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
-           
+            res.send("Added a partner")
         });
-       
-        res.send("Added a partner" + " "+ newPartner._id)
     }
     if (userType == 'Member') {
         var usern = req.body.username;
@@ -191,15 +157,48 @@ router.post('/create', function (req, res) {
             //tasks: tsks,
             // projects: prjs
         });
-        newMember.ProfileURL= '/api/profile/' + newMember._id;
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
-            
+            res.send("Added a member");
         });
-        res.send("Added a member");
     }
 });
+
+
+//As an admin i can i can update my name story#30
+router.put('/:id/name', function (req, res) {
+    var userType = req.body.userType;
+    var userId = req.params.id;
+    var fname = req.body.fname;
+    var lname = req.body.lname;
+    if (userType == 'Admin') {
+        Admin.findByIdAndUpdate(userId, { fname: fname, lname: lname },
+            function (err, response) {
+                console.log(response);
+            });
+    }
+    return res.send("Name Updated");
+});
+
+//As an admin i can update my password story#30
+router.put('/:id/password', function (req, res) {
+    var userType = req.body.userType;
+    var userId = req.params.id;
+    var password = req.body.password;
+    if (userType == 'Admin') {
+        Admin.findByIdAndUpdate(userId, { password: password },
+            function (err, response) {
+                console.log(response);
+            });
+    }
+    return res.send("Password Updated");
+});
+
+
+
+
+
 
 
 
