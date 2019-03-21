@@ -63,13 +63,15 @@ router.post('/CreateVacancy', function (req, res) {
     var salary = req.body.salary;    
     var dailyHours = req.body.dailyHours; 
     var partner = req.body.partner; 
-    var vacancy = new Vacancy({description:description,duration:duration,location:location,salary:salary,dailyHours:dailyHours,partner:partner});
+    var vacancy = new Vacancy({description:description,duration:duration,location:location,salary:salary,dailyHours:dailyHours, partner:partner});
     vacancy.url= '/api/vacancy/' + vacancy._id;
     vacancy.save(function(err){
         if(err) return handleError(err);
     });
-    return res.send("created vacancy succefully");
+    return res.send("created vacancy successfully");
 });
+
+
  //15    
 router.get('/:id/comment', function (req,res) { 
     var userType = req.body.userType; //should come from session
@@ -187,26 +189,39 @@ router.get('/RecommendedVacancies', function (req, res) {
         })
 })
 
-
+//As an admin i can change vacancy status if it is submitted and as a partner i can change vacancy status if it is opened
 router.put('/:id/status', function(req,res){
     var userType = req.body.userType;
     var vacId = req.params.id;
     var vacStatus = req.body.status;
-    if (userType == 'Admin'&&  Vacancy.status== 'Submitted'){
-        Vacancy.findByIdAndUpdate(vacId, {status: vacStatus}, 
-          function(err, response){
-          console.log(response);
-        });
+    if (userType == 'Admin'){
+        Vacancy.findById(vacId).exec(function(err,vacancy){
+            if(vacancy.status == 'Submitted')
+              Vacancy.findByIdAndUpdate(vacId, {status: vacStatus}, 
+              function(err, response){
+              console.log(response); 
+              return res.send("Status Updated");
+            });
+            else  
+            return res.send("This vacancy is already opened and you are not allowed to change its status")
                     
-    }
-    else if (userType == 'Partner' &&  Vacancy.status== 'Open'){
-        Vacany.findByIdAndUpdate(vacId, {status: vacStatus}, 
-        function(err, response){
-           console.log(response);
-         });
-    }        
-    return res.send("Status Updated");
+    })}
+    else if (userType == 'Partner'){
+        Vacancy.findById(vacId).exec(function(err,vacancy){
+            if(vacancy.status == 'Open')
+              Vacancy.findByIdAndUpdate(vacId, {status: vacStatus}, 
+              function(err, response){
+              console.log(response); 
+              return res.send("Status Updated");
+             });
+            else
+            return res.send("You are not allowed to change the status of this vacancy")
+      
+                    
+    })}
+    
 });
+
 
 
 
@@ -266,5 +281,7 @@ router.post('/:id/', function(req, res){  //submitting edited vacancy
         }
     })
 })
+
+
 module.exports = router;
 
