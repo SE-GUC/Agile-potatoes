@@ -257,42 +257,19 @@ router.put('/:id/update',function(req,res){
 
   if(userTypeU=='Member'&&userId==memberId){
     Member.findById(memberId)
-    .exec(function(err,doc){         
-        
+    .exec(function(err,doc){
+        console.log(doc);         
         doc.address = addressU;
+        doc.lname = lnameU;
+        doc.fname = fnameU;
+        doc.password = passwordU;
+        doc.interests = interestsU;
+        doc.skills = skillsU;
+     
         doc.save();
     });
    
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.lname = lnameU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.fname = fnameU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.password = passwordU;c
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.interests = interestsU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.skills = skillsU;
-        doc.save();
-    });
+    
 
 }
 //Membership Expiry Date, Member State
@@ -301,15 +278,11 @@ else if(userTypeU=='Admin'){
     .exec(function(err,doc){         
         
         doc.membershipExpiryDate = membershipExpiryDateU;
-        doc.save();
-    });
-
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
         doc.userType = userTypeU;
         doc.save();
     });
+
+    
 }
 else {res.send("not your profile")}
 

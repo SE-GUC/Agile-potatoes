@@ -138,6 +138,20 @@ return res.send("deleted");
 }
 
 );
+// Story 21.2 display a vacancy post for partner/admin/member
+
+router.get('/Vacancies/:id', function (req, res) {
+    var vacId = req.params.id;
+
+        Vacancy.findById(vacId,'-_id').exec(
+            function (err, response) {
+                if(err)console.log(err);
+				return res.send(response);
+            });
+
+    
+});
+
 
 router.get('/pendingVacancies', function(req,res){
 

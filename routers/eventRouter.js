@@ -197,7 +197,19 @@ return res.send("deleted");
 
 
 );
+// Story 21.2 display an event post for partner/admin/member
 
+router.get('/Events/:id', function (req, res) {
+    var eveId = req.params.id;
+
+        Event.findById(eveId,'-_id').exec(
+            function (err, response) {
+                if(err)return res.send("event not found");
+				return res.send(response);
+            });
+
+    
+});
 
 //user story 21: As a partner I can update my pending events
 router.put('/:id', async (req, res) => {
