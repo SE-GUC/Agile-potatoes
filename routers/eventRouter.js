@@ -120,8 +120,7 @@ router.get('/PendingEvents', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-
-	Event.find({ 'eventStatus': 'Approved' }, function (err, events) {
+	Event.find({"eventStatus": 'Approved'}).exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
