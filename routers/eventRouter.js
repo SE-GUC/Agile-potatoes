@@ -106,11 +106,11 @@ router.post('/:id/CreateEvent', function (req, res) {
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }).exec(function (err, response) {
+		Event.find({ eventStatus: 'Submitted' }).exec(function (err, event) {
 			if(err) 
 			{	return res.send(err);}
 			else
-			{	return res.send(response);}
+			{	return res.send(event);}
 		})
 		
 		}
