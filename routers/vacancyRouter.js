@@ -54,19 +54,29 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
-router.post('/CreateVacancy', function (req, res) {
-    var userId = req.body.id;   //should come from session
-  
+router.post('/:id/CreateVacancy', function (req, res) {
+    var userId = req.params.id;   //should come from session
     var description = req.body.description; 
     var duration = req.body.duration;    
     var location = req.body.location; 
     var salary = req.body.salary;    
     var dailyHours = req.body.dailyHours; 
-    var partner = req.body.partner; 
-    var vacancy = new Vacancy({description:description,duration:duration,location:location,salary:salary,dailyHours:dailyHours, partner:partner});
+    var vacancy = new Vacancy({
+        description:description,
+        duration:duration,
+        location:location,
+        salary:salary,
+        dailyHours:dailyHours,
+        partner:userId
+    });
+
     vacancy.url= '/api/vacancy/' + vacancy._id;
     vacancy.save(function(err){
         if(err) return handleError(err);
+    });
+    Partner.findById(userId).exec(function(err,par){
+        par.vacancies.push(vacancy);
+        par.save();   
     });
     return res.send("created vacancy successfully");
 });

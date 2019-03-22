@@ -127,8 +127,9 @@ router.post('/create', function (req, res) {
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
-            res.send("Added a partner")
+            
         });
+        res.send("Added a partner")
     }
     if (userType == 'Member') {
         var usern = req.body.username;
@@ -160,8 +161,9 @@ router.post('/create', function (req, res) {
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
-            res.send("Added a member");
+           
         });
+        res.send("Added a member");
     }
 });
 
