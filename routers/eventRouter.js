@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const Event = require('../models/eventModel');
+const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
 const bodyParser = require('body-parser');
@@ -15,48 +16,45 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 router.post('/:id/CreateEvent', function (req, res) {
 	var userType = req.body.userType; //should come from session
 	var userId = req.params.id;    //should come from session
-	var eventId = req.body.eventId;
 	var description = req.body.description;
+	var name = req.body.name;
 	var price = req.body.price;
 	var location = req.body.location;
+	var city = req.body.city;
 	var eventDate = req.body.date;
 	var remainingPlaces = req.body.places;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
 	if (userType == 'Admin') {
-		Admin.findById(userId).exec(function (err, admin) {
-			console.log(Admin.event);
-			admin.events.push(eventId)
-			admin.save();
-		});
-
 		var event = new Event({
+			name:name,
 			description: description,
 			price: price,
 			location: location,
+			city:city,
 			eventDate: eventDate,
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
-			url: '/api/event/' + eventId,
 			speakers: speakers,
 			topics: topics
 		});
+		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
 		})
-
+		Admin.findById(userId).exec(function (err, admin) {
+			console.log(Admin.event);
+			admin.events.push(event._id)
+			admin.save();
+		});
+		return res.send("created event successfully" + " " + event._id);
 	}
 	else if (userType == 'Partner') {
-		Partner.findById(userId).exec(function (err, partner) {
-			console.log(Partner.event);
-			partner.events.push(eventID)
-			partner.save();
-		});
-
 		var event = new Event({
+			name:name,
 			description: description,
 			price: price,
 			location: location,
@@ -64,18 +62,24 @@ router.post('/:id/CreateEvent', function (req, res) {
 			eventStatus: 'Submitted',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
-			url: '/api/event/' + eventId,
 			speakers: speakers,
 			topics: topics
 		});
+
+		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
 		})
+		Partner.findById(userId).exec(function (err, partner) {
+					console.log(Partner.event);
+					partner.events.push(event._id)
+					partner.save();
+				});
 
-
+		return res.send("created event successfully" + " " + event._id);
 	}
-	return res.send("created event successfully");
+	
 });
 
 
@@ -102,11 +106,14 @@ router.post('/:id/CreateEvent', function (req, res) {
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }, function (err, response) {
-			return res.send(response);
-			console.log(response);
-		});
-	}
+		Event.find({ eventStatus: 'Submitted' }).exec(function (err, event) {
+			if(err) 
+			{	return res.send(err);}
+			else
+			{	return res.send(event);}
+		})
+		
+		}
 	else {
 		return res.send('This Information is not accessible!');
 	}
@@ -115,8 +122,7 @@ router.get('/PendingEvents', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-
-	Event.find({ 'eventStatus.type': 'Approved' }, function (err, events) {
+	Event.find({"eventStatus": 'Approved'}).exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -124,6 +130,36 @@ router.get('/ApprovedEvents', function (req, res) {
 	})
 })
 
+// Story 22.1 : viewing recommended events as a member (sprint 2)
+router.get('/RecommendedEvents', function (req, res) {
+	var userId = req.body.userId;
+	var memberPastEventsTypes = [];
+	var recommendedEvents = [];
+	Member.findById(userId)
+		.populate('events', 'eventType')
+		.exec((err,member)=>{	
+			if (err) console.log(err); // getting recommended events
+			member.events.map((event) => {
+				memberPastEventsTypes.push(event.eventType);
+			})
+			Event.find({'eventStatus': 'Approved'})
+				.exec((err,events) => {
+					if(err) console.log(err);
+					for(event of events){
+						if ((event.city) && (member.address.includes(event.city))) {
+							recommendedEvents.push(event);
+						}
+						else if (member.interests.includes(event.eventType)) {
+							recommendedEvents.push(event);
+						}
+						else if (memberPastEventsTypes.includes(event.eventType)) {
+							recommendedEvents.push(event);
+						}
+					}
+					res.send(recommendedEvents);
+				})
+		})
+})
 
 router.delete('/', function(req,res){
     var userType=req.body.userType;
@@ -209,4 +245,5 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
+
 module.exports = router;
