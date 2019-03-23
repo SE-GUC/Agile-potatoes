@@ -6,6 +6,10 @@ const config = require("./config");
 const port = process.env.PORT || config.getDevelopmentPort();
 mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
 
+app.get('/', function (err,res) {
+    res.send('welcome to lirtenhub');    
+})
+
 const notificationRouter = require('./routers/notificationRouter');
 const profileRouter = require('./routers/profileRouter');
 const vacancyRouter = require('./routers/vacancyRouter');
