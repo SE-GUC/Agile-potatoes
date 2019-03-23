@@ -118,13 +118,24 @@ router.get('/PendingEvents', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-	Event.find({"eventStatus": 'Approved'}).exec(function (err, events) {
+	Event.find({eventStatus: 'Approved'}).exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
 		return res.send(events);
 	})
 })
+
+/// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
+router.get('/:id/PartnerPendingEvents', function(req,res){
+    var userType = req.body.userType
+    var userid = req.params.id 
+    if(userType == 'Partner'){
+    event.find({partner: userid, eventstatus: 'Submitted'}).exec(function(err, event){
+        return res.send(event);
+    });
+    }
+});
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
 router.get('/RecommendedEvents', function (req, res) {
