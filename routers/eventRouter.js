@@ -26,6 +26,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
+	var partner = req.body.userId;
 	if (userType == 'Admin') {
 		var event = new Event({
 			name:name,
@@ -63,7 +64,8 @@ router.post('/:id/CreateEvent', function (req, res) {
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
 			speakers: speakers,
-			topics: topics
+			topics: topics,
+			partner: partner
 		});
 
 		event.url = '/api/event/' + event._id
@@ -99,7 +101,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 		})
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEvents', function (req, res) {
+router.get('/PendingEvents', 'url name eventDate', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
 		Event.find({ eventStatus: 'Submitted' }).exec(function (err, event) {
@@ -117,7 +119,7 @@ router.get('/PendingEvents', function (req, res) {
 
 
 // Story 14 : viewing approved events as admin/partner/member
-router.get('/ApprovedEvents', function (req, res) {
+router.get('/ApprovedEvents', 'url name eventDate' ,function (req, res) {
 	Event.find({eventStatus: 'Approved'}).exec(function (err, events) {
 		if (err) {
 			return console.log(err);
@@ -127,7 +129,7 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
-router.get('/:id/PartnerPendingEvents', function(req,res){
+router.get('/:id/PartnerPendingEvents', 'url name eventDate', function (req, res) {
     var userType = req.body.userType
     var userid = req.params.id 
     if(userType == 'Partner'){
@@ -138,7 +140,7 @@ router.get('/:id/PartnerPendingEvents', function(req,res){
 });
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
-router.get('/RecommendedEvents', function (req, res) {
+router.get('/RecommendedEvents', 'url name eventDate', function (req, res) {
 	var userId = req.body.userId;
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
@@ -206,7 +208,7 @@ return res.send("deleted");
 );
 // Story 21.2 display an event post for partner/admin/member
 
-router.get('/Events/:id', function (req, res) {
+router.get('/Post/:id', function (req, res) {
     var eveId = req.params.id;
 
         Event.findById(eveId,'-_id').exec(
