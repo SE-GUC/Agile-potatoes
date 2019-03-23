@@ -101,10 +101,10 @@ router.post('/:id/CreateEvent', function (req, res) {
 		})
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEvents', 'url name eventDate', function (req, res) {
+router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }).exec(function (err, event) {
+		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate').exec(function (err, event) {
 			if(err) 
 			{	return res.send(err);}
 			else
@@ -119,8 +119,8 @@ router.get('/PendingEvents', 'url name eventDate', function (req, res) {
 
 
 // Story 14 : viewing approved events as admin/partner/member
-router.get('/ApprovedEvents', 'url name eventDate' ,function (req, res) {
-	Event.find({eventStatus: 'Approved'}).exec(function (err, events) {
+router.get('/ApprovedEvents' ,function (req, res) {
+	Event.find({ eventStatus: 'Approved' }, 'url name eventDate').exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -129,22 +129,22 @@ router.get('/ApprovedEvents', 'url name eventDate' ,function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
-router.get('/:id/PartnerPendingEvents', 'url name eventDate', function (req, res) {
+router.get('/:id/PartnerPendingEvents', function (req, res) {
     var userType = req.body.userType
     var userid = req.params.id 
     if(userType == 'Partner'){
-    Event.find({partner: userid, eventStatus: 'Submitted'}).exec(function(err, event){
+		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate').exec(function(err, event){
         return res.send(event);
     });
     }
 });
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
-router.get('/RecommendedEvents', 'url name eventDate', function (req, res) {
+router.get('/RecommendedEvents', function (req, res) {
 	var userId = req.body.userId;
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
-	Member.findById(userId)
+	Member.findById(userId, 'url name eventDate')
 		.populate('events', 'eventType')
 		.exec((err,member)=>{	
 			if (err) console.log(err); // getting recommended events

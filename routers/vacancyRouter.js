@@ -160,7 +160,7 @@ router.get('/Post/:id', function (req, res) {
 });
 
 
-router.get('/pendingVacancies', 'url name location', function (req, res) {
+router.get('/pendingVacancies', function (req, res) {
 
     var userType=req.body.userType;
     var pendingVacancies=[];
@@ -183,14 +183,14 @@ return  res.send(pendingVacancies);
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
-router.get('/RecommendedVacancies', 'url name location', function (req, res) {
+router.get('/RecommendedVacancies', function (req, res) {
     var userId = req.body.userId;
     var RecommendedVacancies = [];
     Member.findById(userId)
         .exec((err, member) => {
             if (err) console.log(err); // getting recommended events
             if (member.availability !== true) return res.send('member is not available to be hired')
-            Vacancy.find({'status': 'Open'})
+            Vacancy.find({'status': 'Open'},'url name location')
                 .exec((err, vacs) => {
                     if (err) console.log(err);
                     for (vac of vacs) {
