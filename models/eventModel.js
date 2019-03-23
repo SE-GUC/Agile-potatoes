@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({ 
+    name:String,
     description: String,
     price: Number,
+    city: {type:String, lowercase: true},
     location: String,
     eventDate: Date,
     postDate: {type:Date, default:Date.now},
@@ -14,7 +16,11 @@ const EventSchema = new Schema({
         default:'Submitted'
     },
     remainingPlaces:Number,
-    eventType:String,
+    eventType: {
+        type: String,
+        lowercase: true,
+        trim: true
+    },
     url: {
         type: String,
         trim: true

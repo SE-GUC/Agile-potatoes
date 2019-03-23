@@ -107,33 +107,6 @@ router.put('/:id', function (req, res) {
 
 
 
-router.put('/:id/name', function (req, res) {
-    var userType = req.body.userType;
-    var userId = req.body.userId;
-    var fname = req.body.name;
-    var lname = req.body.name;
-    if (userType == 'Admin') {
-        Admin.findByIdAndUpdate(userId, { fname: fname, lname: lname },
-            function (err, response) {
-                console.log(response);
-            });
-    }
-    return res.send("Name Updated");
-});
-
-
-router.put('/:id/password', function (req, res) {
-    var userType = req.body.userType;
-    var userId = req.body.userId;
-    var password = req.body.password;
-    if (userType == 'Admin') {
-        Admin.findByIdAndUpdate(userId, { password: password },
-            function (err, response) {
-                console.log(response);
-            });
-    }
-    return res.send("Password Updated");
-});
 
 //user stories 1 & 2: creating member or partner profiles
 router.post('/create', function (req, res) {
@@ -154,8 +127,9 @@ router.post('/create', function (req, res) {
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
-            res.send("Added a partner")
+            
         });
+        res.send("Added a partner")
     }
     if (userType == 'Member') {
         var usern = req.body.username;
@@ -187,10 +161,46 @@ router.post('/create', function (req, res) {
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
-            res.send("Added a member");
+           
         });
+        res.send("Added a member");
     }
 });
+
+
+//As an admin i can i can update my name story#30
+router.put('/:id/name', function (req, res) {
+    var userType = req.body.userType;
+    var userId = req.params.id;
+    var fname = req.body.fname;
+    var lname = req.body.lname;
+    if (userType == 'Admin') {
+        Admin.findByIdAndUpdate(userId, { fname: fname, lname: lname },
+            function (err, response) {
+                console.log(response);
+            });
+    }
+    return res.send("Name Updated");
+});
+
+//As an admin i can update my password story#30
+router.put('/:id/password', function (req, res) {
+    var userType = req.body.userType;
+    var userId = req.params.id;
+    var password = req.body.password;
+    if (userType == 'Admin') {
+        Admin.findByIdAndUpdate(userId, { password: password },
+            function (err, response) {
+                console.log(response);
+            });
+    }
+    return res.send("Password Updated");
+});
+
+
+
+
+
 
 
 
@@ -249,42 +259,19 @@ router.put('/:id/update',function(req,res){
 
   if(userTypeU=='Member'&&userId==memberId){
     Member.findById(memberId)
-    .exec(function(err,doc){         
-        
+    .exec(function(err,doc){
+        console.log(doc);         
         doc.address = addressU;
+        doc.lname = lnameU;
+        doc.fname = fnameU;
+        doc.password = passwordU;
+        doc.interests = interestsU;
+        doc.skills = skillsU;
+     
         doc.save();
     });
    
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.lname = lnameU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.fname = fnameU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.password = passwordU;c
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.interests = interestsU;
-        doc.save();
-    });
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.skills = skillsU;
-        doc.save();
-    });
+    
 
 }
 //Membership Expiry Date, Member State
@@ -293,15 +280,11 @@ else if(userTypeU=='Admin'){
     .exec(function(err,doc){         
         
         doc.membershipExpiryDate = membershipExpiryDateU;
-        doc.save();
-    });
-
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
         doc.userType = userTypeU;
         doc.save();
     });
+
+    
 }
 else {res.send("not your profile")}
 
