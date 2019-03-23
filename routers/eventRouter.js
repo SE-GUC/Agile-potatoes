@@ -131,7 +131,7 @@ router.get('/:id/PartnerPendingEvents', function(req,res){
     var userType = req.body.userType
     var userid = req.params.id 
     if(userType == 'Partner'){
-    event.find({partner: userid, eventstatus: 'Submitted'}).exec(function(err, event){
+    Event.find({partner: userid, eventStatus: 'Submitted'}).exec(function(err, event){
         return res.send(event);
     });
     }
