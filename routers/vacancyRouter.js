@@ -243,13 +243,16 @@ router.put('/:id/status', function(req,res){
     
 });
 
-
-
-
-
-
-
-
+/// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
+router.get('/:id/PendingVacancies', function(req,res){
+    var userType = req.body.userType
+    var userid = req.params.id 
+    if(userType == 'Partner'){
+    Vacancy.find({partner: userid, status: 'Submitted'}).exec(function(err, vacancy){
+        return res.send(vacancy);
+    });
+    }
+});
 
 ////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function(req, res){  //showing non approved vacancy to be updated and checking if its pending
