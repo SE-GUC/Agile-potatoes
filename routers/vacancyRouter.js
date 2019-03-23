@@ -147,7 +147,7 @@ return res.send("deleted");
 );
 // Story 21.2 display a vacancy post for partner/admin/member
 
-router.get('/Vacancies/:id', function (req, res) {
+router.get('/Post/:id', function (req, res) {
     var vacId = req.params.id;
 
         Vacancy.findById(vacId,'-_id').exec(
@@ -160,7 +160,7 @@ router.get('/Vacancies/:id', function (req, res) {
 });
 
 
-router.get('/pendingVacancies', function(req,res){
+router.get('/pendingVacancies', 'url name location', function (req, res) {
 
     var userType=req.body.userType;
     var pendingVacancies=[];
@@ -183,7 +183,7 @@ return  res.send(pendingVacancies);
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
-router.get('/RecommendedVacancies', function (req, res) {
+router.get('/RecommendedVacancies', 'url name location', function (req, res) {
     var userId = req.body.userId;
     var RecommendedVacancies = [];
     Member.findById(userId)
@@ -244,7 +244,7 @@ router.put('/:id/status', function(req,res){
 });
 
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
-router.get('/:id/PendingVacancies', function(req,res){
+router.get('/:id/PartnerPendingVacancies', function(req,res){
     var userType = req.body.userType
     var userid = req.params.id 
     if(userType == 'Partner'){
