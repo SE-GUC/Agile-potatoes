@@ -147,7 +147,7 @@ return res.send("deleted");
 );
 // Story 21.2 display a vacancy post for partner/admin/member
 
-router.get('/Vacancies/:id', function (req, res) {
+router.get('/posts/:id', function (req, res) {
     var vacId = req.params.id;
 
         Vacancy.findById(vacId,'-_id').exec(
