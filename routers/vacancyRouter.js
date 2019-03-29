@@ -113,17 +113,19 @@ router.get('/:id/applicants', function (req, res) {
         })
 })
 
-router.delete('/', function(req,res){
-    var userType=req.body.userType;
-    var vacId= req.params.id;
+//story 11 As a partner I can delete my vacancy request before it is approved
 
+router.delete('/:vacid/deleteVacancy', function(req,res){
+    var userType=req.body.userType;
+    var vacId= req.params.vacid;
+    var userId= req.body.id;
     if(userType == 'Partner')
     {
         Vacancy.findById(vacId)
         .exec(function(err,vacancy){
-            if(vacancy.status=='Submitted')
+            if(vacancy.status=='Submitted' && vacancy.partner==userId)
             {
-                Vacancy.deleteOne(vacancy,function(err,result){
+                Vacancy.findByIdAndDelete(vacancy,function(err,result){
                     if(err)
                     {
                         handleError(err);
@@ -140,11 +142,10 @@ router.delete('/', function(req,res){
     }
 
 
-return res.send("deleted");
+return res.send("deleted vacancy successfully");
 
-}
+});
 
-);
 // Story 21.2 display a vacancy post for partner/admin/member
 
 router.get('/posts/:id', function (req, res) {
@@ -159,6 +160,8 @@ router.get('/posts/:id', function (req, res) {
     
 });
 
+
+//////Story 17 As an admin I cana view pending vacancies announcments requests
 
 router.get('/pendingVacancies', function(req,res){
 
