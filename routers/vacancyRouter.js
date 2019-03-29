@@ -54,30 +54,34 @@ router.post('/:id/comment', function (req,res) {
     }
     return res.send("updated");
 });
+// As a partner I can submit a vacancy announcement request
 router.post('/:id/CreateVacancy', function (req, res) {
+    var userType = req.body.userType;
     var userId = req.params.id;   //should come from session
-    var description = req.body.description; 
-    var duration = req.body.duration;    
-    var location = req.body.location; 
-    var salary = req.body.salary;    
-    var dailyHours = req.body.dailyHours; 
+    var description = req.body.description;
+    var duration = req.body.duration;
+    var location = req.body.location;
+    var salary = req.body.salary;
+    var dailyHours = req.body.dailyHours;
+    var vacancyId = req.body.vacancyId;
+    if (userType == 'Partner') {
     var vacancy = new Vacancy({
-        description:description,
-        duration:duration,
-        location:location,
-        salary:salary,
-        dailyHours:dailyHours,
-        partner:userId
+        description: description,
+        duration: duration,
+        location: location,
+        salary: salary,
+        dailyHours: dailyHours,
     });
 
-    vacancy.url= '/api/vacancy/' + vacancy._id;
-    vacancy.save(function(err){
-        if(err) return handleError(err);
+    vacancy.url = '/api/vacancy/' + vacancy._id;
+    vacancy.save(function (err) {
+        if (err) return handleError(err);
     });
-    Partner.findById(userId).exec(function(err,par){
+    Partner.findById(userId).exec(function (err, par) {
         par.vacancies.push(vacancy);
-        par.save();   
+        par.save();
     });
+}
     return res.send("created vacancy successfully");
 });
 
