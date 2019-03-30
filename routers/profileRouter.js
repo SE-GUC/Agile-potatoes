@@ -58,7 +58,6 @@ router.get('/:id', function (req, res) {
     return;
 })
 
-
 //user story 8: As a Member I can post feedback to a Partner I previously worked with
 router.post('/:id/feedback', function (req, res) {
     var userType = req.body.userType; //should come from session (has to be Member)
@@ -92,21 +91,19 @@ router.put('/:id', function (req, res) {
         if (partnerID == userID) {
             Partner.findById(partnerID).exec(function (err, partner) {
                 if (members) {
-                    console.log("yes there's members to push");
+                    console.log("Yes there's members to push");
                     partner.boardMembers = members;
                 }
                 if (pwd) {
                     partner.password = pwd;
                 }
-                res.send({ msg: "updated", members, pwd });
+                res.send(partner);
+                console.log("Updated partner profile successfully");
                 partner.save();
             });
         }
     }
 });
-
-
-
 
 //user stories 1 & 2: creating member or partner profiles
 router.post('/create', function (req, res) {
@@ -127,7 +124,7 @@ router.post('/create', function (req, res) {
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
-            
+
         });
         res.send("Added a partner")
     }
@@ -161,12 +158,11 @@ router.post('/create', function (req, res) {
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
-           
+
         });
         res.send("Added a member");
     }
 });
-
 
 //As an admin i can i can update my name story#30
 router.put('/:id/name', function (req, res) {
@@ -197,32 +193,23 @@ router.put('/:id/password', function (req, res) {
     return res.send("Password Updated");
 });
 
-
-
-
-
-
-
-
 //add feedback to partner
-router.put('/:id/feedback', function (req,res) {
+router.put('/:id/feedback', function (req, res) {
 
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId;    //should come from session
     var feedback = req.body.feedback;
     var memberId = req.params.id;
     console.log(memberId);
-    if (userType == 'Partner'){
-        
-
+    if (userType == 'Partner') {
         Member.findById(memberId)
-            .exec(function (err, member) {    
-               
-                    member.reviews.push({
-                        text: feedback,
-                        partner: userId
-                    });
-                    member.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
+            .exec(function (err, member) {
+
+                member.reviews.push({
+                    text: feedback,
+                    partner: userId
+                });
+                member.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
                 console.log(member);
             });
         Member.findById(memberId) //notify the member
@@ -232,15 +219,15 @@ router.put('/:id/feedback', function (req,res) {
                     description: 'Partner reviewed your performance in his vacancy'
                 });
                 console.log(member)
-               member.save(); 
+                member.save();
             });
-    } else{res.send("only partners can add feedback");}
+    } else { res.send("only partners can add feedback"); }
 
-res.send("finished");
+    res.send("finished");
 
 });
 
-router.put('/:id/update',function(req,res){
+router.put('/:id/update', function (req, res) {
     var userTypeU = req.body.userType; //should come from session
     var userId = req.body.userId;    //should come from session
     var memberId = req.params.id;
@@ -253,44 +240,44 @@ router.put('/:id/update',function(req,res){
     var skillsU = req.body.skills;
     var memberStateU = req.body.memberState;
     var membershipExpiryDateU = req.body.membershipExpiryDate;
-    
-  //Address, Name, Password, Skills, Interests
+
+    //Address, Name, Password, Skills, Interests
 
 
-  if(userTypeU=='Member'&&userId==memberId){
-    Member.findById(memberId)
-    .exec(function(err,doc){
-        console.log(doc);         
-        doc.address = addressU;
-        doc.lname = lnameU;
-        doc.fname = fnameU;
-        doc.password = passwordU;
-        doc.interests = interestsU;
-        doc.skills = skillsU;
-     
-        doc.save();
-    });
-   
-    
+    if (userTypeU == 'Member' && userId == memberId) {
+        Member.findById(memberId)
+            .exec(function (err, doc) {
+                console.log(doc);
+                doc.address = addressU;
+                doc.lname = lnameU;
+                doc.fname = fnameU;
+                doc.password = passwordU;
+                doc.interests = interestsU;
+                doc.skills = skillsU;
 
-}
-//Membership Expiry Date, Member State
-else if(userTypeU=='Admin'){
-    Member.findById(memberId)
-    .exec(function(err,doc){         
-        
-        doc.membershipExpiryDate = membershipExpiryDateU;
-        doc.userType = userTypeU;
-        doc.save();
-    });
-
-    
-}
-else {res.send("not your profile")}
+                doc.save();
+            });
 
 
-res.send('updated');
-    
+
+    }
+    //Membership Expiry Date, Member State
+    else if (userTypeU == 'Admin') {
+        Member.findById(memberId)
+            .exec(function (err, doc) {
+
+                doc.membershipExpiryDate = membershipExpiryDateU;
+                doc.userType = userTypeU;
+                doc.save();
+            });
+
+
+    }
+    else { res.send("not your profile") }
+
+
+    res.send('updated');
+
 });
 
 

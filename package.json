@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js"
   },
   "engines": {
@@ -22,8 +22,10 @@
   },
   "homepage": "https://github.com/SE-GUC/Agile-potatoes#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "jest": "^24.5.0",
     "joi": "^14.3.1",
     "mongoose": "^5.4.19",
     "node": "^11.12.0",
