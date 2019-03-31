@@ -9,50 +9,50 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-/////////// 7
-router.post('/:id/comment', function (req, res) {
+/////////// 7 Add comment to vacancy (admin-partner negotiation) 
+router.post('/:id/comment', (req, res, next) => {
     var userType = req.body.userType; //should come from session
     var userId = req.body.userId;    //should come from session
     var comment = req.body.comment;
     var vacId = req.params.id;
     if (userType == 'Admin') {
         Vacancy.findById(vacId)
-            .exec(function (err, vacancy) {
+            .populate('partner')
+            .exec((err, vacancy) => {
+                if (err) console.log(err)
                 vacancy.commentsByAdmin.push({
                     text: comment,
                     author: userId
                 });
-                vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASE
-            })
-        Vacancy.findById(vacId).populate('partner') //notifying partner
-            .exec(function (err, vacancy) {
+                ////notifying partner
                 vacancy.partner.notifications.push({
                     srcURL: '/api/vacancy/' + vacId,
                     description: 'Admin commented on your vacancy request'
                 });
-                vacancy.partner.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
+                vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
+                return res.status(201).send(vacancy.commentsByAdmin);
             })
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId)
-            .exec(function (err, vacancy) {
-                console.log(vacancy.commentsByPartner);
+            .populate('admin')
+            .exec((err, vacancy) => {
+                if (err) console.log(err)
                 vacancy.commentsByPartner.push({
                     text: comment,
                     author: userId
                 });
+                ////notifying admin
+                if (vacancy.admin) {
+                    vacancy.admin.notifications.push({
+                        srcURL: '/api/vacancy/' + vacId,
+                        description: 'Partner commented on his vacancy request'
+                    });
+                }
                 vacancy.save();
-            });
-        Vacancy.findById(vacId).populate('admin') //notifying admin
-            .exec(function (err, vacancy) {
-                vacancy.admin.notifications.push({
-                    srcURL: '/api/vacancy/' + vacId,
-                    description: 'Partner commented on your vacancy request'
-                });
-                vacancy.admin.save();
+                return res.status(201).send(vacancy.commentsByPartner);
             })
     }
-    return res.send("updated");
 });
 
 router.post('/:id/CreateVacancy', function (req, res) {
@@ -82,8 +82,9 @@ router.post('/:id/CreateVacancy', function (req, res) {
     return res.send("created vacancy successfully");
 });
 
-//15    
-router.get('/:id/comment', function (req, res) {
+
+//15 getting all comments of a post
+router.get('/:id/comments', function (req, res) {
     var userType = req.body.userType; //should come from session
     var vacId = req.params.id;
     if (userType == 'Admin' || userType == 'Partner') {  //only partners and admins can access vacancies' comments section
@@ -96,11 +97,33 @@ router.get('/:id/comment', function (req, res) {
     }
 })
 
-////////// 16
-router.get('/:id/applicants', function (req, res) {
-    var userId = req.body.userId; //should come from session
+/////////// allow member to apply for a job
+router.put('/:id/apply', function (req, res) {
+    var uid = req.body.userId; //should come from session
     var vacId = req.params.id;
-    Partner.findById(userId, 'vacancies')
+    Vacancy.findById(vacId)
+        .exec((err, vac) => {
+            if (err) console.log(err);
+            if (!vac) {
+                res.status(404).send('vacancy not found')
+            } else {
+                if (vac.status != "Open") {
+                    res.status(404).send('vacancy is not open at the momnent')
+                } else {
+                    vac.applicants.push(uid);
+                    vac.save();
+                    return res.status(201).send('user successfully applid for the job')
+                }
+            }
+        })
+
+})
+
+////////// 16 getting all those who applied to a vacancy
+router.get('/:id/applicants', function (req, res) {
+    var userId = req.get('userId'); //should come from session
+    var vacId = req.params.id;
+    Partner.findById(userId)
         .exec(function (err, partnerDoc) {
             if (partnerDoc.vacancies.find(vac => (vac._id == vacId)))   //partner investigating HIS vacancy applicants
                 Vacancy.findById(vacId, 'applicants')
@@ -109,7 +132,7 @@ router.get('/:id/applicants', function (req, res) {
                         return res.send(vacancyDoc.applicants);
                     })
             else                                                        //partner try to investigate other partner vacancy applicants
-                return res.send('you are not allowed to view this')
+                return res.status(403).send('you are not allowed to view this')
         })
 })
 
@@ -143,15 +166,15 @@ router.delete('/', function (req, res) {
 
 // Story 21.2 display a vacancy post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
+
     var vacId = req.params.id;
 
     Vacancy.findById(vacId, '-_id').exec(
         function (err, response) {
             if (err) console.log(err);
+            // console.log(response);
             return res.send(response);
         });
-
-
 });
 
 router.get('/pendingVacancies', function (req, res) {
@@ -176,13 +199,13 @@ router.get('/pendingVacancies', function (req, res) {
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
 router.get('/RecommendedVacancies', function (req, res) {
-    var userId = req.body.userId;
+    var userId = req.get('userId');
     var RecommendedVacancies = [];
-    Member.findById(userId)
+    Member.findById(userId, 'url name availability address skills ')
         .exec((err, member) => {
             if (err) console.log(err); // getting recommended events
             if (member.availability !== true) return res.send('member is not available to be hired')
-            Vacancy.find({ 'status': 'Open' }, 'url name location')
+            Vacancy.find({ 'status': 'Open' }, 'url name location city')
                 .exec((err, vacs) => {
                     if (err) console.log(err);
                     for (vac of vacs) {
@@ -295,7 +318,6 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
             res.send('Vacancy cannot be edited after being approved');
         }
     })
-})
+});
 
 module.exports = router;
-

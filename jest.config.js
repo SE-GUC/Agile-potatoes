@@ -2,6 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -12,10 +13,10 @@ module.exports = {
   // browser: false,
 
   // The directory where Jest should store its cached dependency information
-  // cacheDirectory: "C:\\Users\\gasse\\AppData\\Local\\Temp\\jest",
+  // cacheDirectory: "C:\\Users\\ibrahim\\AppData\\Local\\Temp\\jest",
 
   // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+  // clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
   // collectCoverage: false,

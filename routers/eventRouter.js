@@ -12,8 +12,9 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
 
 // Story 3, 4: creating events	
-router.post('/:id/CreateEvent', function (req, res) {
+router.post(`/:id/CreateEvent`, function (req, res) {
 	var userType = req.body.userType; //should come from session
+	var userId = req.params.id;    //should come from session
 	var description = req.body.description;
 	var name = req.body.name;
 	var price = req.body.price;
@@ -24,7 +25,6 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
-	var userID = req.params.id;
 	if (userType == 'Admin') {
 		var event = new Event({
 			name: name,
@@ -44,12 +44,12 @@ router.post('/:id/CreateEvent', function (req, res) {
 			if (err) throw err;
 			console.log(eve);
 		})
-		Admin.findById(userID).exec(function (err, admin) {
+		Admin.findById(userId).exec(function (err, admin) {
 			console.log(Admin.event);
 			admin.events.push(event._id)
 			admin.save();
 		});
-		return res.send("created event successfully" + " " + event._id);
+		return res.send('created event for admin successfully');
 	}
 	else if (userType == 'Partner') {
 		var event = new Event({
@@ -63,23 +63,22 @@ router.post('/:id/CreateEvent', function (req, res) {
 			eventType: eventType,
 			speakers: speakers,
 			topics: topics,
-			partner: userID
+			partner: userId
 		});
 
 		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
+			console.log(eve);
 		})
-		Partner.findById(userID).exec(function (err, partner) {
-			if (err) throw err;
-			console.log(event);
+		Partner.findById(userId).exec(function (err, partner) {
+			console.log(Partner.event);
 			partner.events.push(event._id)
 			partner.save();
-			console.log("Created event successfully " + event._id);
-			return res.send(event);
 		});
-	}
 
+		return res.send('created event for partner successfully');
+	}
 });
 
 //15
@@ -133,10 +132,10 @@ router.get('/:id/PartnerPendingEvents', function (req, res) {
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
 router.get('/RecommendedEvents', function (req, res) {
-	var userId = req.body.userId;
+	var userId = req.get('userId');
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
-	Member.findById(userId, 'url name eventDate')
+	Member.findById(userId, 'url name eventDate address interests events')
 		.populate('events', 'eventType')
 		.exec((err, member) => {
 			if (err) console.log(err); // getting recommended events
@@ -157,7 +156,7 @@ router.get('/RecommendedEvents', function (req, res) {
 							recommendedEvents.push(event);
 						}
 					}
-					res.send(recommendedEvents);
+					return res.send(recommendedEvents);
 				})
 		})
 })
@@ -177,15 +176,8 @@ router.delete('/', function (req, res) {
 						event.save();
 					})
 				}
-
-
-			}
-
-
-			)
+			})
 	}
-
-
 	return res.send("deleted");
 
 });
@@ -193,7 +185,6 @@ router.delete('/', function (req, res) {
 // Story 21.2 display an event post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
 	var eveId = req.params.id;
-
 	Event.findById(eveId, '-_id').exec(
 		function (err, response) {
 			if (err) return res.send("event not found");
