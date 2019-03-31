@@ -36,6 +36,18 @@ const functions = {
             console.log(error)
             return 'not';
         }
+    },
+    showingProfile: async (mem,profile) => {
+        let returnedProfile;
+        try {
+            returnedProfile = await axios.get(`http://localhost:3000/api/profile/${profile._id}`, { 'headers': { 'userId': `${mem._id}`, 'userType': 'Member' } });
+            return (returnedProfile.data._id == profile._id);
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
     }
 };
 module.exports = functions;

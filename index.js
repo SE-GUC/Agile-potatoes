@@ -27,7 +27,9 @@ app.use('/api/event', eventRouter);
 // handling errors
 app.use(function (err, req, res, next) {
     res.status(422).send({ error: err.message });
+    next();
 });
+
 
 
 console.log(`app is up and running ... on http://localhost:${port}`);

@@ -8,7 +8,7 @@ const funcs = require('./fn');
 const mongoose = require('mongoose');
 const config = require("./config");
 
-describe('testing stories 7,16 and 22', () => {
+describe('testing stories 7, 16, 12 and 22', () => {
     // documents to perform tests on   
     let mem1; 
     let adm1;
@@ -45,5 +45,10 @@ describe('testing stories 7,16 and 22', () => {
         expect(noOfApplicants).toBe(1); 
         done();
     });
+    test('expecting returned profile to have same id of created one', async (done) => {
+        let isSame = await funcs.showingProfile(mem1, par1);
+        expect(isSame).toBeTruthy(); 
+        done();
+    })
     
 })

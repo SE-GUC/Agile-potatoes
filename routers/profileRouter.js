@@ -8,53 +8,58 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-//user story 12
-router.get('/:id', function (req, res) {
+//user story 12 returning user detatils to display his profile
+router.get('/:id', function (req, res, next) {
     var userType = req.get('userType'); //should come from session
     var userId = req.get('userId'); //should come from session
     var profId = req.params.id;
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
             Admin.findById({ _id: profId }, function (err, adminDoc) {
-                if (err) throw err;
-                res.send(adminDoc);
+                if (err) next(err);
+                return res.send(adminDoc);
             });
         }
         else if (userType == 'Partner') {
             Partner.findById({ _id: profId }, function (err, partnerDoc) {
-                if (err) throw err;
-                res.send(partnerDoc);
+                if (err) next(err);
+                return es.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
             Member.findById({ _id: profId }, function (err, memberDoc) {
-                if (err) throw err;
-                res.send(memberDoc);
+                if (err) next(err);
+                return res.send(memberDoc);
             })
         }
     }
     else {                        //user viewing other's profile
-        if (userType == 'Admin') {
-            Admin.findById(profId, 'username fname lname events', function (err, adminDoc) {
-                if (err) throw err;
-                console.log(adminDoc);
-                res.send(adminDoc);
-            });
-        }
-        else if (userType == 'Partner') {
-            Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
-                if (err) throw err;
-                res.send(partnerDoc);
-            });
-        }
-        else if (userType == 'Member') {
             Member.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, memberDoc) {
-                if (err) throw err;
-                res.send(memberDoc);
-            });
-        }
+                if (err) next(err);
+                if (memberDoc){
+                    return res.send(memberDoc);
+                }
+                else {
+                    Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
+                        if (err) next(err);
+                        if (partnerDoc) {
+                            return res.send(partnerDoc);
+                        }
+                        else {
+                            Admin.findById(profId, 'fname lname events', function (err, adminDoc) {
+                                if (err) next(err);
+                                if (adminDoc) {
+                                    return res.send(adminDoc);
+                                }
+                                else {
+                                    return res.status(404).send('profile not found')
+                                }
+                            })
+                        }
+                    })
+                }
+            })
     }
-    return;
 })
 
 
