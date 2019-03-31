@@ -156,3 +156,53 @@ describe('testing stories 7, 16, 12 and 22', () => {
     })
 
 });
+
+describe('testing user stories 23,24,25', () => {
+    
+    let vac1, vac2, adm1;
+    beforeAll(async (done) => {
+        await mongoose.connect(config.getTestingDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
+        par1 = new Partner({ username: 'TesterPartner', name: 'Tester', password: '12345678910', email: 'commentTesterPartner@a.com' });
+        adm1 = new Admin({ username: 'adminMadeTotest', password: 'blahblah', fname: 'Adminfirst', lname: 'Adminlast', email: '123Admin@gmail.com' });
+        vac1 = new Vacancy({ name: 'vacancyMadeToTest', status: 'Submitted', description: 'testingParty', duration: '7 years', partner:par1._id });
+        vac2 = new Vacancy({ name: 'vacancyMadeToTest2', status: 'Open', description: 'testinggggg', duration: '10 years', partner: par1._id });
+
+        await vac1.save();
+        await adm1.save();
+        await vac2.save();
+        await par1.save();
+        done();
+    });
+    afterAll((done) => {
+        setTimeout(async () => {
+            await mongoose.connection.db.dropDatabase();
+            await mongoose.connection.close();
+            done();
+        }, 500)
+    });
+    test('changing a status of a vacancy by an admin', async (done) => {
+        let response = await funcs.ChangeVacStatusAdmin(vac1);
+        expect(response).toBeTruthy();
+        done();
+    });
+
+    test('changing a status of a vacancy by a partner', async (done) => {
+        let response1 = await funcs.ChangeVacStatusPartner(vac2);
+        expect(response1).toBeTruthy();
+        done();
+    });
+
+    test('changing name of admin', async (done) => {
+        let response2 = await funcs.ChangeAdminName(adm1);
+        expect(response2).toMatch('Updated');
+        done();
+    });
+
+    test('changing password of admin', async (done) => {
+        let response3 = await funcs.ChangeAdminPassword(adm1);
+        expect(response3).toMatch('Updated');
+        done();
+    });
+
+
+});

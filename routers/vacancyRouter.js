@@ -233,13 +233,14 @@ router.put('/:id/status', function (req, res) {
     var userType = req.body.userType;
     var vacId = req.params.id;
     var vacStatus = req.body.status;
+    var partnerid = req.body.partner;
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted')
                 Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
                     function (err, response) {
                         console.log(response);
-                        return res.send("Status Updated");
+                        return res.send(response);
                     });
             else
                 return res.send("This vacancy is already opened and you are not allowed to change its status")
@@ -248,13 +249,13 @@ router.put('/:id/status', function (req, res) {
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open')
+            if (vacancy.status == 'Open'&& vacancy.partner == partnerid)
                 Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
                     function (err, response) {
                         console.log(response);
-                        return res.send("Status Updated");
+                        return res.send(response);
                     });
-            else
+            else   
                 return res.send("You are not allowed to change the status of this vacancy")
 
 

@@ -175,7 +175,89 @@ const functions = {
                 return 'not';
             }
             
-         }
+         },
+
+
+        ChangeVacStatusAdmin: async (vac) => {
+            let updatedVac = "";
+            try {
+                updatedVac = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
+                    userType: "Admin",
+                    status: "Open"
+                });
+                if (updatedVac.status != vac.status)
+                    return true
+                else
+                    return false
+    
+    
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+    
+        },
+    
+        ChangeVacStatusPartner: async (vac) => {
+            let updatedVac2 = "";
+            try {
+                updatedVac2 = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
+                    userType: "Partner",
+                    status: "Closed"
+                });
+    
+                if (updatedVac2.status != vac.status)
+                    return true
+                else
+                    return false
+    
+    
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+    
+        },
+    
+        ChangeAdminName: async (admin) => {
+            let updatedAdmin = "";
+            try {
+                updatedAdmin = await axios.put(`http://localhost:3000/api/profile/${admin._id}/name`, {
+                    "userType": "Admin",
+                    "fname": "blah",
+                    "lname": "blah blah"
+                });
+    
+                return 'Updated';
+    
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+    
+        },
+    
+        ChangeAdminPassword: async (admin) => {
+            let updatedAdmin2 = "";
+            try {
+                updatedAdmin2 = await axios.put(`http://localhost:3000/api/profile/${admin._id}/password`, {
+                    "userType": "Admin",
+                    "password": "blahblahblah"
+                });
+    
+                return 'Updated';
+    
+    
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+    
+        } 
 };
 
 module.exports = functions;
