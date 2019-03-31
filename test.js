@@ -158,13 +158,13 @@ describe('testing stories 7, 16, 12 and 22', () => {
 });
 
 describe('testing user stories 23,24,25', () => {
-    
+
     let vac1, vac2, adm1;
     beforeAll(async (done) => {
         await mongoose.connect(config.getTestingDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
         par1 = new Partner({ username: 'TesterPartner', name: 'Tester', password: '12345678910', email: 'commentTesterPartner@a.com' });
         adm1 = new Admin({ username: 'adminMadeTotest', password: 'blahblah', fname: 'Adminfirst', lname: 'Adminlast', email: '123Admin@gmail.com' });
-        vac1 = new Vacancy({ name: 'vacancyMadeToTest', status: 'Submitted', description: 'testingParty', duration: '7 years', partner:par1._id });
+        vac1 = new Vacancy({ name: 'vacancyMadeToTest', status: 'Submitted', description: 'testingParty', duration: '7 years', partner: par1._id });
         vac2 = new Vacancy({ name: 'vacancyMadeToTest2', status: 'Open', description: 'testinggggg', duration: '10 years', partner: par1._id });
 
         await vac1.save();
@@ -234,7 +234,7 @@ describe('testing user stories 23,24,25', () => {
 
         });
         test('expecting 2 comments added to an event', async (done) => {
-            let noOfComments =await  funcs.AddingTwoCommentsToEvents(eve1, par1, adm1);
+            let noOfComments = await funcs.AddingTwoCommentsToEvents(eve1, par1, adm1);
             expect(noOfComments).toBe(2);
             done();
         });
@@ -243,4 +243,5 @@ describe('testing user stories 23,24,25', () => {
             expect(number).toBe(1);
             done();
         });
-});
+    });
+}
