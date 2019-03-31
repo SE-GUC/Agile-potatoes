@@ -204,7 +204,7 @@ describe('testing user stories 23,24,25', () => {
         done();
     });
 
-
+})
     describe('21.1 21.2', () => {
         // documents to perform tests on   
         let mem1, adm1;
@@ -325,8 +325,158 @@ describe('testing user stories 23,24,25', () => {
          });
     
     });
-    
-    
 
 
+const Event = require('./models/eventModel');
+const Admin = require('./models/adminModel');
+
+const config = require("./config");
+const mongoose = require('mongoose');
+const funcs = require('./fn');
+const axios = require('axios');
+
+const requestbody = {	userType: 'Admin',
+userId: '5c9175c03c631c0c80f077c0',
+name:'event',
+description: 'cool event',
+price: 0
 }
+const approvedevent = {
+  eventStatus: 'Approved',
+  speakers: [],
+  topics: [],
+  feedbacks: [],
+  attendees: [],
+  name: 'event',
+  description: 'cool event',
+  price: 0,
+  commentsByAdmin: [],
+  commentsByPartner: [],
+  __v: 0
+}
+const admin = new Admin({
+  username:'sewsew',
+  password:'haha',
+  email:'erq@ee.com',
+  notifications: [{
+    seen: false,
+    srcURL: 'String',
+    description: 'String1'
+}]
+})
+const notification = [{
+  srcURL: 'String',
+  description: 'String1'
+}]
+
+
+const pendingvacancy ={ 
+  id: '5323513539149214931asdr3',
+  status: 'Submitted',
+  description: 'job',
+  duration: 'unknown'
+  }
+
+
+//submitting create admin and create vacancy
+beforeAll(async () => {
+   await mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+   
+     admin.save();
+  
+    await funcs.createvacancy(pendingvacancy);
+});
+
+// test create an approved event using id of an admin I have created him
+test ('creating approved event', async () => {   
+  await mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+
+  const adminid = Admin.findOne(admin).then(user => {
+     return user.id
+   }).catch((error) => {
+//     console.log(error);
+   })
+   const id11 = await adminid;
+  const api = axios.create({baseURL: 'http://localhost:3000/api/'})
+  api.post('event/'+ id11 +'/CreateEvent/', {
+    'userType': requestbody.userType,
+    'userId': requestbody.userId,
+    'name': requestbody.name,
+    'description': requestbody.description,
+    'price': requestbody.price
+  })
+  .then(res => {
+      expect(res).toMatchObject(approvedevent)
+  })
+  .catch(error => {
+//      console.log('hey')
+  })
+  await mongoose.disconnect();
+
+})
+
+
+
+
+//test story 14 viewing approved events
+test ('getting the approved event', async () => {
+  function getevent() {
+    return axios.get('http://localhost:3000/api/event/ApprovedEvents').then(response => {
+      return response.data
+    }).catch((error) => {
+ //     console.log(error);
+    });
+  }
+  
+  getevent().then(data => {
+    expect(data).toContainEqual(expect.objectContaining(approvedevent))
+    }).catch((error) => {
+      // console.log(error);
+    });
+})
+
+
+//test added notification to an admin created and the notifications is pushed in that admin also and comparing the returned data with the
+// same data of notification (story 13)
+test('showing notifications',async () => {
+  await mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+  const adminid = Admin.findOne(admin).then(user => {
+   return user.id
+  }).catch((error) => {
+//     console.log(error);
+    })
+
+  const id11 = await adminid;
+  function getnotif() {
+    return axios.get('http://localhost:3000/api/notification/'+ id11).then(response => {
+      return response.data
+    }).catch((error) => {
+ //     console.log(error);
+    });
+  }
+  getnotif().then(data => {
+    expect(data).toMatchObject(notification)
+    }).catch((error) => {
+      // console.log(error);
+    });
+})
+
+
+
+
+
+//story 21 using predefined ids in my DB 
+
+test('Partner can view his vacancy', async () => {
+      const response = await funcs.getpendingvacancies('5c877adf2e4e5a47b0dac90c');
+      expect(response.data).toMatchObject(pendingvacancy)
+})
+
+
+
+
+afterAll(async () => {
+  await mongoose.disconnect();
+});
+
+    

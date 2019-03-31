@@ -1,4 +1,7 @@
 const axios = require('axios');
+const axios = require('axios');
+const Vacancy = require('./models/vacancyModel');
+
 const functions = {
     updateUserAdmin: async (user,adm) => {
         let outBefore;
@@ -400,7 +403,7 @@ const functions = {
         return "nothing";
     }
 
-    }
+    },
 
     ViewingPendingVacancies: async (adm) => {       
         try{
@@ -412,11 +415,39 @@ const functions = {
         
         return vacancies.data.length;
 
-    }
+        }
+        catch(err)
+        {
+            console.log('error')
+        }
 
 
-}
-}
+    },
+
+    
+
+
+    getpendingvacancies: async (id) => {
+            return await axios.get('http://localhost:3000/api/vacancy/'+ id)
+        },
+    createvacancy: async (pendingvacancy) => {
+
+        const pendingvacancy1 = await new Vacancy(pendingvacancy)   
+        pendingvacancy1.save();
+    },
+    getvacancy: async (pendingvacancy) => {
+        
+        vac = await Vacancy.findOne(pendingvacancy,'id status description duration').exec(function (err, vacancy){
+            return vacancy
+            })
+            return vac
+    },
+    createevent: async ()=>{
+        return await axios.post('http://localhost:3000/api/event/5c9175c03c631c0c80f077c0/CreateEvent/');
+    },
+    getevent: async () => {
+        return axios.get('http://localhost:3000/api/event/ApprovedEvents')
+        }
 
 
 
