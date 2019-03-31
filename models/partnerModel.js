@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const PartnerSchema = new Schema({
     username:{type:String, required:true, unique:true},
-    password:{type:String, required:true},
+    password:{type:String},
     name: {type:String, unique: true},
     email:{type:String, required:true, unique:true},
     boardMembers:[{

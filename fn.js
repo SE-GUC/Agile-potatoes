@@ -1,6 +1,7 @@
 const axios = require('axios');
 const functions = {
-    AddingTwoCommentsToVacancy: async (vac, par, adm) => {        
+
+    AddingTwoCommentsToVacancy: async (vac, par, adm) => {
         let updatedVac = "";
         try {
             await axios.post(`http://localhost:3000/api/vacancy/${vac._id}/comment`, {
@@ -15,13 +16,13 @@ const functions = {
             });
             updatedVac = await axios.get(`http://localhost:3000/api/vacancy/Post/${vac._id}`);
             return (updatedVac.data.commentsByPartner.concat(updatedVac.data.commentsByAdmin).length);
-            
+
         } catch (error) {
             console.log('GOT ERROR')
             console.log(error)
             return 'not';
         }
-        
+
     },
     gettingApplicants: async (vac, par, mem) => {
         let applicantsRes;
@@ -37,7 +38,7 @@ const functions = {
             return 'not';
         }
     },
-    showingProfile: async (mem,profile) => {
+    showingProfile: async (mem, profile) => {
         let returnedProfile;
         try {
             returnedProfile = await axios.get(`http://localhost:3000/api/profile/${profile._id}`, { 'headers': { 'userId': `${mem._id}`, 'userType': 'Member' } });
@@ -53,7 +54,7 @@ const functions = {
         let recommendVacanciesRes;
         try {
             recommendVacanciesRes = await axios.get(`http://localhost:3000/api/vacancy/RecommendedVacancies`, { 'headers': { 'userId': `${mem._id}` } });
-            return(recommendVacanciesRes.data.length);
+            return (recommendVacanciesRes.data.length);
         } catch (error) {
             console.log('GOT ERROR')
             console.log(error)
@@ -71,6 +72,45 @@ const functions = {
             console.log(error)
             return 'not';
         }
+    },
+
+    updatePartnerProfileChangePassword: async (par1) => {
+        const updated = await axios.put(`http://localhost:3000/api/profile/${par1._id}`, {
+            userType: "Partner",
+            userID: par1._id,
+            password: "new_12345_password"
+        });
+        return updated.data.password;
+    },
+
+    updatePartnerProfileAddBoardMembers: async (par1) => {
+        const updated = await axios.put(`http://localhost:3000/api/profile/${par1._id}`, {
+            userType: "Partner",
+            userID: par1._id,
+            boardMembers: [{
+                name: "ahdthsdjskztmed",
+                email: "ahmedeeeenn@dfdgsaf"
+            },
+            {
+                name: "mama",
+                email: "mamaaaAfsdgg@rgsdh"
+            },
+            {
+                name: "mido",
+                email: "wdhssdhsd@erahaERHdfZHnf"
+            }]
+        });
+        return updated.data.boardMembers.length;
+    },
+
+    updateEventByChangingRemainingPlaces: async (event1, par1) => {
+        const updated = await axios.put(`http://localhost:3000/api/event/${event1._id}`, {
+            userType: "Partner",
+            userID: par1._id,
+            remainingPlaces: 10
+        });
+        return updated.data.remainingPlaces;
     }
 };
+
 module.exports = functions;
