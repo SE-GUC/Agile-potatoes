@@ -204,6 +204,42 @@ describe('testing user stories 23,24,25', () => {
         done();
     });
 
+
+    describe('21.1 21.2', () => {
+        // documents to perform tests on   
+        let mem1, adm1;
+        beforeAll(async (done) => {
+            await mongoose.connect(config.getTestDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
+    
+            mem1 = new Member({ username: 'TesterMember', password: '176351', fname: 'john', lname: 'doe', email: 'memtest@m.com', address: '23 IdiotTest St testCity', interests:['lego', 'programming'] });
+            adm1 = new Admin({ username: 'TesterAdmin', password: '1234568910', email: 'commentTesterAdmin@a.com' });
+            await mem1.save();
+            await adm1.save();
+            done();
+        });
+        afterAll((done) => {
+            setTimeout(async () => {
+                await mongoose.connection.db.dropDatabase();
+                await mongoose.connection.close();
+            }, 50000)
+            done();
+        });
+    
+        test('update prof', async (done) => {
+            jest.setTimeout(55000);
+            let feed = await funcs.updateUser(mem1);
+            expect(feed).toBe(false);
+            done();
+        });
+        test('update prof admin', async (done) => {
+            jest.setTimeout(55000);
+            let feed = await funcs.updateUserAdmin(mem1,adm1);
+            expect(feed).toBe(false);
+            done();
+        });
+    
+    }) 
+
     describe('TESTING NADA', () => {
         let mem1, adm1, par1, vac1, vac2, eve1;
         beforeAll(async (done) => {

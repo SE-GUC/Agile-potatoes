@@ -1,6 +1,56 @@
 const axios = require('axios');
 const functions = {
-
+    updateUserAdmin: async (user,adm) => {
+        let outBefore;
+        let outAfter;
+        
+        try {
+          outBefore=await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
+            'headers': {
+              'userId': `${user._id}`,
+              'userType': 'Member'
+            }
+          });
+          outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
+            "userType": "Admin",
+            "userID":`${adm._id}`,
+            "membershipExpiryDate":"2002-10-31T22:00:00.000+00:00"
+    
+            
+          });
+          console.log(outAfter.data);
+          return (outBefore.data.membershipExpiryDate==outAfter.data.membershipExpiryDate);
+        } catch (error) {
+          console.log(error)
+          return 'Wrong path ?';
+        }
+      },
+      updateUser: async (user) => {
+        let outBefore;
+        let outAfter;
+        
+        try {
+          outBefore=await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
+            'headers': {
+              'userId': `${user._id}`,
+              'userType': 'Member'
+            }
+          });
+          outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
+            "userType": "Member",
+            "userID":`${user._id}`,
+            "lname":"uniqueone"
+    
+            
+          });
+          console.log(outAfter.data);
+          return (outBefore.data.lname==outAfter.data.lname);
+        } catch (error) {
+          console.log(error)
+          return 'Wrong path ?';
+        }
+      },
+      
     AddingTwoCommentsToVacancy: async (vac, par, adm) => {
         let updatedVac = "";
         try {
