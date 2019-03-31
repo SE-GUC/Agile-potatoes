@@ -26,7 +26,8 @@ const VacancySchema = new Schema({
         type: String,
         trim: true
     },
-    partner: {
+    partner: {      // should be required
+        required: true,
         type: mongoose.ObjectId,
         ref: 'Partner'
     },
