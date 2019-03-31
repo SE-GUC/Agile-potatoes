@@ -1,5 +1,15 @@
+const DbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/lirtenDB?retryWrites=true";
+const TestingDbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/TestlirtenDB?retryWrites=true";;
+
+
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
-    return "mongodb+srv://Hassan:zizojicko24@cluster0-spbpz.mongodb.net/test?retryWrites=true";
+    // MUST BE CHANGED BEFORE DEPLOYMENT to DBConnectionString
+    return TestingDbConnectionString;
+
+}
+
+const getTestingDbConnectionString = function () { // Set your connection string to mongoDB 
+    return TestingDbConnectionString;
 }
 
 const getDevelopmentPort = function () {
@@ -8,5 +18,6 @@ const getDevelopmentPort = function () {
 
 module.exports = {
     getDbConnectionString,
+    getTestingDbConnectionString,
     getDevelopmentPort
 };
