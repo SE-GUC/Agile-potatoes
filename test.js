@@ -465,6 +465,9 @@ test('showing notifications',async () => {
 
 
 
+
+
+
 //story 21 using predefined ids in my DB 
 
 test('Partner can view his vacancy', async () => {
@@ -478,5 +481,57 @@ test('Partner can view his vacancy', async () => {
 afterAll(async () => {
   await mongoose.disconnect();
 });
+
+describe('testing stories 1,2,19,20', () => {
+    // documents to perform tests on   
+    let mem1, adm1, par1, vac1, vac2, eve1;
+    beforeAll(async (done) => {
+        await mongoose.connect(config.getTestingDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
+
+        mem1 = new Member({ username: 'TesterMember', password: '176351', fname: 'john', lname: 'doe', email: 'memtest@m.com', address: '23 IdiotTest St testCity', interests: ['lego', 'programming'] });
+        adm1 = new Admin({ username: 'TesterAdmin', password: '1234568910', email: 'commentTesterAdmin@a.com' });
+        par1 = new Partner({ username: 'TesterPartner', name: 'Tester', password: '12345678910', email: 'commentTesterPartner@a.com' });
+        vac1 = new Vacancy({ name: 'vacancyMadeToTest', status: 'Open', description: 'testingParty', duration: '7 years', city: 'testCity', partner: par1._id, admin: adm1._id });
+        vac2 = new Vacancy({ name: 'vacancy2MadeToTest', status: 'Open', description: 'testingParty2', duration: '7 years', city: 'Paris', partner: par1._id });
+        eve1 = new Event({ name: 'eventMadeToTest', eventStatus: 'Approved', description: 'testingParty', duration: '7 years', eventType: 'lego', partner: par1._id })
+        par1.vacancies.push(vac1._id);
+        await mem1.save();
+        await adm1.save();
+        await vac1.save();
+        await vac2.save();
+        await par1.save();
+        await eve1.save();
+        done();
+    });
+    afterAll((done) => {
+        setTimeout(async () => {
+           // await mongoose.connection.db.dropDatabase();
+            await mongoose.connection.close();
+        }, 500)
+        done();
+    });
+    test(`Creating a Partner should return a message if it was done successfully`, async (done) => {
+        var res = await funcs.createPartner();
+        expect(res).toMatch("Added a partner");
+        done();
+    })
+
+    test(`Creating a member should return a message if it was done successfully`, async (done) => {
+        var res = await funcs.createMember();
+        expect(res).toMatch("Added a member");
+        done();
+    })
+
+    test(`Pending events for partner should return an array of event objects`, async (done) => {
+        var res = await funcs.GetPendingEventsForPartner;
+        expect(res[0]).toBeInstanceOf(Event);
+        done();
+    })
+
+    test(`Pending vacancies for partner should return an array of Vacancy objects`, async (done) => {
+        var res = await funcs.GetPendingVacanciesForPartner;
+        expect(res[0]).toBeInstanceOf(Vacancy);
+        done();
+    })
 
     

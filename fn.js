@@ -447,8 +447,75 @@ const functions = {
     },
     getevent: async () => {
         return axios.get('http://localhost:3000/api/event/ApprovedEvents')
-        }
+        },
 
+
+        createPartner: async () => {
+            try {
+                var res = await axios.post('http://localhost:3000/api/profile/create', {
+                    userType: "Partner",
+                    username: "ASalah6",
+                    password: "124",
+                    name: "ahmed",
+                    email: "ay7aga",
+                    workfield: "idk"
+                })
+                console.log(res)
+                return res
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+        },
+        createMember: async () => {
+            try {
+                var res = await axios.post('http://localhost:3000/api/profile/create', {
+                    userType: "Member",
+                    username: 'TesterMember',
+                    password: '176351',
+                    fname: 'john',
+                    lname: 'doe',
+                    email: 'memtest@m.com',
+                    address: '23 IdiotTest St testCity',
+                    interests: ['lego', 'programming']
+                })
+                console.log(res)
+                return res
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+        },
+    
+        GetPendingEventsForPartner: async () => {
+            try {
+                res = await axios.get(`http://localhost:3000/api/event/${par._id}/PartnerPendingEvents`, {
+                    userType: "Partner",
+                })
+                console.log(res);
+                return res
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+        },
+    
+        GetPendingVacanciesForPartner: async () => {
+            try {
+                res = await axios.get(`http://localhost:3000/api/vacancy/${par._id}/PartnerPendingVacancies`, {
+                    userType: "Partner",
+                })
+                console.log(res)
+                return res
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+        }
 
 
 
