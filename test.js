@@ -59,6 +59,48 @@ describe('Testing user story 20 and 21, As a partner I can edit my profile (Boar
     });
 });
 
+describe('testing stories 3, 4, and 18', () => {
+    // documents to perform tests on   
+    let mem1, adm1, par1, vac1, vac2, eve1;
+    beforeAll(async (done) => {
+        jest.setTimeout(30000);
+        await mongoose.connect(config.getTestingDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
+        adm1 = new Admin({ username: 'TesterAdmin', password: '1234568910', email: 'commentTesterAdmin@a.com' });
+        par1 = new Partner({ username: 'TesterPartner', name: 'Tester', password: '12345678910', email: 'commentTesterPartner@a.com' });
+        await adm1.save();
+        await par1.save();
+        done();
+    });
+    afterAll((done) => {
+        setTimeout(async () => {
+            await mongoose.connection.db.dropDatabase();
+            await mongoose.connection.close();
+            done();
+        }, 500)
+       
+    });
+    test(`Creating an event should return a message if it was done for a partner successfully`, async (done) => {
+        jest.setTimeout(6000);
+        var res = await funcs.CreatingAnEventForPartner(par1);
+        expect(res).toMatch("created event for partner successfully");
+        done();
+    })
+
+    test(`Creating an event should return a message if it was done for a admin successfully`, async (done) => {
+        jest.setTimeout(6000);
+        var res = await funcs.CreatingAnEventForPartner(par1);
+        expect(res).toMatch("created event for admin successfully");
+        done();
+    })
+
+    test(`Pending events should return an array of event objects`, async (done) => {
+        jest.setTimeout(6000);
+        var res = await funcs.GetPendingEventsForAdmin();
+        expect(res.data[0]).toBeInstanceOf(Event);
+        done();
+    })
+});
+
 describe('testing stories 7, 16, 12 and 22', () => {
     // documents to perform tests on   
     let mem1, adm1, par1, vac1, vac2, eve1;
