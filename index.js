@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const config = require("./config");
 
 const port = process.env.PORT || config.getDevelopmentPort();
-mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true});
+mongoose.connect(config.getDbConnectionString(), {useNewUrlParser: true, useCreateIndex: true });
 
 
 const notificationRouter = require('./routers/notificationRouter');

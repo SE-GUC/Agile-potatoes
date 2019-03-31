@@ -81,28 +81,30 @@ router.put('/:id', function (req, res) {
     var userType = req.body.userType; //should come from session
     var userID = req.body.userID; //should come from session (person logged in)
     var partnerID = req.params.id; //the ID of the partner I want to update
+    var pwd; var members;
     if (req.body.boardMembers) {
-        var members = req.body.boardMembers;
+        members = req.body.boardMembers;
     }
     if (req.body.password) {
-        var pwd = req.body.password;
+        pwd = req.body.password;
     }
     if (userType == 'Partner') {
         if (partnerID == userID) {
             Partner.findById(partnerID).exec(function (err, partner) {
                 if (members) {
-                    console.log("Yes there's members to push");
                     partner.boardMembers = members;
                 }
                 if (pwd) {
                     partner.password = pwd;
                 }
                 res.send(partner);
-                console.log("Updated partner profile successfully");
                 partner.save();
+                console.log("Updated partner profile successfully");
             });
         }
     }
+    else
+        res.send("Error. You are not a partner");
 });
 
 //user stories 1 & 2: creating member or partner profiles

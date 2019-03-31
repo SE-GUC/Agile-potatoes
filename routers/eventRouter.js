@@ -14,7 +14,6 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 // Story 3, 4: creating events	
 router.post('/:id/CreateEvent', function (req, res) {
 	var userType = req.body.userType; //should come from session
-	var userId = req.params.id;    //should come from session
 	var description = req.body.description;
 	var name = req.body.name;
 	var price = req.body.price;
@@ -25,7 +24,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
-	var partner = req.body.userId;
+	var userID = req.params.id;
 	if (userType == 'Admin') {
 		var event = new Event({
 			name: name,
@@ -45,7 +44,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 			if (err) throw err;
 			console.log(eve);
 		})
-		Admin.findById(userId).exec(function (err, admin) {
+		Admin.findById(userID).exec(function (err, admin) {
 			console.log(Admin.event);
 			admin.events.push(event._id)
 			admin.save();
@@ -64,21 +63,21 @@ router.post('/:id/CreateEvent', function (req, res) {
 			eventType: eventType,
 			speakers: speakers,
 			topics: topics,
-			partner: partner
+			partner: userID
 		});
 
 		event.url = '/api/event/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
-			console.log(eve);
 		})
-		Partner.findById(userId).exec(function (err, partner) {
-			console.log(Partner.event);
+		Partner.findById(userID).exec(function (err, partner) {
+			if (err) throw err;
+			console.log(event);
 			partner.events.push(event._id)
 			partner.save();
+			console.log("Created event successfully " + event._id);
+			return res.send(event);
 		});
-
-		return res.send("created event successfully" + " " + event._id);
 	}
 
 });
@@ -203,19 +202,75 @@ router.get('/Post/:id', function (req, res) {
 });
 
 //user story 21: As a partner I can update my pending events
+//Date, Location, Description, Price, Type, Topics, Speakers, Number of Attendees, Remaining Places.
 router.put('/:id', async (req, res) => {
-	var userType = 'Partner' //should come from session
-	var userID = '5c7945fe1c9d440000ec7811' //should come from session
-	var creatorID = '5c7945fe1c9d440000ec7811'; //should come from event itself
-	var id = req.params.id;
-	if (userType == 'Partner' && creatorID == userID) {     //partner updating HIS event
-		var values = req.body;
-		await Event.update({ _id: id }, values);
-		console.log("Event updated successfully");
-		await Event.findById(id).exec(function (err, event) {
-			if(err) console.log(err);
-			res.send(event);
-		})
+	var userType = req.body.userType; //should come from session
+	var userID = req.body.userID; //should come from session
+	var eventID = req.params.id;
+	var date; var location; var desc; var price; var type; var topics; var speakers; var attendees; var remPlaces;
+	if (userType == 'Partner') {     //partner updating HIS event
+		if (req.body.date) {
+			date = req.body.date;
+		}
+		if (req.body.location) {
+			location = req.body.location;
+		}
+		if (req.body.description) {
+			desc = req.body.description;
+		}
+		if (req.body.price) {
+			price = req.body.price
+		}
+		if (req.body.type) {
+			type = req.body.eventType;
+		}
+		if (req.body.topics) {
+			topics = req.body.topics
+		}
+		if (req.body.speakers) {
+			speakers = req.body.speakers;
+		}
+		if (req.body.attendees) {
+			attendees = req.body.attendees;
+		}
+		if (req.body.remainingPlaces) {
+			remPlaces = req.body.remainingPlaces;
+		}
+		await Event.findById(eventID).exec(function (err, event) {
+			if (event.partner._id == userID && event.eventStatus == 'Submitted') {
+				if (date) {
+					event.date = date;
+				}
+				if (location) {
+					event.location = location;
+				}
+				if (desc) {
+					event.description = desc;
+				}
+				if (price) {
+					event.price = price;
+				}
+				if (type) {
+					event.type = type;
+				}
+				if (topics) {
+					event.topics = topics;
+				}
+				if (speakers) {
+					event.speakers = speakers;
+				}
+				if (attendees) {
+					event.attendees = attendees;
+				}
+				if (remPlaces) {
+					event.remainingPlaces = remPlaces;
+				}
+				res.send(event);
+				console.log("Updated event successfully");
+				event.save();
+			}
+			//else res.send("Event was already approved so you can't update it");
+		});
 	}
 	else
 		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
