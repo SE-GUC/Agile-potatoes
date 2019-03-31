@@ -170,42 +170,35 @@ router.get('/RecommendedEvents', function (req, res) {
 		})
 })
 
-router.delete('/', function(req,res){
+router.delete('/:evid/deleteEvent', function(req,res){
     var userType=req.body.userType;
-    var evId= req.params.id;
+	var evId= req.params.evid;
+    var userId= req.body.userid;
 
     if(userType == 'Partner')
     {
-        Event.findById(vacId)
+        Event.findById(evId)
         .exec(function(err,event){
-            if(event.status=='Submitted')
+            if(event.status=='Submitted' && event.partner==userId)
             {
-                Event.deleteOne(event,function(err,result){
+                Event.findByIdAndRemove(event,function(err,result){
                     if(err)
                     {
-                        handleError(err);
+						console.log(err);
+						handleError(err);
                     }
                     event.save();
-                })
-            }
-
-
+                });	
+			}
+			
+				});
         }
-        
-        
-        )
-    }
-
-
-return res.send("deleted");
-
-}
+		return res.send("deleted event successfully");   
+    });
 
 
 
 
-
-);
 // Story 21.2 display an event post for partner/admin/member
 
 router.get('/Post/:id', function (req, res) {
