@@ -15,7 +15,7 @@ describe('Testing user story 20 and 21, As a partner I can edit my profile (Boar
     beforeAll(async (done) => {
         jest.setTimeout(30000);
         await mongoose.connect(config.getDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
-        par1 = new Partner({ username: 'testPartner', name: 'Test', password: '12345', email: 'passwordTesterPartner@a.com' });
+        par1 = new Partner({ username: 'testPartner', name: 'Testing', password: '12345', email: 'passwordTesterPartner@a.com' });
         await par1.save();
         event1 = new Event({
             description: "test event",
@@ -82,7 +82,7 @@ describe('testing stories 7, 16, 12 and 22', () => {
     });
     afterAll((done) => {
         setTimeout(async () => {
-            await mongoose.connection.db.dropDatabase();
+            //await mongoose.connection.db.dropDatabase();
             await mongoose.connection.close();
         }, 500)
         done();
