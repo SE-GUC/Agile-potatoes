@@ -167,6 +167,7 @@ router.delete('/', function (req, res) {
 // Story 21.2 display a vacancy post for partner/admin/member
 
 router.get('/Post/:id', function (req, res) {
+
     var vacId = req.params.id;
 
     Vacancy.findById(vacId, '-_id').exec(

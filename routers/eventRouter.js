@@ -209,6 +209,7 @@ return res.send("deleted");
 // Story 21.2 display an event post for partner/admin/member
 
 router.get('/Post/:id', function (req, res) {
+
     var eveId = req.params.id;
 
         Event.findById(eveId,'-_id').exec(
