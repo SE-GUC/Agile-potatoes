@@ -246,6 +246,14 @@ router.post('/:id/comment', function (req,res) {
                 });
                 event.save(); 
             });
+        Event.findById(evId).populate('partner') //notifying partner
+            .exec(function (err, event) {
+                event.partner.notifications.push({
+                    srcURL: '/api/event/' + evId,
+                    description: 'admin commented on your event request'
+                });
+                event.admin.save();
+            })
     } 
     else if (userType == 'Partner') {
         Event.findById(evId)
@@ -257,6 +265,14 @@ router.post('/:id/comment', function (req,res) {
                 });
                 event.save(); 
             });
+        Event.findById(evId).populate('admin') //notifying admin
+            .exec(function (err, event) {
+                event.admin.notifications.push({
+                    srcURL: '/api/event/' + evId,
+                    description: 'Partner commented on your event request'
+                });
+                event.admin.save();
+            })
     }
     return res.send("updated");
 });
