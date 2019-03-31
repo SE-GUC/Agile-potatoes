@@ -82,7 +82,7 @@ describe('testing stories 7, 16, 12 and 22', () => {
     });
     afterAll((done) => {
         setTimeout(async () => {
-            //await mongoose.connection.db.dropDatabase();
+            await mongoose.connection.db.dropDatabase();
             await mongoose.connection.close();
         }, 500)
         done();

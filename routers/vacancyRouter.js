@@ -54,31 +54,36 @@ router.post('/:id/comment', (req, res, next) => {
             })
     }
 });
-
+// As a partner I can submit a vacancy announcement request
 router.post('/:id/CreateVacancy', function (req, res) {
+    var userType = req.body.userType;
     var userId = req.params.id;   //should come from session
     var description = req.body.description;
     var duration = req.body.duration;
     var location = req.body.location;
     var salary = req.body.salary;
     var dailyHours = req.body.dailyHours;
-    var vacancy = new Vacancy({
-        description: description,
-        duration: duration,
-        location: location,
-        salary: salary,
-        dailyHours: dailyHours,
-        partner: userId
-    });
+    var vacancyId = req.body.vacancyId;
+    if (userType == 'Partner') {
 
-    vacancy.url = '/api/vacancy/' + vacancy._id;
-    vacancy.save(function (err) {
-        if (err) return handleError(err);
-    });
-    Partner.findById(userId).exec(function (err, par) {
-        par.vacancies.push(vacancy);
-        par.save();
-    });
+        var vacancy = new Vacancy({
+            description: description,
+            duration: duration,
+            location: location,
+            salary: salary,
+            dailyHours: dailyHours,
+            partner: userId
+        });
+
+        vacancy.url = '/api/vacancy/' + vacancy._id;
+        vacancy.save(function (err) {
+            if (err) return handleError(err);
+        });
+        Partner.findById(userId).exec(function (err, par) {
+            par.vacancies.push(vacancy);
+            par.save();
+        });
+    }
     return res.send("created vacancy successfully");
 });
 
@@ -136,32 +141,26 @@ router.get('/:id/applicants', function (req, res) {
         })
 })
 
-router.delete('/', function (req, res) {
-    var userType = req.body.userType;
-    var vacId = req.params.id;
+//story 11 As a partner I can delete my vacancy request before it is approved
 
+router.delete('/:vacid/deleteVacancy', function (req, res) {
+    var userType = req.body.userType;
+    var vacId = req.params.vacid;
+    var userId = req.body.id;
     if (userType == 'Partner') {
         Vacancy.findById(vacId)
             .exec(function (err, vacancy) {
-                if (vacancy.status == 'Submitted') {
-                    Vacancy.deleteOne(vacancy, function (err, result) {
+                if (vacancy.status == 'Submitted' && vacancy.partner == userId) {
+                    Vacancy.findByIdAndDelete(vacancy, function (err, result) {
                         if (err) {
                             handleError(err);
                         }
                         vacancy.save();
                     })
                 }
-
-
-            }
-
-
-            )
+            })
+        return res.send("deleted vacancy successfully");
     }
-
-
-    return res.send("deleted");
-
 });
 
 // Story 21.2 display a vacancy post for partner/admin/member
@@ -177,7 +176,11 @@ router.get('/Post/:id', function (req, res) {
         });
 });
 
+
+//////Story 17 As an admin I cana view pending vacancies announcments requests
+
 router.get('/pendingVacancies', function (req, res) {
+
 
     var userType = req.body.userType;
     var pendingVacancies = [];

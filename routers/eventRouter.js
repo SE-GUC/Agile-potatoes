@@ -161,25 +161,27 @@ router.get('/RecommendedEvents', function (req, res) {
 		})
 })
 
-router.delete('/', function (req, res) {
+router.delete('/:evid/deleteEvent', function (req, res) {
 	var userType = req.body.userType;
-	var evId = req.params.id;
+	var evId = req.params.evid;
+	var userId = req.body.userid;
 
 	if (userType == 'Partner') {
-		Event.findById(vacId)
+		Event.findById(evId)
 			.exec(function (err, event) {
-				if (event.status == 'Submitted') {
-					Event.deleteOne(event, function (err, result) {
+				if (event.status == 'Submitted' && event.partner == userId) {
+					Event.findByIdAndRemove(event, function (err, result) {
 						if (err) {
+							console.log(err);
 							handleError(err);
 						}
 						event.save();
-					})
+					});
 				}
-			})
-	}
-	return res.send("deleted");
 
+			});
+	}
+	return res.send("deleted event successfully");
 });
 
 // Story 21.2 display an event post for partner/admin/member
@@ -267,9 +269,6 @@ router.put('/:id', async (req, res) => {
 		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
 });
 
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }))
-
 router.post('/:id/comment', function (req, res) {
 	var userType = req.body.userType;
 	var userId = req.body.userId;
@@ -284,6 +283,14 @@ router.post('/:id/comment', function (req, res) {
 				});
 				event.save();
 			});
+		Event.findById(evId).populate('partner') //notifying partner
+			.exec(function (err, event) {
+				event.partner.notifications.push({
+					srcURL: '/api/event/' + evId,
+					description: 'admin commented on your event request'
+				});
+				event.admin.save();
+			})
 	}
 	else if (userType == 'Partner') {
 		Event.findById(evId)
@@ -295,8 +302,18 @@ router.post('/:id/comment', function (req, res) {
 				});
 				event.save();
 			});
+		Event.findById(evId).populate('admin') //notifying admin
+			.exec(function (err, event) {
+				event.admin.notifications.push({
+					srcURL: '/api/event/' + evId,
+					description: 'Partner commented on your event request'
+				});
+				event.admin.save();
+			})
 	}
 	return res.send("updated");
 });
 
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }))
 module.exports = router;

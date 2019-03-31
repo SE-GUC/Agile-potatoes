@@ -80,7 +80,6 @@ const functions = {
             userID: par1._id,
             password: "new_12345_password"
         });
-        console.log(updated.data.password);
         return updated.data.password;
     },
 
@@ -101,7 +100,6 @@ const functions = {
                 email: "wdhssdhsd@erahaERHdfZHnf"
             }]
         });
-        console.log(updated.data.boardMembers.length);
         return updated.data.boardMembers.length;
     },
 
@@ -111,7 +109,6 @@ const functions = {
             userID: par1._id,
             remainingPlaces: 10
         });
-        console.log(updated.data.remainingPlaces);
         return updated.data.remainingPlaces;
     }
 };
