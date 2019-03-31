@@ -110,7 +110,72 @@ const functions = {
             remainingPlaces: 10
         });
         return updated.data.remainingPlaces;
-    }
+    },
+
+    CreatingAnEventForPartner: async (par) => {     
+        var res;   
+        try {
+             res = await axios.post(`http://localhost:3000/api/event/${par._id}/CreateEvent`, {
+                userType: "Partner",
+                name:"eve",
+                description: "idk",
+                price: "567",
+                location: "bla",
+                eventDate: "2019-5-10",
+                eventStatus: "Submitted",
+                remainingPlaces: "3",
+                eventType: "warever",
+                speakers: "idkkk",
+                topics: "nothing",
+                partner:  par._id
+            })
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    },
+
+    CreatingAnEventForAdmin: async (adm) => {        
+        try {
+            var res = await axios.post(`http://localhost:3000/api/event/${adm._id}/CreateEvent`, {
+                userType: "Admin",
+                name:"eve1",
+                description: "idk1",
+                price: "567",
+                location: "bla1",
+                eventDate: "2019-5-10",
+                eventStatus: "Submitted",
+                remainingPlaces: "3",
+                eventType: "warever1",
+                speakers: "idkkk1",
+                topics: "nothing1"
+            })
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    },
+    GetPendingEventsForAdmin: async()  => {        
+        
+            try {
+                res =  await axios.get(`http://localhost:3000/api/event/PendingEventsAdmin`, {
+                    userType: "Admin",
+                    
+                })
+               
+                return res
+                
+            } catch (error) {
+                console.log('GOT ERROR')
+                console.log(error)
+                return 'not';
+            }
+            
+         }
 };
 
 module.exports = functions;

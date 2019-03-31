@@ -95,7 +95,7 @@ router.get('/:id/comment', function (req, res) {
 })
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEvents', function (req, res) {
+router.get('/PendingEventsAdmin', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
 		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate').exec(function (err, event) {
