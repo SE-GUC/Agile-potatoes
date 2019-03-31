@@ -356,7 +356,71 @@ const functions = {
 
         }
 
+    },
+    DeletePendingVacancyReq: async (vac,par) =>  {
+        let deletingVacancy = "";
+        try{
+
+            axios.defaults.adapter = require('axios/lib/adapters/http');
+            await axios.delete(`http://localhost:3000/api/vacancy/${vac._id}/deleteVacancy`, {
+            userType: "Partner",
+            userId: par._id
+        });
+
+        axios.defaults.adapter = require('axios/lib/adapters/http');
+        var pendingVac= axios.get(`http://localhost:3000/api/vacancy/${vac._id}/PendingVacancies`);
+        
+        return pendingVac.data.length;
+
     }
+    catch{
+        console.log("error");
+        return "nothing";
+    }
+    
+    },
+    DeletePendingEventReq: async (eve,par) =>  {
+        let deletingEvent = "";
+        try{
+
+            axios.defaults.adapter = require('axios/lib/adapters/http');
+            await axios.delete(`http://localhost:3000/api/event/${eve._id}/deleteEvent`, {
+            userType: "Partner",
+            userId: par._id
+        });
+
+        axios.defaults.adapter = require('axios/lib/adapters/http');
+        var pendingEve= axios.get(`http://localhost:3000/api/vacancy/${eve._id}/PartnerPendingEvents`);
+        
+        return pendingEve.data.length;
+
+    }
+    catch{
+        console.log("error");
+        return "nothing";
+    }
+
+    }
+
+    ViewingPendingVacancies: async (adm) => {       
+        try{
+
+            axios.defaults.adapter = require('axios/lib/adapters/http');
+          vacancies=  await axios.get(`http://localhost:3000/api/vacancy/${adm._id}/pendingVacancies`, {
+            userType: "Admin",
+        });
+        
+        return vacancies.data.length;
+
+    }
+
+
+}
+}
+
+
+
+
 
 }
       

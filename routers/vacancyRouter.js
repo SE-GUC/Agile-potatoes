@@ -179,7 +179,7 @@ router.get('/Post/:id', function (req, res) {
 
 //////Story 17 As an admin I cana view pending vacancies announcments requests
 
-router.get('/pendingVacancies', function (req, res) {
+router.get('/:id/pendingVacancies', function (req, res) {
 
 
     var userType = req.body.userType;

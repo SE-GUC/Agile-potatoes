@@ -280,4 +280,53 @@ describe('testing user stories 23,24,25', () => {
             done();
         });
     });
+
+    describe('Testing', () => {
+      
+        let mem1, adm1, par1, vac1, vac2, eve1;
+        beforeAll(async (done) => {
+            await mongoose.connect(config.getDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true });
+            
+            mem1 = new Member({ username: 'TesterMember', password: '176351', fname: 'john', lname: 'doe', email: 'memtest@m.com', address: '23 IdiotTest St testCity' });
+            adm1 = new Admin({ username: 'TesterAdmin', password: '1234568910', email: 'commentTesterAdmin@a.com' });
+            par1 = new Partner({ username: 'TesterPartner', name: 'Tester', password: '12345678910', email: 'commentTesterPartner@a.com' });
+            vac1 = new Vacancy({ name: 'vacancyMadeToTest', status: 'Open', description: 'testingParty', duration: '7 years', city: 'testCity',partner: par1._id, admin: adm1._id });
+            vac2 = new Vacancy({ name: 'vacancy2MadeToTest', status: 'Open', description: 'testingParty2', duration: '7 years', city: 'Paris', partner: par1._id });
+            eve1= new Event({name:"Eventmadetotest",status:"Submitted",description:"testingparty3",price:300,city:"Barcelona",Partner:par1._id});
+    
+            par1.vacancies.push(vac1._id);
+            await mem1.save();
+            await adm1.save();
+            await vac1.save();
+            await vac2.save();
+            await par1.save();
+            done();
+        });
+        afterAll((done) => {
+            setTimeout(async () => {
+                await mongoose.connection.db.dropDatabase();
+                await mongoose.connection.close();
+                done();
+            }, 100000)
+            
+        });
+    
+        test('expecting the deletion of an vacancy', async (done) =>{
+           await deletion = funcs.DeletePendingVacancyReq(vac1,par1);
+            expect(deletion.data.length).toBe(0);
+            done();
+    
+        });
+        test('viewing pending events for admin', async (done) =>{
+            await viewing = funcs.ViewingPendingVacancies(adm1);
+             expect(viewing.data.length).toBe(0);
+             done();
+     
+         });
+    
+    });
+    
+    
+
+
 }
