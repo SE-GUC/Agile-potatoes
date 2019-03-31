@@ -44,7 +44,7 @@ const MemberSchema = new Schema({
     events: [{
         type: mongoose.ObjectId,
         ref: 'Event'
-   }],
+    }],
     projects:[{type:String}],
     tasks: [{type: String}], 
     vacancies:[{

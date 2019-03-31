@@ -8,54 +8,58 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-//user story 12
-router.get('/:id', function (req, res) {
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userId; //should come from session
+//user story 12 returning user detatils to display his profile
+router.get('/:id', function (req, res, next) {
+    var userType = req.get('userType'); //should come from session
+    var userId = req.get('userId'); //should come from session
     var profId = req.params.id;
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
             Admin.findById({ _id: profId }, function (err, adminDoc) {
-                if (err) throw err;
-                res.send(adminDoc);
+                if (err) next(err);
+                return res.send(adminDoc);
             });
         }
         else if (userType == 'Partner') {
             Partner.findById({ _id: profId }, function (err, partnerDoc) {
-                if (err) throw err;
-                res.send(partnerDoc);
+                if (err) next(err);
+                return es.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
             Member.findById({ _id: profId }, function (err, memberDoc) {
-                if (err) throw err;
-                console.log("I am heeerrreeee");
-                res.send(memberDoc);
+                if (err) next(err);
+                return res.send(memberDoc);
             })
         }
     }
     else {                        //user viewing other's profile
-        if (userType == 'Admin') {
-            Admin.findById(profId, 'username fname lname events', function (err, adminDoc) {
-                if (err) throw err;
-                console.log(adminDoc);
-                res.send(adminDoc);
-            });
-        }
-        else if (userType == 'Partner') {
-            Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
-                if (err) throw err;
-                res.send(partnerDoc);
-            });
-        }
-        else if (userType == 'Member') {
             Member.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, memberDoc) {
-                if (err) throw err;
-                res.send(memberDoc);
-            });
-        }
+                if (err) next(err);
+                if (memberDoc){
+                    return res.send(memberDoc);
+                }
+                else {
+                    Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
+                        if (err) next(err);
+                        if (partnerDoc) {
+                            return res.send(partnerDoc);
+                        }
+                        else {
+                            Admin.findById(profId, 'fname lname events', function (err, adminDoc) {
+                                if (err) next(err);
+                                if (adminDoc) {
+                                    return res.send(adminDoc);
+                                }
+                                else {
+                                    return res.status(404).send('profile not found')
+                                }
+                            })
+                        }
+                    })
+                }
+            })
     }
-    return;
 })
 
 
@@ -117,6 +121,7 @@ router.post('/create', function (req, res) {
         var n = req.body.name;
         var em = req.body.email;
         var wf = req.body.workfield
+
         var newPartner = new Partner({
             username: usern,
             password: pwd,
@@ -124,6 +129,7 @@ router.post('/create', function (req, res) {
             email: em,
             workfield: wf
         });
+        newPartner.ProfileURL = '/api/profile/' + newPartner._id;
         newPartner.save(function (err, p) {
             if (err) throw err;
             console.log(p);
@@ -138,9 +144,9 @@ router.post('/create', function (req, res) {
         var fn = req.body.fname;
         var ln = req.body.lname;
         var add = req.body.address;
-        //var skls = req.body.skills;
-        //var mc = req.body.masterclasses;
-        //var cert = req.body.certificates;
+        var skls = req.body.skills;
+        var mc = req.body.masterclasses;
+        var cert = req.body.certificates;
         var intst = req.body.interests;
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
@@ -151,13 +157,15 @@ router.post('/create', function (req, res) {
             fname: fn,
             lname: ln,
             address: add,
-            //skills: skls,
-            //masterclasses: mc,
-            //certificates: cert,
+            skills: skls,
+            masterclasses: mc,
+            certificates: cert,
             interests: intst,
             //tasks: tsks,
             // projects: prjs
         });
+        newMember.ProfileURL = '/api/profile/' + newMember._id;
+
         newMember.save(function (err, m) {
             if (err) throw err;
             console.log(m);
@@ -251,7 +259,7 @@ router.put('/:id/update',function(req,res){
     var passwordU = req.body.password;
     var interestsU = req.body.interests;
     var skillsU = req.body.skills;
-    var memberStateU = req.body.memberState;
+    var memberStateU = req.body.memberState; 
     var membershipExpiryDateU = req.body.membershipExpiryDate;
     
   //Address, Name, Password, Skills, Interests

@@ -26,6 +26,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
+	var partner = req.body.userId;
 	if (userType == 'Admin') {
 		var event = new Event({
 			name:name,
@@ -63,7 +64,8 @@ router.post('/:id/CreateEvent', function (req, res) {
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
 			speakers: speakers,
-			topics: topics
+			topics: topics,
+			partner: partner
 		});
 
 		event.url = '/api/event/' + event._id
@@ -102,7 +104,7 @@ router.post('/:id/CreateEvent', function (req, res) {
 router.get('/PendingEvents', function (req, res) {
 	var usertype = req.body.usertype
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }).exec(function (err, event) {
+		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate').exec(function (err, event) {
 			if(err) 
 			{	return res.send(err);}
 			else
@@ -117,8 +119,8 @@ router.get('/PendingEvents', function (req, res) {
 
 
 // Story 14 : viewing approved events as admin/partner/member
-router.get('/ApprovedEvents', function (req, res) {
-	Event.find({eventStatus: 'Approved'}).exec(function (err, events) {
+router.get('/ApprovedEvents' ,function (req, res) {
+	Event.find({ eventStatus: 'Approved' }, 'url name eventDate').exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -127,11 +129,11 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
-router.get('/:id/PartnerPendingEvents', function(req,res){
+router.get('/:id/PartnerPendingEvents', function (req, res) {
     var userType = req.body.userType
     var userid = req.params.id 
     if(userType == 'Partner'){
-    Event.find({partner: userid, eventStatus: 'Submitted'}).exec(function(err, event){
+		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate').exec(function(err, event){
         return res.send(event);
     });
     }
@@ -139,10 +141,10 @@ router.get('/:id/PartnerPendingEvents', function(req,res){
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
 router.get('/RecommendedEvents', function (req, res) {
-	var userId = req.body.userId;
+	var userId = req.get('userId');
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
-	Member.findById(userId)
+	Member.findById(userId, 'url name eventDate address interests events')
 		.populate('events', 'eventType')
 		.exec((err,member)=>{	
 			if (err) console.log(err); // getting recommended events
@@ -163,7 +165,7 @@ router.get('/RecommendedEvents', function (req, res) {
 							recommendedEvents.push(event);
 						}
 					}
-					res.send(recommendedEvents);
+					return res.send(recommendedEvents);
 				})
 		})
 })
@@ -199,7 +201,8 @@ router.delete('/:evid/deleteEvent', function(req,res){
 
 // Story 21.2 display an event post for partner/admin/member
 
-router.get('/posts/:id', function (req, res) {
+router.get('/Post/:id', function (req, res) {
+
     var eveId = req.params.id;
 
         Event.findById(eveId,'-_id').exec(
