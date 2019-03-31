@@ -48,6 +48,29 @@ const functions = {
             console.log(error)
             return 'not';
         }
+    },
+    recommendVacancies: async (mem) => {
+        let recommendVacanciesRes;
+        try {
+            recommendVacanciesRes = await axios.get(`http://localhost:3000/api/vacancy/RecommendedVacancies`, { 'headers': { 'userId': `${mem._id}` } });
+            return(recommendVacanciesRes.data.length);
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    },
+    recommendEvents: async (mem) => {
+        let recommendEventsRes;
+        try {
+            recommendEventsRes = await axios.get(`http://localhost:3000/api/event/RecommendedEvents`, { 'headers': { 'userId': `${mem._id}` } });
+            console.log(recommendEventsRes.data);
+            return (recommendEventsRes.data.length);
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
     }
 };
 module.exports = functions;

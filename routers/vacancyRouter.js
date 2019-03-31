@@ -200,9 +200,9 @@ router.get('/pendingVacancies', function (req, res) {
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
 router.get('/RecommendedVacancies', function (req, res) {
-    var userId = req.body.userId;
+    var userId = req.get('userId');
     var RecommendedVacancies = [];
-    Member.findById(userId)
+    Member.findById(userId, 'url name availability address skills ')
         .exec((err, member) => {
             if (err) console.log(err); // getting recommended events
             if (member.availability !== true) return res.send('member is not available to be hired')

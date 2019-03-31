@@ -141,10 +141,10 @@ router.get('/:id/PartnerPendingEvents', function (req, res) {
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
 router.get('/RecommendedEvents', function (req, res) {
-	var userId = req.body.userId;
+	var userId = req.get('userId');
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
-	Member.findById(userId, 'url name eventDate')
+	Member.findById(userId, 'url name eventDate address interests events')
 		.populate('events', 'eventType')
 		.exec((err,member)=>{	
 			if (err) console.log(err); // getting recommended events
@@ -165,7 +165,7 @@ router.get('/RecommendedEvents', function (req, res) {
 							recommendedEvents.push(event);
 						}
 					}
-					res.send(recommendedEvents);
+					return res.send(recommendedEvents);
 				})
 		})
 })
