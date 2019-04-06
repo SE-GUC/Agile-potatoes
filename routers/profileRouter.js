@@ -75,7 +75,7 @@ router.post('/:id/feedback', function (req, res) {
                 author: userID
             });
             partner.save();
-        });
+        }).then(console.log("Added feedback ;)"));
         return res.send("Feedback added");
     }
 });

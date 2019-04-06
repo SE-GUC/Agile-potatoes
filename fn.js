@@ -1,59 +1,58 @@
 const axios = require('axios');
-const axios = require('axios');
 const Vacancy = require('./models/vacancyModel');
 
 const functions = {
-    updateUserAdmin: async (user,adm) => {
+    updateUserAdmin: async (user, adm) => {
         let outBefore;
         let outAfter;
-        
+
         try {
-          outBefore=await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
-            'headers': {
-              'userId': `${user._id}`,
-              'userType': 'Member'
-            }
-          });
-          outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
-            "userType": "Admin",
-            "userID":`${adm._id}`,
-            "membershipExpiryDate":"2002-10-31T22:00:00.000+00:00"
-    
-            
-          });
-          console.log(outAfter.data);
-          return (outBefore.data.membershipExpiryDate==outAfter.data.membershipExpiryDate);
+            outBefore = await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
+                'headers': {
+                    'userId': `${user._id}`,
+                    'userType': 'Member'
+                }
+            });
+            outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
+                "userType": "Admin",
+                "userID": `${adm._id}`,
+                "membershipExpiryDate": "2002-10-31T22:00:00.000+00:00"
+
+
+            });
+            console.log(outAfter.data);
+            return (outBefore.data.membershipExpiryDate == outAfter.data.membershipExpiryDate);
         } catch (error) {
-          console.log(error)
-          return 'Wrong path ?';
+            console.log(error)
+            return 'Wrong path ?';
         }
-      },
-      updateUser: async (user) => {
+    },
+    updateUser: async (user) => {
         let outBefore;
         let outAfter;
-        
+
         try {
-          outBefore=await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
-            'headers': {
-              'userId': `${user._id}`,
-              'userType': 'Member'
-            }
-          });
-          outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
-            "userType": "Member",
-            "userID":`${user._id}`,
-            "lname":"uniqueone"
-    
-            
-          });
-          console.log(outAfter.data);
-          return (outBefore.data.lname==outAfter.data.lname);
+            outBefore = await axios.get(`http://localhost:3000/api/profile/${user._id}`, {
+                'headers': {
+                    'userId': `${user._id}`,
+                    'userType': 'Member'
+                }
+            });
+            outAfter = await axios.put(`http://localhost:3000/api/profile/${user._id}/update`, {
+                "userType": "Member",
+                "userID": `${user._id}`,
+                "lname": "uniqueone"
+
+
+            });
+            console.log(outAfter.data);
+            return (outBefore.data.lname == outAfter.data.lname);
         } catch (error) {
-          console.log(error)
-          return 'Wrong path ?';
+            console.log(error)
+            return 'Wrong path ?';
         }
-      },
-      
+    },
+
     AddingTwoCommentsToVacancy: async (vac, par, adm) => {
         let updatedVac = "";
         try {
@@ -165,12 +164,12 @@ const functions = {
         return updated.data.remainingPlaces;
     },
 
-    CreatingAnEventForPartner: async (par) => {     
-        var res;   
+    CreatingAnEventForPartner: async (par) => {
+        var res;
         try {
-             res = await axios.post(`http://localhost:3000/api/event/${par._id}/CreateEvent`, {
+            res = await axios.post(`http://localhost:3000/api/event/${par._id}/CreateEvent`, {
                 userType: "Partner",
-                name:"eve",
+                name: "eve",
                 description: "idk",
                 price: "567",
                 location: "bla",
@@ -180,7 +179,7 @@ const functions = {
                 eventType: "warever",
                 speakers: "idkkk",
                 topics: "nothing",
-                partner:  par._id
+                partner: par._id
             })
             return res
         } catch (error) {
@@ -190,11 +189,11 @@ const functions = {
         }
     },
 
-    CreatingAnEventForAdmin: async (adm) => {        
+    CreatingAnEventForAdmin: async (adm) => {
         try {
             var res = await axios.post(`http://localhost:3000/api/event/${adm._id}/CreateEvent`, {
                 userType: "Admin",
-                name:"eve1",
+                name: "eve1",
                 description: "idk1",
                 price: "567",
                 location: "bla1",
@@ -212,104 +211,104 @@ const functions = {
             return 'not';
         }
     },
-    GetPendingEventsForAdmin: async()  => {        
-        
-            try {
-                res =  await axios.get(`http://localhost:3000/api/event/PendingEventsAdmin`, {
-                    userType: "Admin",
-                    
-                })
-               
-                return res
-                
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-            
-         },
+    GetPendingEventsForAdmin: async () => {
+
+        try {
+            res = await axios.get(`http://localhost:3000/api/event/PendingEventsAdmin`, {
+                userType: "Admin",
+
+            })
+
+            return res
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+
+    },
 
 
-        ChangeVacStatusAdmin: async (vac) => {
-            let updatedVac = "";
-            try {
-                updatedVac = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
-                    userType: "Admin",
-                    status: "Open"
-                });
-                if (updatedVac.status != vac.status)
-                    return true
-                else
-                    return false
-    
-    
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-    
-        },
-    
-        ChangeVacStatusPartner: async (vac) => {
-            let updatedVac2 = "";
-            try {
-                updatedVac2 = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
-                    userType: "Partner",
-                    status: "Closed"
-                });
-    
-                if (updatedVac2.status != vac.status)
-                    return true
-                else
-                    return false
-    
-    
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-    
-        },
-    
-        ChangeAdminName: async (admin) => {
-            let updatedAdmin = "";
-            try {
-                updatedAdmin = await axios.put(`http://localhost:3000/api/profile/${admin._id}/name`, {
-                    "userType": "Admin",
-                    "fname": "blah",
-                    "lname": "blah blah"
-                });
-    
-                return 'Updated';
-    
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-    
-        },
-    
-        ChangeAdminPassword: async (admin) => {
-            let updatedAdmin2 = "";
-            try {
-                updatedAdmin2 = await axios.put(`http://localhost:3000/api/profile/${admin._id}/password`, {
-                    "userType": "Admin",
-                    "password": "blahblahblah"
-                });
-    
-                return 'Updated';
-    
-    
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-    
+    ChangeVacStatusAdmin: async (vac) => {
+        let updatedVac = "";
+        try {
+            updatedVac = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
+                userType: "Admin",
+                status: "Open"
+            });
+            if (updatedVac.status != vac.status)
+                return true
+            else
+                return false
+
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+
+    },
+
+    ChangeVacStatusPartner: async (vac) => {
+        let updatedVac2 = "";
+        try {
+            updatedVac2 = await axios.put(`http://localhost:3000/api/vacancy/${vac._id}/status`, {
+                userType: "Partner",
+                status: "Closed"
+            });
+
+            if (updatedVac2.status != vac.status)
+                return true
+            else
+                return false
+
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+
+    },
+
+    ChangeAdminName: async (admin) => {
+        let updatedAdmin = "";
+        try {
+            updatedAdmin = await axios.put(`http://localhost:3000/api/profile/${admin._id}/name`, {
+                "userType": "Admin",
+                "fname": "blah",
+                "lname": "blah blah"
+            });
+
+            return 'Updated';
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+
+    },
+
+    ChangeAdminPassword: async (admin) => {
+        let updatedAdmin2 = "";
+        try {
+            updatedAdmin2 = await axios.put(`http://localhost:3000/api/profile/${admin._id}/password`, {
+                "userType": "Admin",
+                "password": "blahblahblah"
+            });
+
+            return 'Updated';
+
+
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+
     },
     AddingTwoCommentsToEvents: async (eve, partner, admin) => {
         let updatedEvent = "";
@@ -360,167 +359,165 @@ const functions = {
         }
 
     },
-    DeletePendingVacancyReq: async (vac,par) =>  {
+    DeletePendingVacancyReq: async (vac, par) => {
         let deletingVacancy = "";
-        try{
+        try {
 
             axios.defaults.adapter = require('axios/lib/adapters/http');
             await axios.delete(`http://localhost:3000/api/vacancy/${vac._id}/deleteVacancy`, {
-            userType: "Partner",
-            userId: par._id
-        });
+                userType: "Partner",
+                userId: par._id
+            });
 
-        axios.defaults.adapter = require('axios/lib/adapters/http');
-        var pendingVac= axios.get(`http://localhost:3000/api/vacancy/${vac._id}/PendingVacancies`);
-        
-        return pendingVac.data.length;
+            axios.defaults.adapter = require('axios/lib/adapters/http');
+            var pendingVac = axios.get(`http://localhost:3000/api/vacancy/${vac._id}/PendingVacancies`);
 
-    }
-    catch{
-        console.log("error");
-        return "nothing";
-    }
-    
+            return pendingVac.data.length;
+
+        }
+        catch{
+            console.log("error");
+            return "nothing";
+        }
+
     },
-    DeletePendingEventReq: async (eve,par) =>  {
+    DeletePendingEventReq: async (eve, par) => {
         let deletingEvent = "";
-        try{
+        try {
 
             axios.defaults.adapter = require('axios/lib/adapters/http');
             await axios.delete(`http://localhost:3000/api/event/${eve._id}/deleteEvent`, {
-            userType: "Partner",
-            userId: par._id
-        });
+                userType: "Partner",
+                userId: par._id
+            });
 
-        axios.defaults.adapter = require('axios/lib/adapters/http');
-        var pendingEve= axios.get(`http://localhost:3000/api/vacancy/${eve._id}/PartnerPendingEvents`);
-        
-        return pendingEve.data.length;
+            axios.defaults.adapter = require('axios/lib/adapters/http');
+            var pendingEve = axios.get(`http://localhost:3000/api/vacancy/${eve._id}/PartnerPendingEvents`);
 
-    }
-    catch{
-        console.log("error");
-        return "nothing";
-    }
+            return pendingEve.data.length;
+
+        }
+        catch{
+            console.log("error");
+            return "nothing";
+        }
 
     },
 
-    ViewingPendingVacancies: async (adm) => {       
-        try{
+    ViewingPendingVacancies: async (adm) => {
+        try {
 
             axios.defaults.adapter = require('axios/lib/adapters/http');
-          vacancies=  await axios.get(`http://localhost:3000/api/vacancy/${adm._id}/pendingVacancies`, {
-            userType: "Admin",
-        });
-        
-        return vacancies.data.length;
+            vacancies = await axios.get(`http://localhost:3000/api/vacancy/${adm._id}/pendingVacancies`, {
+                userType: "Admin",
+            });
+
+            return vacancies.data.length;
 
         }
-        catch(err)
-        {
+        catch (err) {
             console.log('error')
         }
 
 
     },
 
-    
+
 
 
     getpendingvacancies: async (id) => {
-            return await axios.get('http://localhost:3000/api/vacancy/'+ id)
-        },
+        return await axios.get('http://localhost:3000/api/vacancy/' + id)
+    },
     createvacancy: async (pendingvacancy) => {
 
-        const pendingvacancy1 = await new Vacancy(pendingvacancy)   
+        const pendingvacancy1 = await new Vacancy(pendingvacancy)
         pendingvacancy1.save();
     },
     getvacancy: async (pendingvacancy) => {
-        
-        vac = await Vacancy.findOne(pendingvacancy,'id status description duration').exec(function (err, vacancy){
+
+        vac = await Vacancy.findOne(pendingvacancy, 'id status description duration').exec(function (err, vacancy) {
             return vacancy
-            })
-            return vac
+        })
+        return vac
     },
-    createevent: async ()=>{
+    createevent: async () => {
         return await axios.post('http://localhost:3000/api/event/5c9175c03c631c0c80f077c0/CreateEvent/');
     },
     getevent: async () => {
         return axios.get('http://localhost:3000/api/event/ApprovedEvents')
-        },
+    },
 
 
-        createPartner: async () => {
-            try {
-                var res = await axios.post('http://localhost:3000/api/profile/create', {
-                    userType: "Partner",
-                    username: "ASalah6",
-                    password: "124",
-                    name: "ahmed",
-                    email: "ay7aga",
-                    workfield: "idk"
-                })
-                console.log(res)
-                return res
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-        },
-        createMember: async () => {
-            try {
-                var res = await axios.post('http://localhost:3000/api/profile/create', {
-                    userType: "Member",
-                    username: 'TesterMember',
-                    password: '176351',
-                    fname: 'john',
-                    lname: 'doe',
-                    email: 'memtest@m.com',
-                    address: '23 IdiotTest St testCity',
-                    interests: ['lego', 'programming']
-                })
-                console.log(res)
-                return res
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-        },
-    
-        GetPendingEventsForPartner: async () => {
-            try {
-                res = await axios.get(`http://localhost:3000/api/event/${par._id}/PartnerPendingEvents`, {
-                    userType: "Partner",
-                })
-                console.log(res);
-                return res
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
-        },
-    
-        GetPendingVacanciesForPartner: async () => {
-            try {
-                res = await axios.get(`http://localhost:3000/api/vacancy/${par._id}/PartnerPendingVacancies`, {
-                    userType: "Partner",
-                })
-                console.log(res)
-                return res
-            } catch (error) {
-                console.log('GOT ERROR')
-                console.log(error)
-                return 'not';
-            }
+    createPartner: async () => {
+        try {
+            var res = await axios.post('http://localhost:3000/api/profile/create', {
+                userType: "Partner",
+                username: "ASalah6",
+                password: "124",
+                name: "ahmed",
+                email: "ay7aga",
+                workfield: "idk"
+            })
+            console.log(res)
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
         }
+    },
+    createMember: async () => {
+        try {
+            var res = await axios.post('http://localhost:3000/api/profile/create', {
+                userType: "Member",
+                username: 'TesterMember',
+                password: '176351',
+                fname: 'john',
+                lname: 'doe',
+                email: 'memtest@m.com',
+                address: '23 IdiotTest St testCity',
+                interests: ['lego', 'programming']
+            })
+            console.log(res)
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    },
+
+    GetPendingEventsForPartner: async () => {
+        try {
+            res = await axios.get(`http://localhost:3000/api/event/${par._id}/PartnerPendingEvents`, {
+                userType: "Partner",
+            })
+            console.log(res);
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    },
+
+    GetPendingVacanciesForPartner: async () => {
+        try {
+            res = await axios.get(`http://localhost:3000/api/vacancy/${par._id}/PartnerPendingVacancies`, {
+                userType: "Partner",
+            })
+            console.log(res)
+            return res
+        } catch (error) {
+            console.log('GOT ERROR')
+            console.log(error)
+            return 'not';
+        }
+    }
 
 
 
 
 }
-      
 
 module.exports = functions;
