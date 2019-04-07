@@ -39,7 +39,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			speakers: speakers,
 			topics: topics
 		});
-		event.url = '/api/event/' + event._id
+		event.url = '/api/event/Post' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
@@ -136,13 +136,14 @@ router.get('/RecommendedEvents', function (req, res) {
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
 	Member.findById(userId, 'url name eventDate address interests events')
-		.populate('events', 'eventType')
+		.populate('events')
 		.exec((err, member) => {
+			if (!member) return res.status(400).send("member not found");
 			if (err) console.log(err); // getting recommended events
 			member.events.map((event) => {
 				memberPastEventsTypes.push(event.eventType);
 			})
-			Event.find({ 'eventStatus': 'Approved' })
+			Event.find({ 'eventStatus': 'Approved' },'name eventType city description eventDate url')
 				.exec((err, events) => {
 					if (err) console.log(err);
 					for (event of events) {
