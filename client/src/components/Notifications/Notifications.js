@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ShowNotifications from './ShowNotifications';
+import NotificationsArray from './NotificationsArray';
 import Header from './Header';
 
 const axios = require('axios');
@@ -12,7 +12,7 @@ class Notifications extends Component {
     }
 
     componentDidMount() {
-      axios.get('http://localhost:3000/api/notification/')
+      axios.get('http://localhost:3001/api/notification/')
       .then(res => this.setState({ notif: res.data }))
     }
 
@@ -21,7 +21,7 @@ class Notifications extends Component {
       <div className="Notifications">
       <Header />
       <p>You are seeing Notifications</p>
-      <ShowNotifications notifications = {this.state.notif}/>
+      <NotificationsArray notifications = {this.state.notif}/>
       </div>
     );
   }

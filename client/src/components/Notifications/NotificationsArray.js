@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import NotificationObject from './NotificationObject';
+import NotificationElement from './NotificationElement';
 
-class ShowNotifications extends Component {
+class NotificationsArray extends Component {
 
   render() {
     return this.props.notifications.map((notification) => (
-      <NotificationObject key={notification.id} notification={notification} />
+      <NotificationElement key={notification.id} notification={notification} />
     ));
   }
 }
 
-ShowNotifications.propTypes = {
+NotificationsArray.propTypes = {
   notifications: PropTypes.array.isRequired
 }
 
-export default ShowNotifications;
+export default NotificationsArray;

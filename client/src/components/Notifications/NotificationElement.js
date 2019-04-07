@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
 
 
-export class NotificationObject extends Component {
+export class NotificationElement extends Component {
   render() {
     return (
       <div>
-        <p>notf: {this.props.notification.description}</p>
+        <p>notf: {this.props.notification.description}  <Link to ={this.props.notification.srcURL} > ;"go to link" </Link></p> 
       </div>
     )
   }
 }
 
-NotificationObject.propTypes = {
+NotificationElement.propTypes = {
     notification: PropTypes.object.isRequired
   }
 
-export default NotificationObject
+export default NotificationElement
