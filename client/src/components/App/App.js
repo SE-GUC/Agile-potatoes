@@ -4,6 +4,7 @@ import SubmitFeedbackForm from './../SubmitFeedbackForm';
 import EventsContainer from './EventsContainer/EventsContainer'
 import AdminProfile from './AdminProfile/AdminName'
 import AdminPassword from './AdminProfile/AdminPassword'
+import EventPost from './EventPost/Event'
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Notifications from '../Notifications/Notifications';
@@ -19,6 +20,7 @@ class App extends Component {
         <EventsContainer />
         <AdminProfile />
         <AdminPassword />
+        <EventPost />
 
         <Router>
           <div className="App1">
