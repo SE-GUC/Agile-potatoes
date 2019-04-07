@@ -15,6 +15,7 @@ class App extends Component {
     return (
       <div className="App">
         <SubmitFeedbackForm />
+        <CreatePartnerform/>
         <EventsContainer />
         <AdminProfile />
         <AdminPassword />
