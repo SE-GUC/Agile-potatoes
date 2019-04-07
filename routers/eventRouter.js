@@ -143,7 +143,7 @@ router.get('/RecommendedEvents', function (req, res) {
 			member.events.map((event) => {
 				memberPastEventsTypes.push(event.eventType);
 			})
-			Event.find({ 'eventStatus': 'Approved' },'name eventType city description eventDate')
+			Event.find({ 'eventStatus': 'Approved' },'name eventType city description eventDate url')
 				.exec((err, events) => {
 					if (err) console.log(err);
 					for (event of events) {
