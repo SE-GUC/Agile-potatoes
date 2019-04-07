@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import SubmitFeedbackForm from './../SubmitFeedbackForm';
 import EventsContainer from './EventsContainer/EventsContainer'
+import AdminProfile from './AdminProfile/AdminName'
+import AdminPassword from './AdminProfile/AdminPassword'
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Notifications/AppHeader';
-import GetPendingEventsAdmin from './GetPendingEventsAdmin'
+import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 
 class App extends Component {
   render() {
@@ -14,6 +16,8 @@ class App extends Component {
       <div className="App">
         <SubmitFeedbackForm />
         <EventsContainer />
+        <AdminProfile />
+        <AdminPassword />
 
         <Router>
           <div className="App1">
