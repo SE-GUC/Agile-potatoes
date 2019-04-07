@@ -12,8 +12,8 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
 // Story 13 : admin/member/partner can view his notifications
 router.get('/', function (req, res) {
-    var userType = 'Admin';
-    var userId = '5c91841855f785284852aa5e'; //should come from session
+    var userType = req.body.userType;
+    var userId = req.body.userId; //should come from session
     var correctType;
 
     console.log(userType);
