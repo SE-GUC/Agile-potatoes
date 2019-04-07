@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
-import SubmitFeedback from '../SubmitFeedback/SubmitFeedback.js'
+import SubmitFeedbackForm from './../SubmitFeedbackForm';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <SubmitFeedback />
+        <SubmitFeedbackForm />
       </div>
     );
   }

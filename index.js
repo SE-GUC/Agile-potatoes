@@ -13,16 +13,17 @@ const eventRouter = require('./routers/eventRouter');
 
 const app = express();
 
+app.get('/', function (err, res) {
+    res.send('welcome to lirtenhub');
+})
+
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
 }
-
-app.get('/', function (err, res) {
-    res.send('welcome to lirtenhub');
-});
+app.use(allowCrossDomain);
 
 app.use(allowCrossDomain);
 app.use('/api/notification', notificationRouter);
@@ -30,7 +31,7 @@ app.use('/api/profile', profileRouter);
 app.use('/api/vacancy', vacancyRouter);
 app.use('/api/event', eventRouter);
 
-// handling errors
+// handling errors here
 app.use(function (err, req, res, next) {
     res.status(422).send({ error: err.message });
     next();

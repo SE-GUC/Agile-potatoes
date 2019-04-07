@@ -72,7 +72,7 @@ router.post('/:id/feedback', function (req, res) {
         Partner.findById(partnerID).exec(function (err, partner) {
             partner.feedbacks.push({
                 text: comment,
-                author: userID
+                member: userID
             });
             partner.save();
         }).then(console.log("Added feedback ;)"));
