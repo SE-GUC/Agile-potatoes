@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Notifications/AppHeader';
 import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
-
+import CreatingVacForm from '../CreatingVacForm'
 class App extends Component {
   render() {
     return (
@@ -21,7 +21,7 @@ class App extends Component {
         <AdminProfile />
         <AdminPassword />
         <EventPost />
-
+            <CreatingVacForm />
         <Router>
           <div className="App1">
             <Header />
@@ -32,7 +32,8 @@ class App extends Component {
             )} />
           </div>
         </Router>
-        <GetPendingEventsAdmin />
+            <GetPendingEventsAdmin />
+          
       </div>
     );
   }
