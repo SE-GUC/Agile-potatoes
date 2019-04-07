@@ -15,7 +15,7 @@ class CreatingVacForm extends React.Component {
     }
 
     createVac() {
-        await axios.post(`http://localhost:3000/api/event/1/CreateEvent`, {
+        await axios.post(`http://localhost:3001/api/event/5ca6301ec19e703fe028768b/CreateVacancy`, {
             description: this.state.description,
             duration: this.state.duration,
             location: this.state.location,
@@ -27,7 +27,7 @@ class CreatingVacForm extends React.Component {
 
     render() {
         return (
-            <form onSubmit=this.createVac>
+            <form onSubmit = {this.createVac}>
                 <label>
                     description:
           <input type="text" value={this.state.description} />
