@@ -5,7 +5,7 @@ import EventsContainer from './EventsContainer/EventsContainer'
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Notifications/AppHeader';
-
+import GetPendingEventsAdmin from './GetPendingEventsAdmin'
 
 class App extends Component {
   render() {
@@ -23,6 +23,7 @@ class App extends Component {
          )} />
        </div>
      </Router>
+     <GetPendingEventsAdmin/>
       </div>
     );
   }
