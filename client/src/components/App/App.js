@@ -10,7 +10,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Notifications/AppHeader';
 import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
-import CreatingVacForm from '../CreatingVacForm'
+import CreatingVacForm from './CreatingVacForm'
+import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
 class App extends Component {
   render() {
     return (
@@ -33,6 +34,8 @@ class App extends Component {
           </div>
         </Router>
             <GetPendingEventsAdmin />
+
+            <GetPendingVacanciesAdmin />
           
       </div>
     );
