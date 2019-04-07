@@ -11,21 +11,18 @@ router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
 // Story 13 : admin/member/partner can view his notifications
-router.get('/:id', function (req, res) {
-    var userType = req.body.userType;
-    var userId = req.body.userId; //should come from session
-    var NotifiedId = req.params.id;
-
-    if (NotifiedId != userId)
-        res.send("you aren't allowed to view other's notifications")
+router.get('/', function (req, res) {
+    var userType = 'Admin';
+    var userId = '5c91841855f785284852aa5e'; //should come from session
     var correctType;
+
     console.log(userType);
     switch (userType) {
         case 'Admin': correctType = Admin; break;
         case 'Partner': correctType = Partner; break;
         case 'Member': correctType = Member; break;
     }
-    correctType.findById(NotifiedId, 'notifications', function (err, user) {
+    correctType.findById(userId, 'notifications', function (err, user) {
         user.notifications.forEach(function (notf) {
             notf.seen = true;
         });
