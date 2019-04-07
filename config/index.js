@@ -1,4 +1,4 @@
-const DbConnectionString = "mongodb+srv://Islam98:1871998@lirtenhub-qoiuq.mongodb.net/test?retryWrites=true";
+const DbConnectionString = "";
 const TestingDbConnectionString = "";
 
 
