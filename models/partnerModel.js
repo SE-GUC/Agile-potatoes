@@ -18,7 +18,7 @@ const PartnerSchema = new Schema({
     }],
     membershipExpiryDate:Date,
     availability:Boolean,
-    workfeild:String,
+    workfield:String,
     vacancies:[{
         type: mongoose.ObjectId,
         ref: 'Vacancy'
