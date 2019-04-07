@@ -4,7 +4,8 @@ import axios from 'axios'
 
 const EventsDisplayer = ({events}) => {
   const goToPost = async (url) => {
-    var post =(url) ?await axios.get("http://localhost:3001"+url):'none0;'
+    console.log(url)
+    var post =(url) ?await axios.get("http://localhost:3001"+url):'none';
     console.log(post)
     //should display event post page
   }
