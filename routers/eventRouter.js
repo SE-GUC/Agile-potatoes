@@ -1,10 +1,12 @@
 
 var express = require('express');
 var router = express.Router();
+const Joi = require('joi');
 const Event = require('../models/eventModel');
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
+const schemas = require('../models/Schemas/schemas');
 const bodyParser = require('body-parser');
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
@@ -25,6 +27,10 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
+
+	const result = Joi.validate(req.body, schemas.eventSchema)
+	if (result.error) return res.status(400).send({ error: result.error.details[0].message });
+
 	if (userType == 'Admin') {
 		var event = new Event({
 			name: name,
@@ -143,7 +149,7 @@ router.get('/RecommendedEvents', function (req, res) {
 			member.events.map((event) => {
 				memberPastEventsTypes.push(event.eventType);
 			})
-			Event.find({ 'eventStatus': 'Approved' },'name eventType city description eventDate url')
+			Event.find({ 'eventStatus': 'Approved' }, 'name eventType city description eventDate url')
 				.exec((err, events) => {
 					if (err) console.log(err);
 					for (event of events) {

@@ -2,6 +2,8 @@ const Admin = require('../models/adminModel')
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel')
 
+const Joi = require('joi');
+const schemas = require('../models/Schemas/schemas');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -120,6 +122,9 @@ router.post('/create', function (req, res) {
         var n = req.body.name;
         var em = req.body.email;
         var wf = req.body.workfield
+        
+        const result = Joi.validate(req.body, schemas.partnerSchema);
+	    if (result.error) return res.status(400).send({ error: result.error.details[0].message });
 
         var newPartner = new Partner({
             username: usern,
@@ -149,6 +154,10 @@ router.post('/create', function (req, res) {
         var intst = req.body.interests;
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
+
+        const result = Joi.validate(req.body, schemas.memberSchema);
+        if (result.error) return res.status(400).send({ error: result.error.details[0].message });
+        
         var newMember = new Member({
             username: usern,
             password: pwd,

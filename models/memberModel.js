@@ -3,21 +3,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MemberSchema = new Schema({
-    username:{type:String, required:true, unique:true},
-    password:{type:String, required:true, unique:true},
-    fname:{type:String, required:true},
-    lname:{type:String, required:true},
-    email:{type:String, required:true, unique:true},
-    address:{type:String,lowercase:true, required:true},
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    fname: { type: String, required: true },
+    lname: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    address: { type: String, lowercase: true, required: true },
     notifications: [{
-        seen:{type:Boolean, default:false},
-        srcURL:String,
-        description:String
+        seen: { type: Boolean, default: false },
+        srcURL: String,
+        description: String
     }],
-    membershipExpiryDate:Date,
-    availability:{
-        type:Boolean,
-        default:true
+    membershipExpiryDate: Date,
+    availability: {
+        type: Boolean,
+        default: true
     },
     skills: [{
         type: String,
@@ -26,15 +26,15 @@ const MemberSchema = new Schema({
     }],
     masterClasses: [String],
     certificates: [String],
-    membershipState:{
+    membershipState: {
         type: String,
         trim: true,
-        enum:['Pending','Active','Expired'],
-        default:'Pending'
+        enum: ['Pending', 'Active', 'Expired'],
+        default: 'Pending'
     },
-    ProfileURL:{
+    ProfileURL: {
         type: String,
-        trim: true  
+        trim: true
     },
     interests: [{
         type: String,
@@ -45,12 +45,12 @@ const MemberSchema = new Schema({
         type: mongoose.ObjectId,
         ref: 'Event'
     }],
-    projects:[{type:String}],
-    tasks: [{type: String}], 
-    vacancies:[{
+    projects: [{ type: String }],
+    tasks: [{ type: String }],
+    vacancies: [{
         type: mongoose.ObjectId,
         ref: 'Vacancy'
-    }],  
+    }],
     reviews: [{
         text: String,
         date: {
