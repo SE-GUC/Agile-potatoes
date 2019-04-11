@@ -13,6 +13,9 @@ router.get('/:id', function (req, res, next) {
     var userType = req.get('userType'); //should come from session
     var userId = req.get('userId'); //should come from session
     var profId = req.params.id;
+    console.log(userId)
+    console.log(userType)
+    
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
             Admin.findById({ _id: profId }, function (err, adminDoc) {
@@ -23,7 +26,7 @@ router.get('/:id', function (req, res, next) {
         else if (userType == 'Partner') {
             Partner.findById({ _id: profId }, function (err, partnerDoc) {
                 if (err) next(err);
-                return es.send(partnerDoc);
+                return res.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
@@ -70,6 +73,7 @@ router.post('/:id/feedback', function (req, res) {
     var comment = req.body.comment;
     if (userType == 'Member') {
         Partner.findById(partnerID).exec(function (err, partner) {
+            
             partner.feedbacks.push({
                 text: comment,
                 member: userID
@@ -237,6 +241,7 @@ router.put('/:id/feedback', function (req, res) {
 
 });
 
+// Admin updates user membership, member updates his profile
 router.put('/:id/update', function (req, res) {
     var userTypeU = req.body.userType; //should come from session
     var userId = req.body.userId;    //should come from session
@@ -248,8 +253,9 @@ router.put('/:id/update', function (req, res) {
     var passwordU = req.body.password;
     var interestsU = req.body.interests;
     var skillsU = req.body.skills;
-    var memberStateU = req.body.memberState;
+ 
     var membershipExpiryDateU = req.body.membershipExpiryDate;
+    var membershipStateU = req.body.membershipState;
 
     //Address, Name, Password, Skills, Interests
 
@@ -257,13 +263,12 @@ router.put('/:id/update', function (req, res) {
     if (userTypeU == 'Member' && userId == memberId) {
         Member.findById(memberId)
             .exec(function (err, doc) {
-                console.log(doc);
-                doc.address = addressU;
-                doc.lname = lnameU;
-                doc.fname = fnameU;
-                doc.password = passwordU;
-                doc.interests = interestsU;
-                doc.skills = skillsU;
+                if (addressU) doc.address = addressU;
+                if (lnameU) doc.lname = lnameU;
+                if (fnameU) doc.fname = fnameU;
+                if (passwordU) doc.password = passwordU;
+                if (interestsU) doc.interests = interestsU;
+                if (skillsU) doc.skills = skillsU;
 
                 doc.save();
             });
@@ -277,13 +282,15 @@ router.put('/:id/update', function (req, res) {
             .exec(function (err, doc) {
 
                 doc.membershipExpiryDate = membershipExpiryDateU;
-                doc.userType = userTypeU;
+                doc.membershipState = membershipStateU;
                 doc.save();
             });
 
 
     }
-    else { res.send("not your profile") }
+    else {     
+        res.send("not your profile") 
+    }
 
 
     res.send('updated');
