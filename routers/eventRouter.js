@@ -45,7 +45,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			console.log(eve);
 		})
 		Admin.findById(userId).exec(function (err, admin) {
-			console.log(Admin.event);
+			console.log(admin.event);
 			admin.events.push(event._id)
 			admin.save();
 		});
@@ -66,13 +66,13 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			partner: userId
 		});
 
-		event.url = '/api/event/' + event._id
+		event.url = '/api/event/Post' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);
 		})
 		Partner.findById(userId).exec(function (err, partner) {
-			console.log(Partner.event);
+			console.log(partner.event);
 			partner.events.push(event._id)
 			partner.save();
 		});
@@ -96,13 +96,12 @@ router.get('/:id/comment', function (req, res) {
 
 // Story 18 : viewing pending event requests as admin
 router.get('/PendingEventsAdmin', function (req, res) {
-	var usertype = req.body.usertype
+	var usertype = req.get('userType');
 	if (usertype == 'Admin') {
-		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate').exec(function (err, event) {
+		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate eventStatus').exec(function (err, event) {
 			if (err) { return res.send(err); }
 			else { return res.send(event); }
 		})
-
 	}
 	else {
 		return res.send('This Information is not accessible!');
@@ -111,7 +110,7 @@ router.get('/PendingEventsAdmin', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-	Event.find({ eventStatus: 'Approved' }, 'url name eventDate').exec(function (err, events) {
+	Event.find({ eventStatus: 'Approved' }, 'url name eventDate eventStatus').exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -121,10 +120,11 @@ router.get('/ApprovedEvents', function (req, res) {
 
 /// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
 router.get('/:id/PartnerPendingEvents', function (req, res) {
-	var userType = req.body.userType
+	var userType = req.get('userType');
 	var userid = req.params.id
 	if (userType == 'Partner') {
-		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate').exec(function (err, event) {
+		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate description').exec(function (err, event) {
+			if (err) return res.send(err)
 			return res.send(event);
 		});
 	}
@@ -276,43 +276,38 @@ router.post('/:id/comment', function (req, res) {
 	var comment = req.body.comment;
 	var evId = req.params.id;
 	if (userType == 'Admin') {
-		Event.findById(evId)
-			.exec(function (err, event) {
+		Event.findById(evId).populate('partner') //notifying partner
+			.exec(async (err, event) => {
 				event.commentsByAdmin.push({
 					text: comment,
 					author: userId
 				});
-				event.save();
+				if (event.partner) {
+					event.partner.notifications.push({
+						srcURL: '/api/event/Post' + evId,
+						description: 'Partner commented on your event request'
+					});
+				}
+				await event.save();
+				return res.status(201).send(event.commentsByAdmin);
 			});
-		Event.findById(evId).populate('partner') //notifying partner
-			.exec(function (err, event) {
-				event.partner.notifications.push({
-					srcURL: '/api/event/' + evId,
-					description: 'admin commented on your event request'
-				});
-				event.admin.save();
-			})
-	}
-	else if (userType == 'Partner') {
-		Event.findById(evId)
-			.exec(function (err, event) {
-				console.log(event.commentsByPartner);
+	} else if (userType == 'Partner') {
+		Event.findById(evId).populate('admin')
+			.exec(async (err, event) => {
 				event.commentsByPartner.push({
 					text: comment,
 					author: userId
 				});
-				event.save();
+				if (event.admin) {
+					event.admin.notifications.push({
+						srcURL: '/api/event/Post' + evId,
+						description: 'Partner commented on your event request'
+					});
+				}
+				await event.save();
+				return res.status(201).send(event.commentsByPartner);
 			});
-		Event.findById(evId).populate('admin') //notifying admin
-			.exec(function (err, event) {
-				event.admin.notifications.push({
-					srcURL: '/api/event/' + evId,
-					description: 'Partner commented on your event request'
-				});
-				event.admin.save();
-			})
 	}
-	return res.send("updated");
 });
 
 router.use(bodyParser.json());
