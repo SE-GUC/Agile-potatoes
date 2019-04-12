@@ -56,3 +56,7 @@ p{
     padding: 5px;
     background-color: #dfe6e9 
 }
+
+.alert-dev{
+    display:none;
+}
