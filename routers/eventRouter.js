@@ -316,6 +316,37 @@ router.post('/:id/comment', function (req, res) {
 	}
 });
 
+//As a member I can mark myself as going to an event
+router.put('/:id/attending', function(req, res){
+    var eventID = req.params.id;
+    var userID = req.body.userID;
+    var userType = req.body.userType;
+    if(userType === 'Member'){
+        Event.findById(eventID).exec(function (err, event){
+            event.attendees.push(userID);
+            event.remainingPlaces = event.remainingPlaces - 1;
+            event.save();
+        });
+        res.send("Marked you as attending");
+    }
+});
+
+//As a member I can mark myself as not going to an event that I 
+//previously marked myself as going to
+router.put('/:id/notAttending', function(req, res){
+    var eventID = req.params.id;
+    var userID = req.body.userID;
+    var userType = req.body.userType;
+    if(userType === 'Member'){
+        Event.findById(eventID).exec(function (err, event){
+            event.attendees.pull(userID);
+            event.remainingPlaces = event.remainingPlaces + 1;
+            event.save();
+        });
+        res.send("Marked you as not-attending");
+    }
+});
+
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }))
 module.exports = router;
