@@ -88,12 +88,13 @@ router.put('/:id', function (req, res) {
     var userType = req.body.userType; //should come from session
     var userID = req.body.userID; //should come from session (person logged in)
     var partnerID = req.params.id; //the ID of the partner I want to update
-    var pwd; var members;
+    var pwd; var members; var oldPassword;
     if (req.body.boardMembers) {
         members = req.body.boardMembers;
     }
-    if (req.body.password) {
+    if (req.body.password && req.body.oldPassword) {
         pwd = req.body.password;
+        oldPassword = req.body.oldPassword;
     }
     if (userType == 'Partner') {
         if (partnerID == userID) {
@@ -101,9 +102,11 @@ router.put('/:id', function (req, res) {
                 if (members) {
                     partner.boardMembers = members;
                 }
-                if (pwd) {
+                if (pwd && oldPassword === partner.password) {
                     partner.password = pwd;
                 }
+                else 
+                    console.log("You provided an wrong old password");
                 res.send(partner);
                 partner.save();
                 console.log("Updated partner profile successfully");
