@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-
-
 import Initiater from "./Initiater";
+
 class Event extends Component {
   state = {
     name: "random",
@@ -16,7 +15,7 @@ class Event extends Component {
     remainingPlaces: 1,
     eventType: "public",
     url: "nil",
-    speakers: ["populate this","d"],
+    speakers: ["populate this", "d"],
     topics: ["pd"],
     feedbacks: ["pd"],
     partner: "populate this",
@@ -42,14 +41,15 @@ class Event extends Component {
     ]
   };
 
- 
+
 
   render() {
     return (
       <body>
-      <Initiater />
+        <Initiater />
       </body>
     );
   }
 }
+
 export default Event;

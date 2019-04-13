@@ -20,7 +20,7 @@ router.post('/:id/comment', (req, res, next) => {
     if (userType == 'Admin') {
         Vacancy.findById(vacId)
             .populate('partner')
-            .exec((err, vacancy) => {
+            .exec(async (err, vacancy)  => {
                 if (err) console.log(err)
                 vacancy.commentsByAdmin.push({
                     text: comment,
@@ -28,17 +28,17 @@ router.post('/:id/comment', (req, res, next) => {
                 });
                 ////notifying partner
                 vacancy.partner.notifications.push({
-                    srcURL: '/api/vacancy/' + vacId,
+                    srcURL: '/api/vacancy/Post' + vacId,
                     description: 'Admin commented on your vacancy request'
                 });
-                vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
+                await vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
                 return res.status(201).send(vacancy.commentsByAdmin);
             })
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId)
             .populate('admin')
-            .exec((err, vacancy) => {
+            .exec(async (err, vacancy) => {
                 if (err) console.log(err)
                 vacancy.commentsByPartner.push({
                     text: comment,
@@ -47,18 +47,18 @@ router.post('/:id/comment', (req, res, next) => {
                 ////notifying admin
                 if (vacancy.admin) {
                     vacancy.admin.notifications.push({
-                        srcURL: '/api/vacancy/' + vacId,
+                        srcURL: '/api/vacancy/Post' + vacId,
                         description: 'Partner commented on his vacancy request'
                     });
                 }
-                vacancy.save();
+                await vacancy.save();
                 return res.status(201).send(vacancy.commentsByPartner);
             })
     }
 });
 
 // As a partner I can submit a vacancy announcement request
-router.post('/:id/CreateVacancy', function (req, res) {
+router.post('/:id/CreateVacancy', async (req, res) => {
     var userType = req.body.userType;
     var userId = req.params.id;   //should come from session
     var description = req.body.description;
@@ -80,16 +80,17 @@ router.post('/:id/CreateVacancy', function (req, res) {
             partner: userId
         });
 
-        vacancy.url = '/api/vacancy/' + vacancy._id;
-        vacancy.save(function (err) {
-            if (err) return handleError(err);
-        });
+        vacancy.url = '/api/vacancy/Post' + vacancy._id;
+        await vacancy.save();
         Partner.findById(userId).exec(function (err, par) {
             par.vacancies.push(vacancy);
             par.save();
         });
+        return res.send("created vacancy successfully");
     }
-    return res.send("created vacancy successfully");
+    else {
+        return res.send("you can't create a vacancy");
+    }
 });
 
 //15 getting all comments of a post
@@ -148,7 +149,7 @@ router.get('/:id/applicants', function (req, res) {
 router.delete('/:vacid/deleteVacancy', function (req, res) {
     var userType = req.body.userType;
     var vacId = req.params.vacid;
-    var userId = req.body.id;
+    var userId = req.body.userId;
     if (userType == 'Partner') {
         Vacancy.findById(vacId)
             .exec(function (err, vacancy) {
@@ -168,7 +169,8 @@ router.delete('/:vacid/deleteVacancy', function (req, res) {
 // Story 21.2 display a vacancy post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
     var vacId = req.params.id;
-    Vacancy.findById(vacId, '-_id').exec(
+
+    Vacancy.findById(vacId).exec(
         function (err, response) {
             if (err) console.log(err);
             // console.log(response);
@@ -177,17 +179,18 @@ router.get('/Post/:id', function (req, res) {
 });
 
 //////Story 17 As an admin I cana view pending vacancies announcments requests
-router.get('/:id/pendingVacancies', function (req, res) {
-    var userType = req.body.userType;
-    var pendingVacancies = [];
+// FOR SOME REASON YOU'RE HAVING ID AS PARAMETER !
+router.get('/:id/pendingVacancies', function (req, res) { 
+    var userType = req.get('userType');
     if (userType == 'Admin') {
-        Vacancy.find().array.forEach(vacancy => {
-            if (vacancy.status == 'Submitted') {
-                pendingVacancies.push(vacancy);
-            }
-        });
+        Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, vacancies) {
+            if (err) return res.send(err)
+			return res.send(vacancies);
+		});
     }
-    return res.send(pendingVacancies);
+    else{
+        return res.status(403).send("not authorized");
+    }
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
@@ -253,12 +256,15 @@ router.put('/:id/status', function (req, res) {
 
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
 router.get('/:id/PartnerPendingVacancies', function (req, res) {
-    var userType = req.body.userType
+    var userType = req.get('userType')
     var userid = req.params.id
     if (userType == 'Partner') {
         Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, vacancy) {
             return res.send(vacancy);
         });
+    }
+    else{
+        return res.status(404).send('not found');
     }
 });
 
@@ -292,7 +298,7 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
         if (err) {
             return res.send(err);
         }
-        if (vacancy.status === 'Submitted') {
+        if (vacancy.status == 'Submitted') {
 
             vacancy.duration = duration;
             vacancy.location = location;
@@ -301,10 +307,13 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
             vacancy.dailyhours = dailyhours;
 
             vacancy.save();
+            return res.send(vacancy);
         }
+        
         else {
-            res.send('Vacancy cannot be edited after being approved');
+            return res.send('Vacancy cannot be edited after being approved');
         }
+        
     })
 });
 

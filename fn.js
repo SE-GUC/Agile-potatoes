@@ -127,7 +127,7 @@ const functions = {
     // },
 
     updatePartnerProfileChangePassword: async (par1) => {
-        const updated = await axios.put(`http://localhost:3000/api/profile/${par1._id}`, {
+        const updated = await axios.put(`http://localhost:3001/api/profile/${par1._id}`, {
             userType: "Partner",
             userID: par1._id,
             password: "new_12345_password"
@@ -136,7 +136,7 @@ const functions = {
     },
 
     updatePartnerProfileAddBoardMembers: async (par1) => {
-        const updated = await axios.put(`http://localhost:3000/api/profile/${par1._id}`, {
+        const updated = await axios.put(`http://localhost:3001/api/profile/${par1._id}`, {
             userType: "Partner",
             userID: par1._id,
             boardMembers: [{
@@ -156,7 +156,7 @@ const functions = {
     },
 
     updateEventByChangingRemainingPlaces: async (event1, par1) => {
-        const updated = await axios.put(`http://localhost:3000/api/event/${event1._id}`, {
+        const updated = await axios.put(`http://localhost:3001/api/event/${event1._id}`, {
             userType: "Partner",
             userID: par1._id,
             remainingPlaces: 10
@@ -516,7 +516,38 @@ const functions = {
     //     }
     // }
 
+    // getappevents: async () => {
+    //     let eventRes;
+    //     try {
+    //         eventRes = await axios.get(`http://localhost:3001/api/event/ApprovedEvents`);
+    //         console.log(eventRes.data);
+    //         return eventRes;
+    //     } catch (error) {
+    //         console.log('GOT ERROR')
+    //         console.log(error)
+    //         return 'not';
+    //     }
+    // },
 
+    // updatevac: async (vac) => {
+    //     let vacRes;
+    //     try {
+    //         vacRes = await axios.post(`http://localhost:3001/api/vacancy/${vac._id}`,{
+    //             vacId: vac._id,
+    //             duration: '2 light years',
+    //             location: 'new cairo',
+    //             description: 'IT',
+    //             salary: 150,
+    //             dailyhours: 8
+    //         });
+ 
+    //         return vacRes;
+    //     } catch (error) {
+    //         console.log('GOT ERROR')
+    //         console.log(error)
+    //         return 'not';
+    //     }
+    // }
 
 
 }
