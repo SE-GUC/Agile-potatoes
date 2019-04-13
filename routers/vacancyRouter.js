@@ -22,6 +22,11 @@ router.post('/:id/comment', (req, res, next) => {
             .populate('partner')
             .exec(async (err, vacancy) => {
                 if (err) console.log(err)
+                if (!vacancy) {
+                    console.log('vacancy not found')
+                    res.status(404).send("vacancy not found");
+                    return next();
+                }
                 vacancy.commentsByAdmin.push({
                     text: comment,
                     author: userId
@@ -40,6 +45,11 @@ router.post('/:id/comment', (req, res, next) => {
             .populate('admin')
             .exec(async (err, vacancy) => {
                 if (err) console.log(err)
+                if (!vacancy) {
+                    console.log('vacancy not found')
+                    res.status(404).send("vacancy not found");
+                    return next();
+                }
                 vacancy.commentsByPartner.push({
                     text: comment,
                     author: userId

@@ -32,7 +32,11 @@ const EventSchema = new Schema({
         type: mongoose.ObjectId,
         ref: 'Partner'
     },
-    attendees: [{
+    admin: {
+        type: mongoose.ObjectId,
+        ref: 'Admin'
+    },
+    attendees:[{
         type: mongoose.ObjectId,
         ref: 'Member'
     }],

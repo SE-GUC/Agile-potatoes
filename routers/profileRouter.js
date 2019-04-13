@@ -23,18 +23,33 @@ router.get('/:id', function (req, res, next) {
         if (userType == 'Admin') {
             Admin.findById({ _id: profId }, function (err, adminDoc) {
                 if (err) next(err);
+                if (!adminDoc) {
+                    console.log('admin not found')
+                    res.status(404).send("admin not found");
+                    return next();
+                }
                 return res.send(adminDoc);
             });
         }
         else if (userType == 'Partner') {
             Partner.findById({ _id: profId }, function (err, partnerDoc) {
                 if (err) next(err);
+                if (!partnerDoc) {
+                    console.log('partner not found')
+                    res.status(404).send("partner not found");
+                    return next();
+                }
                 return res.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
             Member.findById({ _id: profId }, function (err, memberDoc) {
                 if (err) next(err);
+                if (!memberDoc) {
+                    console.log('member not found')
+                    res.status(404).send("member not found");
+                    return next();
+                }
                 return res.send(memberDoc);
             })
         }
@@ -58,7 +73,9 @@ router.get('/:id', function (req, res, next) {
                                 return res.send(adminDoc);
                             }
                             else {
-                                return res.status(404).send('profile not found')
+                                console.log('profile not found');
+                                res.status(404).send('profile not found');
+                                return next();
                             }
                         })
                     }

@@ -68,14 +68,56 @@ class EventPostNew extends Component {
     e.preventDefault();
     //var placesNow = this.state.eventData.remainingPlaces;
     axios.put("http://localhost:3001/api/event/5cab5d3222a833137c7acd38/notAttending", {
-        "userID": this.state.userData._id,
-        "userType": this.state.userData.userType
-      }).then(this.setState({
-        userHasBooked: false,
-        //eventData: {remainingPlaces: placesNow - 1}
-      }));
+      "userID": this.state.userData._id,
+      "userType": this.state.userData.userType
+    }).then(this.setState({
+      userHasBooked: false,
+      //eventData: {remainingPlaces: placesNow - 1}
+    }));
   }
 
+  closeEvent() {
+    axios.put(`http://localhost:3001/api/event/${this.state.eventData._id}/closeMyEvent`, {
+      "userType": this.state.userData.userType,
+      "userId": this.state.userData._id
+    }).then(res => {
+      if (res.data === 'closed') {
+        this.setState({
+          ...this.state,
+          eventData: {
+            ...this.state.eventData,
+            eventStatus: 'Finished'
+          }
+        })
+      }
+    }).catch((err) => {
+      console.log(err.response.data);
+      this.refs.alert.innerText = err.response.data
+      console.log(this.refs.alert);
+      this.refs.alert.style.display = 'block'
+    })
+  }
+
+  reOpenEvent() {
+    axios.put(`http://localhost:3001/api/event/${this.state.eventData._id}/reOpenMyEvent`, {
+      "userType": this.state.userData.userType,
+      "userId": this.state.userData._id
+    }).then(res => {
+      if (res.data === 'opened') {
+        this.setState({
+          ...this.state,
+          eventData: {
+            ...this.state.eventData,
+            eventStatus: 'Approved'
+          }
+        })
+      }
+    }).catch((err) => {
+      this.refs.alert.innerText = err.response.data
+      this.refs.alert.style.display = 'block'
+    })
+  }
+  
   render() {
     if (!this.state.loaded) return null;
     return (
@@ -94,12 +136,12 @@ class EventPostNew extends Component {
               <br />
               <h4>Speakers</h4>
               <div className="row">{this.state.eventData.speakers.map((speaker) => {
-                return <div className="col-sm-4"><i> -{speaker}</i></div>
+                return <div key={speaker} className="col-sm-4"><i> -{speaker}</i></div>
               })}</div>
               <br />
               <h4>Topics</h4>
-              <div className="row">{this.state.eventData.topics.map((speaker) => {
-                return <div className="col-sm-4"><p> {speaker}</p></div>
+              <div className="row">{this.state.eventData.topics.map((topic) => {
+                return <div key={topic} className="col-sm-4"><p> {topic}</p></div>
               })}</div>
             </div>
             {
@@ -110,7 +152,7 @@ class EventPostNew extends Component {
               <div className="comments-section col-sm-12">
                 <h4>Comments</h4>
                 {this.getCommentsSorted().map((comment) => {
-                  return <div className='comment'>
+                  return <div key={comment.date} className='comment'>
                     <p className="font-weight-bold">{comment.author.name}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
                     <p>{comment.text}</p>
                   </div>
@@ -129,9 +171,9 @@ class EventPostNew extends Component {
           <div className="right-of-post col-sm-3">
             <p className="text-center h3">{this.state.eventData.price} EGP</p>
             {this.state.userHasBooked ? (
-              <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} onClick={this.onClickCancel} >Cancel</button>
+              <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} >Cancel</button>
             ) : (
-                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} onClick={this.onClickBook} >BOOK NOW</button>
+                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} >BOOK NOW</button>
               )}
             <p className="text-muted text-center">remaining seats:{this.state.eventData.remainingPlaces}</p>
             {
@@ -140,7 +182,7 @@ class EventPostNew extends Component {
               (this.state.eventData.eventStatus === "Submitted")
               &&
               <div><br /><br /><br />
-                <button class="btn btn-success ctrl-button col-sm-12 ">Approve Event</button>
+                <button className="btn btn-success ctrl-button col-sm-12 ">Approve Event</button>
               </div>
             }
             {
@@ -153,23 +195,24 @@ class EventPostNew extends Component {
               </div>
             }
             {
-              (this.state.userData.userType === "Partner")
+              (this.state.userData.userType === "Partner" || this.state.userData.userType === "Admin")
               &&
               (this.state.eventData.eventStatus === "Approved")
               &&
               <div><br /><br /><br />
-                <button className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
+                <button onClick={this.closeEvent.bind(this)} className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
               </div>
             }
             {
-              (this.state.userData.userType === "Partner")
+              (this.state.userData.userType === "Partner" || this.state.userData.userType === "Admin")
               &&
               (this.state.eventData.eventStatus === "Finished")
               &&
               <div><br /><br /><br />
-                <button className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
+                <button onClick={this.reOpenEvent.bind(this)} className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
               </div>
             }
+            <div ref="alert" className="alert alert-danger alert-dev" role="alert">This is a primary alert—check it out</div>
           </div>
         </div>
       </div>
