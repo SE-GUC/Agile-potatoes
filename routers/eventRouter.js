@@ -188,7 +188,7 @@ router.delete('/:evid/deleteEvent', function (req, res) {
 // Story 21.2 display an event post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
 	var eveId = req.params.id;
-	Event.findById(eveId, '-_id').populate('partner').populate('attendees').exec(
+	Event.findById(eveId, '-_id').populate('partner', 'name').populate('attendees', 'fname lname').exec(
 		function (err, response) {
 			if (err) return res.send("event not found");
 			return res.send(response);
