@@ -16,7 +16,6 @@
 }
 .events-window {
     height: 100 px;
-    background-color: crimson;
     float: right;
-    padding-top: 50px;
+    padding-top: 75px;
 }

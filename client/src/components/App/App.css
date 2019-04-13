@@ -1,5 +1,7 @@
-.App {
-    background-color: aqua;
+  body {
+    background-color:ghostwhite;
+    margin:0px;
+    padding: 0px;
   }
   
   .App-logo {
@@ -22,6 +24,7 @@
   .App-link {
     color: #2e8888;
   }
+  
   
   @keyframes App-logo-spin {
     from {
