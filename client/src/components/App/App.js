@@ -12,12 +12,13 @@ import './App.css';
 // import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 // import CreatingVacForm from './CreatingVacForm'
 // import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
-import EventPostNew from './EventPostNew/EventPostNew'
+// import EventPostNew from './EventPostNew/EventPostNew'
+import VacancyPost from './VacancyPost/VacancyPost'
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <EventPostNew />
+        <VacancyPost />
         {/* <GetApplicants/>
         <SubmitFeedbackForm />
         <CreatePartnerform/>

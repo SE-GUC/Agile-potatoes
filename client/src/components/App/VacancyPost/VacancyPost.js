@@ -52,27 +52,23 @@ class VacancyPost extends Component {
     }
   }
 
-  onClickBook = (e) => {
+  onClickApply = (e) => {
     e.preventDefault();
-    //var placesNow = this.state.eventData.remainingPlaces;
-    axios.put("http://localhost:3001/api/profile/5cab5d3222a833137c7acd38/attending", {
+    axios.put("http://localhost:3001/api/vacancy/5ca11a709b305d4878a54e02/apply", {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(this.setState({
-      userHasBooked: true,
-      //eventData: {remainingPlaces: placesNow - 1}
+      userHasApplied: true
     }));
   }
 
   onClickCancel = (e) => {
     e.preventDefault();
-    //var placesNow = this.state.eventData.remainingPlaces;
-    axios.put("http://localhost:3001/api/profile/5cab5d3222a833137c7acd38/notAttending", {
+    axios.put("http://localhost:3001/api/vacancy/5ca11a709b305d4878a54e02/un-apply", {
         "userID": this.state.userData._id,
         "userType": this.state.userData.userType
       }).then(this.setState({
-        userHasBooked: false,
-        //eventData: {remainingPlaces: placesNow - 1}
+        userHasApplied: false
       }));
   }
 
@@ -80,24 +76,30 @@ class VacancyPost extends Component {
     if (!this.state.loaded) return null;
     return (
       <div>
-        <div className="event-post offset-sm-2 col-sm-8 row ">
+        <div className="vacancy-post offset-sm-2 col-sm-8 row ">
           <div className="left-of-post col-sm-9">
-            <div className="event-post-header">
+            <div className="vacancy-post-header">
               <p className="text-muted"><i className="fas fa-calendar-day"></i>  {this.state.vacancyData.postDate}</p>
               <h2>{this.state.vacancyData.name}</h2>
-              <p><span className="text-muted">posted by </span>{this.state.vacancyData.partner.name}</p>
+              <p><span className="text-muted">Posted by </span>{this.state.vacancyData.partner.name}</p>
               <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.vacancyData.location}, {this.state.vacancyData.city}</p>
             </div>
-            <div className="event-post-info">
+            <div className="vacancy-post-info">
               <h4>Details</h4>
               <p>{this.state.vacancyData.description}</p>
               <br />
               <h4>Daily Hours</h4>
               <p>{this.state.vacancyData.dailyHours}</p>
               <br />
+              <h4>Duration</h4>
+              <p>{this.state.vacancyData.duration}</p>
+              <br />
+              <h4>URL</h4>
+              <p>{this.state.vacancyData.url}</p>
+              <br />
             </div>
             {
-              (this.state.vacancyData.vacancyStatus === "Submitted")
+              (this.state.vacancyData.status === "Submitted")
               &&
               (this.state.userData.userType === "Admin" || this.state.userData.userType === "Partner")
               &&
@@ -125,9 +127,8 @@ class VacancyPost extends Component {
             {this.state.userHasApplied ? (
               <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.vacancyData.status === 'Closed'} onClick={this.onClickCancel} >CANCEL</button>
             ) : (
-                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.vacancyData.status !== 'Closed'} onClick={this.onClickApply} >APPLY NOW</button>
+                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== 'Member' || this.state.vacancyData.status === 'Closed'} onClick={this.onClickApply} >APPLY NOW</button>
               )}
-            <p className="text-muted text-center">remaining seats:{this.state.eventData.remainingPlaces}</p>
             {
               (this.state.userData.userType === "Admin")
               &&
