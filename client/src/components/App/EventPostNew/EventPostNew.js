@@ -22,7 +22,7 @@ class EventPostNew extends Component {
 
   async componentDidMount() {
     let event = await axios.get("http://localhost:3001/api/event/Post/5cab5d3222a833137c7acd38");
-    console.log(event);
+    console.log(event.data);
     this.setState({
       eventData: event.data,
       loaded: true
@@ -171,9 +171,9 @@ class EventPostNew extends Component {
           <div className="right-of-post col-sm-3">
             <p className="text-center h3">{this.state.eventData.price} EGP</p>
             {this.state.userHasBooked ? (
-              <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} >Cancel</button>
+              <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} onClick={this.onClickCancel}>CANCEL</button>
             ) : (
-                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} >BOOK NOW</button>
+                <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} onClick={this.onClickBook}>BOOK NOW</button>
               )}
             <p className="text-muted text-center">remaining seats:{this.state.eventData.remainingPlaces}</p>
             {
