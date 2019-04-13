@@ -2,6 +2,8 @@ const Vacancy = require('../models/vacancyModel');
 const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
 const Member = require('../models/memberModel');
+const Joi = require('joi');
+const schemas = require('../models/Schemas/schemas');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -18,7 +20,7 @@ router.post('/:id/comment', (req, res, next) => {
     if (userType == 'Admin') {
         Vacancy.findById(vacId)
             .populate('partner')
-            .exec(async (err, vacancy)  => {
+            .exec(async (err, vacancy) => {
                 if (err) console.log(err)
                 if (!vacancy) {
                     console.log('vacancy not found')
@@ -64,6 +66,7 @@ router.post('/:id/comment', (req, res, next) => {
             })
     }
 });
+
 // As a partner I can submit a vacancy announcement request
 router.post('/:id/CreateVacancy', async (req, res) => {
     var userType = req.body.userType;
@@ -73,7 +76,10 @@ router.post('/:id/CreateVacancy', async (req, res) => {
     var location = req.body.location;
     var salary = req.body.salary;
     var dailyHours = req.body.dailyHours;
-    
+
+    const result = Joi.validate(req.body, schemas.vacancySchema);
+    if (result.error) return res.status(400).send({ error: result.error.details[0].message });
+
     if (userType == 'Partner') {
         var vacancy = new Vacancy({
             description: description,
@@ -97,13 +103,11 @@ router.post('/:id/CreateVacancy', async (req, res) => {
     }
 });
 
-
 //15 getting all comments of a post
 router.get('/:id/comments', function (req, res) {
     var userType = req.body.userType; //should come from session
     var vacId = req.params.id;
     if (userType == 'Admin' || userType == 'Partner') {  //only partners and admins can access vacancies' comments section
-
         Vacancy.findById(vacId).populate('author').exec(function (err, vacancy) {
             if (err) console.log(err);
             var Allcomments = vacancy.commentsByAdmin.concat(vacancy.commentsByPartner); // putting all comments in one object
@@ -112,25 +116,28 @@ router.get('/:id/comments', function (req, res) {
     }
 })
 
-/////////// allow member to apply for a job
+// Allow member to apply for a vacancy
 router.put('/:id/apply', function (req, res) {
-    var uid = req.body.userId; //should come from session
+    var uid = req.body.userID; //should come from session
+    var userType = req.body.userType;
     var vacId = req.params.id;
-    Vacancy.findById(vacId)
-        .exec((err, vac) => {
-            if (err) console.log(err);
-            if (!vac) {
-                res.status(404).send('vacancy not found')
-            } else {
-                if (vac.status != "Open") {
-                    res.status(404).send('vacancy is not open at the momnent')
+    if (userType === 'Member') {
+        Vacancy.findById(vacId)
+            .exec((err, vac) => {
+                if (err) console.log(err);
+                if (!vac) {
+                    res.status(404).send('vacancy not found')
                 } else {
-                    vac.applicants.push(uid);
-                    vac.save();
-                    return res.status(201).send('user successfully applid for the job')
+                    if (vac.status != "Open") {
+                        res.status(404).send('vacancy is not open at the momnent')
+                    } else {
+                        vac.applicants.push(uid);
+                        vac.save();
+                        return res.status(201).send('Application successful')
+                    }
                 }
-            }
-        })
+            })
+    }
 
 })
 
@@ -152,7 +159,6 @@ router.get('/:id/applicants', function (req, res) {
 })
 
 //story 11 As a partner I can delete my vacancy request before it is approved
-
 router.delete('/:vacid/deleteVacancy', function (req, res) {
     var userType = req.body.userType;
     var vacId = req.params.vacid;
@@ -175,7 +181,6 @@ router.delete('/:vacid/deleteVacancy', function (req, res) {
 
 // Story 21.2 display a vacancy post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
-
     var vacId = req.params.id;
 
     Vacancy.findById(vacId).exec(
@@ -186,22 +191,19 @@ router.get('/Post/:id', function (req, res) {
         });
 });
 
-
 //////Story 17 As an admin I cana view pending vacancies announcments requests
 // FOR SOME REASON YOU'RE HAVING ID AS PARAMETER !
-router.get('/:id/pendingVacancies', function (req, res) { 
+router.get('/:id/pendingVacancies', function (req, res) {
     var userType = req.get('userType');
     if (userType == 'Admin') {
         Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, vacancies) {
             if (err) return res.send(err)
-			return res.send(vacancies);
-		});
+            return res.send(vacancies);
+        });
     }
-    else{
+    else {
         return res.status(403).send("not authorized");
     }
-
-
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
@@ -248,21 +250,18 @@ router.put('/:id/status', function (req, res) {
                     });
             else
                 return res.send("This vacancy is already opened and you are not allowed to change its status")
-
         })
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open'&& vacancy.partner == partnerid)
+            if (vacancy.status == 'Open' && vacancy.partner == partnerid)
                 Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
                     function (err, response) {
                         console.log(response);
                         return res.send(response);
                     });
-            else   
+            else
                 return res.send("You are not allowed to change the status of this vacancy")
-
-
         })
     }
 
@@ -277,20 +276,18 @@ router.get('/:id/PartnerPendingVacancies', function (req, res) {
             return res.send(vacancy);
         });
     }
-    else{
+    else {
         return res.status(404).send('not found');
     }
 });
 
 ////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
-
     var userType = req.body.userType;  //should come from session
     var userId = req.body.id;      //should come from session
     var vacId = req.params.id;
 
     Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
-
         if (userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted') {
             return res.send(vacancy);
         }
@@ -302,7 +299,6 @@ router.get('/:id/', function (req, res) {  //showing non approved vacancy to be 
 
 ////////////// Story 22.2 : A partner can update his vacancy
 router.post('/:id/', function (req, res) {  //submitting edited vacancy
-
     var vacId = req.params.id;
     var duration = req.body.duration;
     var location = req.body.location;
@@ -326,12 +322,27 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
             vacancy.save();
             return res.send(vacancy);
         }
-        
+
         else {
             return res.send('Vacancy cannot be edited after being approved');
         }
-        
+
     })
+});
+
+//As a member I can withdraw my application from a vacancy
+//that I previously applied to
+router.put('/:id/un-apply', function (req, res) {
+    var vacancyID = req.params.id;
+    var userID = req.body.userID;
+    var userType = req.body.userType;
+    if (userType === 'Member') {
+        Vacancy.findById(vacancyID).exec(function (err, vacancy) {
+            vacancy.applicants.pull(userID);
+            vacancy.save();
+        });
+        res.send("Application withdrawn");
+    }
 });
 
 module.exports = router;

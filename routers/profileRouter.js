@@ -1,7 +1,10 @@
 const Admin = require('../models/adminModel')
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel')
+const Event = require('../models/eventModel');
 
+const Joi = require('joi');
+const schemas = require('../models/Schemas/schemas');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
@@ -106,12 +109,13 @@ router.put('/:id', function (req, res) {
     var userType = req.body.userType; //should come from session
     var userID = req.body.userID; //should come from session (person logged in)
     var partnerID = req.params.id; //the ID of the partner I want to update
-    var pwd; var members;
+    var pwd; var members; var oldPassword;
     if (req.body.boardMembers) {
         members = req.body.boardMembers;
     }
-    if (req.body.password) {
+    if (req.body.password && req.body.oldPassword) {
         pwd = req.body.password;
+        oldPassword = req.body.oldPassword;
     }
     if (userType == 'Partner') {
         if (partnerID == userID) {
@@ -119,9 +123,11 @@ router.put('/:id', function (req, res) {
                 if (members) {
                     partner.boardMembers = members;
                 }
-                if (pwd) {
+                if (pwd && oldPassword === partner.password) {
                     partner.password = pwd;
                 }
+                else 
+                    console.log("You provided an wrong old password");
                 res.send(partner);
                 partner.save();
                 console.log("Updated partner profile successfully");
@@ -141,6 +147,9 @@ router.post('/create', function (req, res) {
         var n = req.body.name;
         var em = req.body.email;
         var wf = req.body.workfield
+        
+        const result = Joi.validate(req.body, schemas.partnerSchema);
+	    if (result.error) return res.status(400).send({ error: result.error.details[0].message });
 
         var newPartner = new Partner({
             username: usern,
@@ -170,6 +179,10 @@ router.post('/create', function (req, res) {
         var intst = req.body.interests;
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
+
+        const result = Joi.validate(req.body, schemas.memberSchema);
+        if (result.error) return res.status(400).send({ error: result.error.details[0].message });
+        
         var newMember = new Member({
             username: usern,
             password: pwd,

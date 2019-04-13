@@ -2,20 +2,20 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const EventSchema = new Schema({ 
-    name:String,
+const EventSchema = new Schema({
+    name: String,
     description: String,
     price: Number,
-    city: {type:String, lowercase: true},
+    city: { type: String, lowercase: true },
     location: String,
     eventDate: Date,
-    postDate: {type:Date, default:Date.now},
-    eventStatus:{
-        type:String, 
+    postDate: { type: Date, default: Date.now },
+    eventStatus: {
+        type: String,
         enum: ['Submitted', 'Approved', 'Finished'],
-        default:'Submitted'
+        default: 'Submitted'
     },
-    remainingPlaces:Number,
+    remainingPlaces: Number,
     eventType: {
         type: String,
         lowercase: true,
@@ -28,7 +28,7 @@ const EventSchema = new Schema({
     speakers: [String],
     topics: [String],
     feedbacks: [String],
-    partner:{
+    partner: {
         type: mongoose.ObjectId,
         ref: 'Partner'
     },
@@ -41,12 +41,12 @@ const EventSchema = new Schema({
         ref: 'Member'
     }],
     commentsByAdmin: [{
-        text:String,
+        text: String,
         date: {
             type: Date,
             default: Date.now
         },
-        author:{
+        author: {
             type: mongoose.Types.ObjectId,
             ref: 'Admin'
         }

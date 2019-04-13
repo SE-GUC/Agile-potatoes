@@ -13,6 +13,7 @@ import EventsContainer from './EventsContainer/EventsContainer'
 // import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 // import CreatingVacForm from './CreatingVacForm'
 // import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
+import VacancyPost from './VacancyPost/VacancyPost'
 import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
@@ -27,7 +28,7 @@ class App extends Component {
             <Route exact path="/events" component={EventsContainer}/>
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
-            <Route exact path="/vacancies/:id" component={HomePage}/>
+            <Route exact path="/vacancies/:id" component={VacancyPost}/>
             <Route exact path="/profile" component={HomePage}/>
             <Route exact path="/notifications" component={HomePage}/>
           </div>
