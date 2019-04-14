@@ -19,6 +19,8 @@ import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
 import Login from './Sign In/Login';
 import Footer from './Footer/Footer'
+import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
+import MemberProfile from './Profiles/MemberProfile/MemberProfile'
 class App extends Component {
 
   constructor(props){
@@ -43,7 +45,8 @@ class App extends Component {
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
-            <Route exact path="/profile" component={HomePage}/>
+            <Route exact path="/partnerprofile" component={PartnerProfile}/>
+            <Route exact path="/memberprofile" component={MemberProfile}/>
             <Route exact path="/notifications" component={HomePage}/>
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>

@@ -21,6 +21,9 @@ class EventsContainer extends Component {
         description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         url: 'hello'
       }
+    ],
+    partnerEvents:[
+      
     ]
   }
   getRecommendedEvents = async ()=>{
@@ -32,6 +35,15 @@ class EventsContainer extends Component {
       console.log('GOT ERROR')
     }
   }
+  getPartnerEvents= async()=>{
+    try {
+      let events = await axios.get(`http://localhost:3001/api/event/5caf1006305a701ee155610a/PartnerEvents`, { 'headers': { 'userType': 'Partner' } });
+      this.setState({partnerEvents:this.state.partnerEvents.concat(events.data)})
+      console.log(this.state.partnerEvents)
+     } catch (error) {
+      console.log('GOT ERROR '+error)
+    }
+  }
   render() {
     return (
       <div className='container-fluid'>
@@ -40,10 +52,12 @@ class EventsContainer extends Component {
                 <div className="list-group">
                   <button type="button" id="allEvents" className="list-group-item list-group-item-action">All Events</button>
                   <button type="button" onClick={this.getRecommendedEvents} id="recommendedEvents" className="list-group-item list-group-item-action">Recommended Events</button>
+                  <button type="button" onClick={this.getPartnerEvents} id="partnerEvents" className="list-group-item list-group-item-action">Partner Events</button>
                 </div>
             </div>
             <div className='events-window col-sm-10'>
               <EventsDisplayer events={this.state.events}/>
+              <EventsDisplayer events={this.state.partnerEvents}/>
             </div>
         </div>
       </div>

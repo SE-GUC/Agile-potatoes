@@ -24,7 +24,9 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
-	var eventDate = req.body.date;
+	let eventDate = moment();                
+	 eventDate = moment(req.body.eventDate+''); 
+	 eventDate.day(eventDate.day()+1)
 	var remainingPlaces = req.body.places;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
@@ -126,14 +128,23 @@ router.get('/ApprovedEvents', function (req, res) {
 	})
 })
 
-/// story 20 : As a Partner, I can view All My Pending(yet not approved) Event Requests. (READ)
-router.get('/:id/PartnerPendingEvents', function (req, res) {
+/// story 20 : As a Partner, I can view All Event Requests.(Sorted by status)
+router.get('/:id/PartnerEvents', function (req, res) {
 	var userType = req.get('userType');
 	var userid = req.params.id
 	if (userType == 'Partner') {
-		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate description').exec(function (err, event) {
+		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate description').exec(function (err, Submittedevent) {
 			if (err) return res.send(err)
-			return res.send(event);
+			Event.find({ eventStatus: 'Approved' }, 'url name eventDate description').exec(function (err, Approvedevent) {
+				if (err) return res.send(err)
+				Event.find({ eventStatus: 'Closed' }, 'url name eventDate description').exec(function (err, Closedevent) {
+					if (err) return res.send(err)
+					Event.find({eventStatus: 'Finished' }, 'url name eventDate description').exec(function (err, Finishedevent) {
+						if (err) return res.send(err)
+						return res.send([...Submittedevent,...Approvedevent,...Closedevent,...Finishedevent])
+					});
+				});
+			});
 		});
 	}
 });

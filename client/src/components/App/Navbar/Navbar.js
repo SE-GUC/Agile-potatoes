@@ -25,6 +25,8 @@ export class Navbar extends Component {
             <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Vacancies</p></NavLink>
             <NavLink to="/events" className="link-button col-sm-3"><p className="text-center">Events</p></NavLink>
             <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Certificates</p></NavLink>
+            <NavLink to="/partnerprofile" className="link-button col-sm-3"><p className="text-center">Partner Profile</p></NavLink>
+            <NavLink to="/memberprofile" className="link-button col-sm-3"><p className="text-center">Member Profile</p></NavLink>
         </div>
         
             {
