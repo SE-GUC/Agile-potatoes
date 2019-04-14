@@ -13,26 +13,46 @@ import EventsContainer from './EventsContainer/EventsContainer'
 // import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 // import CreatingVacForm from './CreatingVacForm'
 // import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
-//import VacancyPost from './VacancyPost/VacancyPost'
+import VacancyPost from './VacancyPost/VacancyPost'
 import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
+import Login from './Sign In/Login';
+import Footer from './Footer/Footer'
+import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
+import MemberProfile from './Profiles/MemberProfile/MemberProfile'
 class App extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      loggedIn: false,
+    }
+  }
+  changeLoggedInFlag = (flag) => {
+    this.setState({
+      loggedIn:flag
+    })
+  }
   render() {
     return (
       <div className="App">
         <Router>
-          <Navbar/>
+          <Navbar loggedIn={this.state.loggedIn} changeLoggedInFlag={this.changeLoggedInFlag}/>
           <div>
             <Route exact path="/" component={HomePage}/>
             <Route exact path="/events" component={EventsContainer}/>
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
-            <Route exact path="/vacancies/:id" component={HomePage}/>
-            <Route exact path="/profile" component={HomePage}/>
+            <Route exact path="/vacancies/:id" component={VacancyPost}/>
+            <Route exact path="/partnerprofile" component={PartnerProfile}/>
+            <Route exact path="/memberprofile" component={MemberProfile}/>
             <Route exact path="/notifications" component={HomePage}/>
+            <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
+        <Footer/>
+
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />

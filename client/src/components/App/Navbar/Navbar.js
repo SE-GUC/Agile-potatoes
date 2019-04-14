@@ -10,6 +10,10 @@ export class Navbar extends Component {
         }
     }
 
+    logout = () => {
+        this.props.changeLoggedInFlag(false)
+
+    }
     render() {
         return (
             <nav className="myNav row">
@@ -21,17 +25,19 @@ export class Navbar extends Component {
                     <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Vacancies</p></NavLink>
                     <NavLink to="/events" className="link-button col-sm-3"><p className="text-center">Events</p></NavLink>
                     <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Certificates</p></NavLink>
+                    <NavLink to="/partnerprofile" className="link-button col-sm-3"><p className="text-center">Partner Profile</p></NavLink>
+                    <NavLink to="/memberprofile" className="link-button col-sm-3"><p className="text-center">Member Profile</p></NavLink>
                 </div>
 
                 {
-                    this.state.isLoggedIn ?
+                    this.props.loggedIn ?
                         (<div className="right-nav col-sm-4 row">
-                            <NavLink to="/" className="link-button offset-sm-5 col-sm-4"><p className="text-center">My Profile  <i className="fas fa-user"></i></p></NavLink>
-                            <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Log Out  <i className="fas fa-sign-out-alt"></i></p></NavLink>
+                            <NavLink to="/" className="link-button offset-sm-3 col-sm-4"><p className="text-center">My Profile  <i className="fas fa-user"></i></p></NavLink>
+                            <NavLink to="/login" onClick={this.logout} className="link-button col-sm-4"><p className="text-center">Log Out  <i className="fas fa-sign-out-alt"></i></p></NavLink>
                         </div>
                         ) : (
                             <div className="right-nav col-sm-4 row">
-                                <NavLink to="/" className="link-button offset-sm-6 col-sm-3"><p className="text-center">Log In  <i className="fas fa-sign-in-alt"></i></p></NavLink>
+                                <NavLink to="/login" className="link-button offset-sm-6 col-sm-3"><p className="text-center">Log In  <i className="fas fa-sign-in-alt"></i></p></NavLink>
                                 <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Sign Up</p></NavLink>
                             </div>)
                 }

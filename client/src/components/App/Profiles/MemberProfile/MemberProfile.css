@@ -1,0 +1,41 @@
+.side-bar {
+    /* position: fixed; */
+    left: 0px;
+    height: 1000px;
+    padding-top: 250px;
+    background-color:#31353D;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+}
+
+.side-bar button {
+    width: 100%;
+    padding-left: 0px ;
+    margin-left: 0px ; 
+}
+.profile-window {
+    height: 100 px;
+    background-color: crimson;
+    float: right;
+    padding-top: 50px;
+}
+
+.profileCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 100px;
+    height:210;
+    position: relative;
+}
+
+
+.profileCard span{
+    float: left;
+    position: absolute;
+    left:20px;
+    bottom: 20px;
+}
+
