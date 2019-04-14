@@ -22,11 +22,12 @@ export class Navbar extends Component {
         </div>
         <div className="middle-nav col-sm-4 row">
             <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Home</p></NavLink>
-            <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Vacancies</p></NavLink>
+            <NavLink to="/vacancies" className="link-button col-sm-3"><p className="text-center">Vacancies</p></NavLink>
             <NavLink to="/events" className="link-button col-sm-3"><p className="text-center">Events</p></NavLink>
             <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Certificates</p></NavLink>
             <NavLink to="/partnerprofile" className="link-button col-sm-3"><p className="text-center">Partner Profile</p></NavLink>
             <NavLink to="/memberprofile" className="link-button col-sm-3"><p className="text-center">Member Profile</p></NavLink>
+            <NavLink to="/adminprofile" className="link-button col-sm-3"><p className="text-center">Admin Profile</p></NavLink>
         </div>
         
             {
