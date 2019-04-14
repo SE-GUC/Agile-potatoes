@@ -3,42 +3,42 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const PartnerSchema = new Schema({
-    username:{type:String, required:true, unique:true},
-    password:{type:String, required:true},
-    name: {type:String, unique: true},
-    email:{type:String, required:true, unique:true},
-    boardMembers:[{
-        name:String,
-        email:String
+    username: { type: String, required: true, unique: true },
+    password: { type: String },
+    name: { type: String, unique: true },
+    email: { type: String, required: true, unique: true },
+    boardMembers: [{
+        name: String,
+        email: String
     }],
     notifications: [{
-        seen: {type: Boolean,default: false},
+        seen: { type: Boolean, default: false },
         srcURL: String,
         description: String
     }],
-    membershipExpiryDate:Date,
-    availability:Boolean,
-    workfeild:String,
-    vacancies:[{
+    membershipExpiryDate: Date,
+    availability: Boolean,
+    workfield: String,
+    vacancies: [{
         type: mongoose.ObjectId,
         ref: 'Vacancy'
     }],
-    membershipState:{
+    membershipState: {
         type: String,
         trim: true,
-        enum:['Pending','Active','Expired'],
-        default:'Pending'
-    }, 
-    pastProjects:[{type:String}],
-    ProfileURL:{
+        enum: ['Pending', 'Active', 'Expired'],
+        default: 'Pending'
+    },
+    pastProjects: [{ type: String }],
+    ProfileURL: {
         type: String,
-        trim: true  
+        trim: true
     },
     events: [{
         type: mongoose.ObjectId,
         ref: 'Event'
     }],
-    
+
     feedbacks: [{
         text: String,
         date: {

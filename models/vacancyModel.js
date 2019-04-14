@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const VacancySchema = new Schema({
-    description: {type:String, required:true},
-    duration: {type: String, required: true},
+    description: { type: String, required: true },
+    duration: { type: String, required: true },
     location: String,
-    city:{type:String,lowercase:true,trim:true},
+    city: { type: String, lowercase: true, trim: true },
     salary: Number,
     dailyHours: Number,
-    name: {type: String,
+    name: {
+        type: String,
         lowercase: true,
         trim: true
     },
@@ -26,7 +27,8 @@ const VacancySchema = new Schema({
         type: String,
         trim: true
     },
-    partner: {
+    partner: {      // should be required
+        required: true,
         type: mongoose.ObjectId,
         ref: 'Partner'
     },
@@ -39,12 +41,12 @@ const VacancySchema = new Schema({
         ref: 'Member'
     }],
     commentsByAdmin: [{
-        text:String,
+        text: String,
         date: {
             type: Date,
             default: Date.now
         },
-        author:{
+        author: {
             type: mongoose.Types.ObjectId,
             ref: 'Admin'
         }
