@@ -17,12 +17,26 @@ import VacancyPost from './VacancyPost/VacancyPost'
 import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
+import Login from './Sign In/Login';
+
 class App extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      loggedIn: false,
+    }
+  }
+  changeLoggedInFlag = (flag) => {
+    this.setState({
+      loggedIn:flag
+    })
+  }
   render() {
     return (
       <div className="App">
         <Router>
-          <Navbar/>
+          <Navbar loggedIn={this.state.loggedIn} changeLoggedInFlag={this.changeLoggedInFlag}/>
           <div>
             <Route exact path="/" component={HomePage}/>
             <Route exact path="/events" component={EventsContainer}/>
@@ -31,6 +45,7 @@ class App extends Component {
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
             <Route exact path="/profile" component={HomePage}/>
             <Route exact path="/notifications" component={HomePage}/>
+            <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
         {/*<EventPostNew/>

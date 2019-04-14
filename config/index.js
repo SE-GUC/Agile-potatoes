@@ -1,5 +1,5 @@
-const DbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
-const TestingDbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
+const DbConnectionString = "mongodb+srv://Hassan:zizojicko24@cluster0-spbpz.mongodb.net/test?retryWrites=true";
+const TestingDbConnectionString = "mongodb+srv://Hassan:zizojicko24@cluster0-spbpz.mongodb.net/Testings?retryWrites=true";
 
 
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
