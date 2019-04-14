@@ -1,3 +1,6 @@
+const nodemailer = require('nodemailer');
+
+
 async function NotiifyByEmail(notifEmail,notifSubject,notifText){
 
     let transporter = nodemailer.createTransport({
