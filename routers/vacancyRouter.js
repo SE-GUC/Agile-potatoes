@@ -298,7 +298,7 @@ router.get('/:id/', function (req, res) {  //showing non approved vacancy to be 
 })
 
 ////////////// Story 22.2 : A partner can update his vacancy
-router.post('/:id/', function (req, res) {  //submitting edited vacancy
+router.put('/:id/', function (req, res) {  //submitting edited vacancy
     var vacId = req.params.id;
     var duration = req.body.duration;
     var location = req.body.location;
@@ -311,14 +311,17 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
         if (err) {
             return res.send(err);
         }
+        console.log(vacancy.status)
+        console.log(vacId)
+        
         if (vacancy.status == 'Submitted') {
 
             vacancy.duration = duration;
             vacancy.location = location;
             vacancy.description = description;
             vacancy.salary = salary;
-            vacancy.dailyhours = dailyhours;
-
+            vacancy.dailyhours = dailyHours;
+            console.log(duration)
             vacancy.save();
             return res.send(vacancy);
         }

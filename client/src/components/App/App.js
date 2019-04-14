@@ -24,13 +24,13 @@ class App extends Component {
         <Router>
           <Navbar/>
           <div>
-            <Route exact path="/" component={HomePage}/>
-            <Route exact path="/events" component={EventsContainer}/>
+             {/* <Route exact path="/" component={HomePage}/> */}
+            <Route exact path="/events" component={EventsContainer}/> 
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
-            <Route exact path="/profile" component={HomePage}/>
-            <Route exact path="/notifications" component={HomePage}/>
+            {/* <Route exact path="/profile" component={HomePage}/>
+            <Route exact path="/notifications" component={HomePage}/> */}
           </div>
         </Router>
         {/*<EventPostNew/>
