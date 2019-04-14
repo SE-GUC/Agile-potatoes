@@ -7,6 +7,7 @@ const schemas = require('../models/Schemas/schemas');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
+const NotifyByEmail = require('../services/NotifyByEmail');
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
@@ -36,6 +37,8 @@ router.post('/:id/comment', (req, res, next) => {
                     srcURL: '/api/vacancy/Post' + vacId,
                     description: 'Admin commented on your vacancy request'
                 });
+                NotifyByEmail(vacancy.partner.email, 'New comment on vacancy that you follow',
+					`Admin commented on your vacancy request \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 await vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
                 return res.status(201).send(vacancy.commentsByAdmin);
             })
@@ -60,6 +63,8 @@ router.post('/:id/comment', (req, res, next) => {
                         srcURL: '/api/vacancy/Post' + vacId,
                         description: 'Partner commented on his vacancy request'
                     });
+                    NotifyByEmail(vacancy.admin.email, 'New comment on vacancy that you follow',
+					`Partner commented on his vacancy \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 }
                 await vacancy.save();
                 return res.status(201).send(vacancy.commentsByPartner);
@@ -243,11 +248,20 @@ router.put('/:id/status', function (req, res) {
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted')
+            {
                 Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
                     function (err, response) {
                         console.log(response);
                         return res.send(response);
                     });
+                if(vacStatus === 'Approved')
+                {
+                    NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
+                    "Admin has approved your vacancy request and it is no more opened,"
+                    + " please don't try to edit it as long as it is approved" 
+                    + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                }
+            }
             else
                 return res.send("This vacancy is already opened and you are not allowed to change its status")
         })
