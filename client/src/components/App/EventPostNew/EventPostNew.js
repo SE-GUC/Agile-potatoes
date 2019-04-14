@@ -117,7 +117,7 @@ class EventPostNew extends Component {
       this.refs.alert.style.display = 'block'
     })
   }
-  
+
   render() {
     if (!this.state.loaded) return null;
     return (

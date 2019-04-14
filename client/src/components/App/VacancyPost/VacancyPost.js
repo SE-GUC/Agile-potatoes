@@ -65,11 +65,11 @@ class VacancyPost extends Component {
   onClickCancel = (e) => {
     e.preventDefault();
     axios.put("http://localhost:3001/api/vacancy/5ca11a709b305d4878a54e02/un-apply", {
-        "userID": this.state.userData._id,
-        "userType": this.state.userData.userType
-      }).then(this.setState({
-        userHasApplied: false
-      }));
+      "userID": this.state.userData._id,
+      "userType": this.state.userData.userType
+    }).then(this.setState({
+      userHasApplied: false
+    }));
   }
 
   render() {
