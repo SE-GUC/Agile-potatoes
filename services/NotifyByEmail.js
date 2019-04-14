@@ -1,13 +1,12 @@
 const nodemailer = require('nodemailer');
-
-
+const config = require("../config");
 async function NotiifyByEmail(notifEmail,notifSubject,notifText){
 
     let transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'islamsecourse@gmail.com',
-                pass: 'Is1871998'
+                user: config.getEmailCredentials().gmail,
+                pass: config.getEmailCredentials().password
             }
         
     });
