@@ -23,12 +23,12 @@ function createToken(userType, email, userID){
 } 
 
 //user story 12 returning user detatils to display his profile
-router.get('/:id',jwtVerifier({secret: secret}), function (req, res, next) {
-    jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
+router.get('/:id', function (req, res, next) {
+    //jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
 
-    if(err) console.log(err)
-    var userType = decoded.userType; //should come from session
-    var userId = decoded.userId; //should come from session
+   // if(err) console.log(err)
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId; //should come from session
     var profId = req.params.id;
  
     
@@ -98,7 +98,49 @@ router.get('/:id',jwtVerifier({secret: secret}), function (req, res, next) {
     }
     
 })
+//})
+//get password of a partner/member/admin
+router.get('/:id/GetPassword',function(req,res){
+    var userID = req.params.id
+    Admin.findById(userID,function(err,adminPass){
+        if(err) return res.send(err)
+        else
+        {
+            if(adminPass)
+            {
+                return res.send(adminPass.password)
+            }
+            else{
+                Partner.findById(userID,function(err,partnerPass){
+                    if(err) return res.send(err)
+                    else
+                    {
+                        if(partnerPass)
+                        {
+                            return res.send(partnerPass.password)
+                        }
+                        else{
+                            Member.findById(userID,function(err,memberPass){
+                                if(err) return res.send(err)
+                                else
+                                {
+                                    if(memberPass)
+                                    {
+                                        return res.send(memberPass.password)
+                                    }
+                                    else{
+                                        return res.send("user not found")
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        }
+    })
 })
+
 
 //user story 8: As a Member I can post feedback to a Partner I previously worked with
 router.post('/:id/feedback', function (req, res) {
@@ -332,6 +374,7 @@ router.put('/:id/update', function (req, res) {
                 if (passwordU) doc.password = passwordU;
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
+                res.send(doc);
 
                 doc.save();
             });
@@ -356,8 +399,7 @@ router.put('/:id/update', function (req, res) {
     }
 
 
-    res.send('updated');
-
+   
 });
 
 //AUTHENTICATION... 
