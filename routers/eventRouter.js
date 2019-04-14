@@ -432,7 +432,26 @@ router.put('/:id/attending', function(req, res){
         res.send("Marked you as attending");
     }
 });
+//As an admin I can approve events
+router.put('/:id/approve', function (req, res) {
+    var userType = req.body.userType;
+	var eveId = req.params.id;
+	console.log("here is it")
+    if (userType == 'Admin') {
+        Event.findById(eveId).exec(function (err, event) {
 
+            if (event.eventStatus !== 'Open')
+                Event.findByIdAndUpdate(eveId, {eventStatus: "Open" },
+                    function (err, response) {
+                        response.save();
+                        return res.send("updated");
+                    });
+            else
+                return res.send("this event is already approved")
+        })
+	}
+else res.send("only admin can approve")
+})
 //As a member I can mark myself as not going to an event that I 
 //previously marked myself as going to
 router.put('/:id/notAttending', function(req, res){

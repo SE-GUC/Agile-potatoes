@@ -1,4 +1,3 @@
-
 const DbConnectionString = "";
 const TestingDbConnectionString = "";
 const EmailCredentials = {

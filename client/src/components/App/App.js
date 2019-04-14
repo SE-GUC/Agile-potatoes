@@ -40,8 +40,8 @@ class App extends Component {
         <Router>
           <Navbar loggedIn={this.state.loggedIn} changeLoggedInFlag={this.changeLoggedInFlag}/>
           <div>
-            <Route exact path="/" component={HomePage}/>
-            <Route exact path="/events" component={EventsContainer}/>
+             {/* <Route exact path="/" component={HomePage}/> */}
+            <Route exact path="/events" component={EventsContainer}/> 
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
