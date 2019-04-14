@@ -1,6 +1,6 @@
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const Joi = require('joi');
 const Event = require('../models/eventModel');
 const Member = require('../models/memberModel')
@@ -8,6 +8,8 @@ const Partner = require('../models/partnerModel');
 const Admin = require('../models/adminModel');
 const schemas = require('../models/Schemas/schemas');
 const bodyParser = require('body-parser');
+const NotifyByEmail = require('../services/NotifyByEmail');
+
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
@@ -378,6 +380,8 @@ router.post('/:id/comment', function (req, res) {
 						srcURL: '/api/event/Post' + evId,
 						description: 'Partner commented on your event request'
 					});
+					NotifyByEmail(event.partner.email, 'New comment on event that you added before',
+					`Admin commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByAdmin);
@@ -394,6 +398,8 @@ router.post('/:id/comment', function (req, res) {
 						srcURL: '/api/event/Post' + evId,
 						description: 'Partner commented on your event request'
 					});
+					NotifyByEmail(event.admin.email, 'New comment on event that you follow',
+					`Partner commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByPartner);
