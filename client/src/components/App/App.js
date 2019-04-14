@@ -13,6 +13,7 @@ import EventsContainer from './EventsContainer/EventsContainer'
 // import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 // import CreatingVacForm from './CreatingVacForm'
 // import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
+// import CreatingVacComment from './CreatingVacComment'
 import VacancyPost from './VacancyPost/VacancyPost'
 import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
@@ -70,7 +71,7 @@ class App extends Component {
           </div>
         </Router>
             <GetPendingEventsAdmin />
-
+              <CreatingVacComment />
             <GetPendingVacanciesAdmin />
            */}
       </div>
