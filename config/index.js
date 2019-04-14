@@ -1,7 +1,9 @@
-const DbConnectionString = "mongodb+srv://darknsSs512:3350446dark@lirtenhubp-ugo0u.mongodb.net/lirtenhubp?retryWrites=true";
-const TestingDbConnectionString = "mongodb+srv://darknsSs512:3350446dark@lirtenhubp-ugo0u.mongodb.net/lirtenhubp?retryWrites=true";
-
-
+const DbConnectionString = "";
+const TestingDbConnectionString = "";
+const EmailCredentials = {
+    gmail : 'write a valid gmail addree',
+    password: 'put the password here'
+}
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
     // MUST BE CHANGED BEFORE DEPLOYMENT to DBConnectionString
     return DbConnectionString;
@@ -16,8 +18,13 @@ const getDevelopmentPort = function () {
     return 3001 ;
 }
 
+const getEmailCredentials = function () {
+    return (EmailCredentials)
+}
+
 module.exports = {
     getDbConnectionString,
     getTestingDbConnectionString,
-    getDevelopmentPort
+    getDevelopmentPort,
+    getEmailCredentials
 };

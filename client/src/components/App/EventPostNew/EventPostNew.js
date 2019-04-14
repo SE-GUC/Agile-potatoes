@@ -253,14 +253,8 @@ console.log(e.target.value)
                 {this.state.eventData.eventDate}
               </p>
               <h2>{this.state.eventData.name}</h2>
-              <p>
-                <span className="text-muted">organized by </span>
-                {this.state.eventData.partner.name}
-              </p>
-              <p className="text-muted">
-                <i className="fas fa-map-marker-alt" />{" "}
-                {this.state.eventData.location}, {this.state.eventData.city}
-              </p>
+              <p><span className="text-muted">organized by </span>{this.state.eventData.partner?(this.state.eventData.partner.name):("LirtnenHub")}</p>
+              <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.eventData.location}, {this.state.eventData.city}</p>
             </div>
             <div className="event-post-info">
               <h4>Details</h4>

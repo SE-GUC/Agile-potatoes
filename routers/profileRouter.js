@@ -2,7 +2,11 @@ const Admin = require('../models/adminModel')
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel')
 const Event = require('../models/eventModel');
-
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const jwtVerifier = require('express-jwt');
+const notify = require('./notificationRouter');
+const NotifyByEmail = require('../services/NotifyByEmail');
 const Joi = require('joi');
 const schemas = require('../models/Schemas/schemas');
 const express = require('express');
@@ -11,13 +15,22 @@ const router = express.Router();
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
+const secret = 'this_secret_is_the_most_powerful_secret_of_all_TIME_..._HUNDRED_PERCENT_CONFIRMED'
+function createToken(userType, email, userID){
+    let expirationDate = Math.floor(Date.now() / 1000) + 10; //4 hours from now...
+    var token = jwt.sign({userType: userType, email: email, userID: userID, exp: expirationDate}, secret);
+    return token;
+} 
+
 //user story 12 returning user detatils to display his profile
 router.get('/:id', function (req, res, next) {
-    var userType = req.get('userType'); //should come from session
-    var userId = req.get('userId'); //should come from session
+    //jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
+
+   // if(err) console.log(err)
+    var userType = req.body.userType; //should come from session
+    var userId = req.body.userId; //should come from session
     var profId = req.params.id;
-    console.log(userId)
-    console.log(userType)
+ 
     
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
@@ -83,7 +96,51 @@ router.get('/:id', function (req, res, next) {
             }
         })
     }
+    
 })
+//})
+//get password of a partner/member/admin
+router.get('/:id/GetPassword',function(req,res){
+    var userID = req.params.id
+    Admin.findById(userID,function(err,adminPass){
+        if(err) return res.send(err)
+        else
+        {
+            if(adminPass)
+            {
+                return res.send(adminPass.password)
+            }
+            else{
+                Partner.findById(userID,function(err,partnerPass){
+                    if(err) return res.send(err)
+                    else
+                    {
+                        if(partnerPass)
+                        {
+                            return res.send(partnerPass.password)
+                        }
+                        else{
+                            Member.findById(userID,function(err,memberPass){
+                                if(err) return res.send(err)
+                                else
+                                {
+                                    if(memberPass)
+                                    {
+                                        return res.send(memberPass.password)
+                                    }
+                                    else{
+                                        return res.send("user not found")
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        }
+    })
+})
+
 
 //user story 8: As a Member I can post feedback to a Partner I previously worked with
 router.post('/:id/feedback', function (req, res) {
@@ -98,6 +155,11 @@ router.post('/:id/feedback', function (req, res) {
                 text: comment,
                 member: userID
             });
+
+            NotifyByEmail(partner.email, 'New feedback',
+            "Member that previously worked with has posted a feedback" 
+            + `\n feedback is: ${comment}`)
+
             partner.save();
         }).then(console.log("Added feedback ;)"));
         return res.send("Feedback added");
@@ -150,10 +212,12 @@ router.post('/create', function (req, res) {
         
         const result = Joi.validate(req.body, schemas.partnerSchema);
 	    if (result.error) return res.status(400).send({ error: result.error.details[0].message });
-
+        bcrypt.hash(pwd,10, function(err, hashedPwd){
+            if(err) res.send(err);
+            else{
         var newPartner = new Partner({
             username: usern,
-            password: pwd,
+            password: hashedPwd,
             name: n,
             email: em,
             workfield: wf
@@ -165,6 +229,8 @@ router.post('/create', function (req, res) {
 
         });
         res.send("Added a partner")
+    }
+})
     }
     if (userType == 'Member') {
         var usern = req.body.username;
@@ -182,10 +248,12 @@ router.post('/create', function (req, res) {
 
         const result = Joi.validate(req.body, schemas.memberSchema);
         if (result.error) return res.status(400).send({ error: result.error.details[0].message });
-        
+        bcrypt.hash(pwd,10, function(err, hashedPwd){
+            if(err) res.send(err);
+            else {
         var newMember = new Member({
             username: usern,
-            password: pwd,
+            password: hashedPwd,
             email: em,
             fname: fn,
             lname: ln,
@@ -206,7 +274,9 @@ router.post('/create', function (req, res) {
         });
         res.send("Added a member");
     }
-});
+})
+    }
+})
 
 //As an admin i can i can update my name story#30
 router.put('/:id/name', function (req, res) {
@@ -262,6 +332,11 @@ router.put('/:id/feedback', function (req, res) {
                     srcURL: '/api/feedback/' + memberId,
                     description: 'Partner reviewed your performance in his vacancy'
                 });
+
+                NotifyByEmail(member.email, 'New feedback from a partner',
+                "Partner that previously worked with has posted a review" 
+                + ` on your performance in his vacancy \n feedback is: ${feedback}`)
+
                 console.log(member)
                 member.save();
             });
@@ -299,6 +374,7 @@ router.put('/:id/update', function (req, res) {
                 if (passwordU) doc.password = passwordU;
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
+                res.send(doc);
 
                 doc.save();
             });
@@ -323,9 +399,111 @@ router.put('/:id/update', function (req, res) {
     }
 
 
-    res.send('updated');
-
+   
 });
 
+//AUTHENTICATION... 
+//START
 
+
+router.post('/login', (req,res) =>{
+    let email = req.body.email;
+    let password = req.body.password;
+
+        Member.findOne({email: email}).exec(function(err, member){
+            if(err) console.log(err)
+            else
+            if(member){
+               
+                bcrypt.compare(member.password, password, function(err, flag){
+                    if(member.email == email && flag){
+                        res.json({
+                            authData: createToken('Member', email, member._id),
+                            userData: {
+                                userType: 'Member',
+                                email: email,
+                                userId: member._id,
+                                fname: member.fname,
+                                lname: member.lname,
+                                membershipExpiryDate: member.membershipExpiryDate,
+                                secret: secret
+                            }
+                        })
+                    }
+                    else{
+                    
+                        res.send("Either your E-mail or Password is wrong.")
+                    } 
+                })
+            
+        }
+        else
+        {
+            Partner.findOne({email: email}).exec(function(err, partner){
+
+                if(err) console.log(err)
+                else
+                if(partner){
+                  
+                    bcrypt.compare(password, partner.password,  function(err, flag){
+                     
+                       
+                        if(partner.email == email && flag){
+                            res.json({
+                                authData: createToken('Partner', email, partner._id),
+                                userData: {
+                                    userType: 'Partner',
+                                    email: email,
+                                    userId: partner._id,
+                                    name: partner.name,
+                                    membershipExpiryDate: partner.membershipExpiryDate,
+                                    secret: secret
+                                }
+                            })
+                        }
+                        
+                        else{
+                           
+                            res.send("Either your E-mail or Password is wrong.")
+                        } 
+                    })
+            }
+            else
+            {
+                Admin.findOne({email: email}).exec(function(err, admin){
+                    
+                    if(err) console.log(err);
+                    else
+                    if(admin){
+                       
+                        bcrypt.compare(admin.password, password, function(err, flag){
+                            if(admin.email == email && flag){
+                                res.json({
+                                    authData: createToken('Admin', email, admin._id),
+                                    userData: {
+                                        userType: 'Admin',
+                                        email: email,
+                                        userId: admin._id,
+                                        fname: admin.fname,
+                                        lname: admin.lname,
+                                        secret: secret
+                                    }
+                                })
+                            }
+                            else{
+                              
+                                res.send("Either your E-mail or Password is wrong.")
+                            } 
+                        })
+                }
+                else
+                res.send("You don't have an account, Please Sign-Up to create an Account and try again.")
+                })
+            }
+            })
+        }   
+        })
+    })
+
+//END
 module.exports = router;
