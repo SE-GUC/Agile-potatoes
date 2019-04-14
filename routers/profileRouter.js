@@ -5,6 +5,8 @@ const Event = require('../models/eventModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const jwtVerifier = require('express-jwt');
+const notify = require('./notificationRouter');
+const NotifyByEmail = require('../services/NotifyByEmail');
 const Joi = require('joi');
 const schemas = require('../models/Schemas/schemas');
 const express = require('express');
@@ -111,6 +113,11 @@ router.post('/:id/feedback', function (req, res) {
                 text: comment,
                 member: userID
             });
+
+            NotifyByEmail(partner.email, 'New feedback',
+            "Member that previously worked with has posted a feedback" 
+            + `\n feedback is: ${comment}`)
+
             partner.save();
         }).then(console.log("Added feedback ;)"));
         return res.send("Feedback added");
@@ -283,6 +290,11 @@ router.put('/:id/feedback', function (req, res) {
                     srcURL: '/api/feedback/' + memberId,
                     description: 'Partner reviewed your performance in his vacancy'
                 });
+
+                NotifyByEmail(member.email, 'New feedback from a partner',
+                "Partner that previously worked with has posted a review" 
+                + ` on your performance in his vacancy \n feedback is: ${feedback}`)
+
                 console.log(member)
                 member.save();
             });

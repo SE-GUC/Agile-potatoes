@@ -18,7 +18,7 @@ import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
 import Login from './Sign In/Login';
-
+import Footer from './Footer/Footer'
 class App extends Component {
 
   constructor(props){
@@ -48,6 +48,8 @@ class App extends Component {
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
+        <Footer/>
+
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />
