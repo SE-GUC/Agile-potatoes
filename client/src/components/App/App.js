@@ -21,6 +21,8 @@ import Login from './Sign In/Login';
 import Footer from './Footer/Footer'
 import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
 import MemberProfile from './Profiles/MemberProfile/MemberProfile'
+import AdminProfile from './AdminProfile/AdminProfile'
+import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
 class App extends Component {
 
   constructor(props){
@@ -43,8 +45,9 @@ class App extends Component {
              {/* <Route exact path="/" component={HomePage}/> */}
             <Route exact path="/events" component={EventsContainer}/> 
             <Route exact path="/events/:id" component={EventPostNew}/>
-            <Route exact path="/vacancies" component={HomePage}/>
+            <Route exact path="/vacancies" component={GetAllVacancies}/>
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
+            <Route exact path="/adminprofile" component={AdminProfile}/>
             <Route exact path="/partnerprofile" component={PartnerProfile}/>
             <Route exact path="/memberprofile" component={MemberProfile}/>
             <Route exact path="/notifications" component={HomePage}/>

@@ -281,6 +281,66 @@ router.put('/:id/status', function (req, res) {
 
 });
 
+//get all vacancies
+router.get('/:id/GetAllVacancies', function (req, res) {
+    var userid = req.params.id;
+    Member.findById(userid).exec(function (err, memberDoc) {
+        if(memberDoc){
+        Vacancy.find({status: 'Open' }).exec(function (err, vacancy) {
+            if(err)
+                return res.send("Error")
+            else    
+            return res.send(vacancy);   
+        });
+    }   
+    })
+
+    Partner.findById(userid).exec(function (err, partnerDoc) {
+        if(partnerDoc){
+            Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
+                if(err)
+                return res.send ("Error")
+
+                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
+                    if(err)
+                    return res.send ("Error")
+                    
+                    Vacancy.find({status: 'Closed'}).exec(function (err, Closedvacancy) {
+                        if(err)
+                        return res.send("Error")
+
+                        return res.send([...Submittedvacancy,...Openvacancy,...Closedvacancy])
+                
+                    });
+
+                
+                });
+            });
+
+
+        
+    }
+    })
+
+    Admin.findById(userid).exec(function (err, adminDoc) {
+        if(adminDoc){
+            Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
+                if (err) 
+                return res.send("Error")
+                
+                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
+                    if (err)
+                    return res.send("Error")
+                    
+                    return res.send([...Submittedvacancies,...Openvacancies])
+                });
+            });
+    }   
+    })
+
+
+});
+
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
 router.get('/:id/PartnerPendingVacancies', function (req, res) {
     var userType = req.get('userType')
