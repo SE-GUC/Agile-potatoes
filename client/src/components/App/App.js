@@ -17,6 +17,7 @@ import VacancyPost from './VacancyPost/VacancyPost'
 import EventPostNew from './EventPostNew/EventPostNew'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
+import Footer from './Footer/Footer'
 class App extends Component {
   render() {
     return (
@@ -33,6 +34,8 @@ class App extends Component {
             <Route exact path="/notifications" component={HomePage}/>
           </div>
         </Router>
+        <Footer/>
+
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />

@@ -1,9 +1,25 @@
-import React from 'react'
+import React,{Component} from 'react'
 import './HomePage.css' 
 import {NavLink} from 'react-router-dom'
 import TypeEffect from './TypeEffect/TypeEffect'
-const HomePage = ({props})=> {
+class HomePage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true
+    }
+  }
+
+  componentDidMount() {
+    this.setState({
+      isLoading: false
+    })
+  }
+
+  render(){
   return (
+    this.state.isLoading ? <div className="spinner"></div>
+ : 
     <div>
     <section id="wall" className="container-fluid">
       <img className="figure-img img-fluid" alt="" src={process.env.PUBLIC_URL + '/cam-coffee.jpg'}></img>
@@ -91,11 +107,11 @@ const HomePage = ({props})=> {
           <div className="final formy shadow-lg p-3 mb-5 bg-white rounded" >
               <form>
                 <div className="form-group">
-                  <label for="name">Name</label>
+                  <label htmlFor="name">Name</label>
                   <input className="form-control" type="text" id="name" name="Name" placeholder="Your Name"/><br/>
-                  <label for="email">Email</label>
+                  <label htmlFor="email">Email</label>
                   <input className="form-control"  type="email" id="email" name="Email" placeholder="Your Email"/><br/>
-                  <label for="msg">Message</label>
+                  <label htmlFor="msg">Message</label>
                   <textarea className="form-control" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
                   <input className="btn btn-lg btn-success button" type="submit" value="Send"/>
                 </div>
@@ -104,12 +120,13 @@ const HomePage = ({props})=> {
         </div>
         <div className="col-sm-6 panel " >
           <div className="final shadow-lg p-3 mb-5 bg-white rounded">
-              <iframe title='map' src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d13822.37903452482!2d31.452808500183107!3d29.99107412713531!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x6e7220116094726d!2z2KfZhNis2KfZhdi52Kkg2KfZhNij2YTZhdin2YbZitipINio2KfZhNmC2KfZh9ix2Kk!5e0!3m2!1sar!2seg!4v1502165300889" width="100%" height="100%" frameborder="0" style={{border:"0"}} allowfullscreen></iframe>
+              <iframe title='map' src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d13822.37903452482!2d31.452808500183107!3d29.99107412713531!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x6e7220116094726d!2z2KfZhNis2KfZhdi52Kkg2KfZhNij2YTZhdin2YbZitipINio2KfZhNmC2KfZh9ix2Kk!5e0!3m2!1sar!2seg!4v1502165300889" width="100%" height="100%" frameBorder="0" style={{border:"0"}} allowFullScreen></iframe>
           </div>
         </div>
       </div>
     </section>
     </div>
   )
+  }
 }
 export default HomePage

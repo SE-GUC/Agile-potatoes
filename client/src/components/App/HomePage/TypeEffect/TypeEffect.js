@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import './TypeEffect.css'
 import Typed from 'typed.js';
 
