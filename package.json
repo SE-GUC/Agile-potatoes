@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "node index.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION = false npm install --prefix client && run build --prefix client"
+    "start": "node server.js",
+    "client": "npm start --prefix client",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && run build --prefix client"
   },
   "engines": {
     "node": "10.15.0",
