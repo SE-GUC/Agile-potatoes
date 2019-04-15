@@ -1,5 +1,5 @@
-const DbConnectionString = "";
-const TestingDbConnectionString = "";
+const DbConnectionString = "mongodb+srv://manar:manar-28@model-nz4dm.mongodb.net/test?retryWrites=true";
+const TestingDbConnectionString = "mongodb+srv://manar:manar-28@model-nz4dm.mongodb.net/test?retryWrites=true";
 const EmailCredentials = {
     gmail : 'write a valid gmail addree',
     password: 'put the password here'

@@ -17,22 +17,23 @@
 }
 .profile-window {
     height: 100 px;
-    background-color: crimson;
     float: right;
     padding-top: 50px;
 }
 
-.profileCard {
+.parprofileCard {
     width: 18rem;
     background-color: aquamarine;
     margin-right: 1rem;
     margin-bottom: 1rem;
-    height:210;
+    margin-top: 200px;
+    margin-left: 50px;
+    height:210px;
     position: relative;
 }
 
 
-.profileCard span{
+.parprofileCard span{
     float: left;
     position: absolute;
     left:20px;
