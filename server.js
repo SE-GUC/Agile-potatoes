@@ -15,9 +15,6 @@ const eventRouter = require('./routers/eventRouter');
 
 const app = express();
 
-app.get('/', function (err, res) {
-    res.send('welcome to lirtenhub');
-})
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
