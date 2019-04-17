@@ -59,8 +59,11 @@ class EventPostNew extends Component {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(this.setState({
-      userHasBooked: true,
-      //eventData: {remainingPlaces: placesNow - 1}
+      eventData: {
+        ...this.state.eventData,
+        remainingPlaces: this.state.eventData.remainingPlaces - 1
+      },
+      userHasBooked: true
     }));
   }
 
@@ -71,8 +74,11 @@ class EventPostNew extends Component {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(this.setState({
+      eventData: {
+        ...this.state.eventData,
+        remainingPlaces: this.state.eventData.remainingPlaces + 1
+      }, 
       userHasBooked: false,
-      //eventData: {remainingPlaces: placesNow - 1}
     }));
   }
 

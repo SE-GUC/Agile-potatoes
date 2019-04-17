@@ -49,7 +49,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			speakers: speakers,
 			topics: topics
 		});
-		event.url = '/api/event/Post' + event._id
+		event.url = '/api/event/Post/' + event._id
 		event.save(function (err, eve) {
 			if (err) throw err;
 			console.log(eve);

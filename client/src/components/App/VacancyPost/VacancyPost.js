@@ -21,8 +21,8 @@ class VacancyPost extends Component {
   }
 
   async componentDidMount() {
-    let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5ca11a709b305d4878a54e02");
-    console.log(vacancy);
+    let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
+    //console.log(vacancy.data);
     this.setState({
       vacancyData: vacancy.data,
       loaded: true
@@ -35,10 +35,11 @@ class VacancyPost extends Component {
     return (this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner)
   }
 
+  //EDIT THIS!!!
   async checkIfAlreadyApplied() {
     // check if user is found in attendees array
     let applied = false;
-    let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5ca11a709b305d4878a54e02");
+    let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
     let applicants = vacancy.data.applicants;
     console.log(applicants)
     for (let i = 0; i < applicants.length; i++) {
@@ -54,7 +55,7 @@ class VacancyPost extends Component {
 
   onClickApply = (e) => {
     e.preventDefault();
-    axios.put("http://localhost:3001/api/vacancy/5ca11a709b305d4878a54e02/apply", {
+    axios.put("http://localhost:3001/api/vacancy/5cb7226dc984592c541ac1a8/apply", {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(this.setState({
@@ -64,7 +65,7 @@ class VacancyPost extends Component {
 
   onClickCancel = (e) => {
     e.preventDefault();
-    axios.put("http://localhost:3001/api/vacancy/5ca11a709b305d4878a54e02/un-apply", {
+    axios.put("http://localhost:3001/api/vacancy/5cb7226dc984592c541ac1a8/un-apply", {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(this.setState({
@@ -98,6 +99,7 @@ class VacancyPost extends Component {
               <p>{this.state.vacancyData.url}</p>
               <br />
             </div>
+
             {
               (this.state.vacancyData.status === "Submitted")
               &&
@@ -121,7 +123,24 @@ class VacancyPost extends Component {
                 </div>
               </div>
             }
+
+            {
+              (this.state.vacancyData.hired.includes(this.state.userData._id))
+              &&
+              (this.state.vacancyData.status === 'Closed')
+              &&
+              (this.state.userData.userType === 'Member')
+              &&
+              <div className="input-group mb-3">
+                <input type="text" className="form-control" />
+                <div className="input-group-append">
+                  <button className="btn btn-primary" type="button" >Submit Feedback</button>
+                </div>
+              </div>
+            }
+
           </div>
+
           <div className="right-of-post col-sm-3">
             <p className="text-center h3">{this.state.vacancyData.salary} EGP</p>
             {this.state.userHasApplied ? (

@@ -38,7 +38,7 @@ router.post('/:id/comment', (req, res, next) => {
                     description: 'Admin commented on your vacancy request'
                 });
                 NotifyByEmail(vacancy.partner.email, 'New comment on vacancy that you follow',
-					`Admin commented on your vacancy request \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                    `Admin commented on your vacancy request \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 await vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
                 return res.status(201).send(vacancy.commentsByAdmin);
             })
@@ -64,7 +64,7 @@ router.post('/:id/comment', (req, res, next) => {
                         description: 'Partner commented on his vacancy request'
                     });
                     NotifyByEmail(vacancy.admin.email, 'New comment on vacancy that you follow',
-					`Partner commented on his vacancy \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        `Partner commented on his vacancy \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 }
                 await vacancy.save();
                 return res.status(201).send(vacancy.commentsByPartner);
@@ -81,21 +81,26 @@ router.post('/:id/CreateVacancy', async (req, res) => {
     var location = req.body.location;
     var salary = req.body.salary;
     var dailyHours = req.body.dailyHours;
+    var city = req.body.city;
+    var name = req.body.name;
 
     const result = Joi.validate(req.body, schemas.vacancySchema);
     if (result.error) return res.status(400).send({ error: result.error.details[0].message });
 
     if (userType == 'Partner') {
         var vacancy = new Vacancy({
+            name: name,
             description: description,
             duration: duration,
             location: location,
             salary: salary,
             dailyHours: dailyHours,
-            partner: userId
+            cit: city,
+            partner: userId,
+            status: 'Submitted'
         });
 
-        vacancy.url = '/api/vacancy/Post' + vacancy._id;
+        vacancy.url = '/api/vacancy/Post/' + vacancy._id;
         await vacancy.save();
         Partner.findById(userId).exec(function (err, par) {
             par.vacancies.push(vacancy);
@@ -188,10 +193,9 @@ router.delete('/:vacid/deleteVacancy', function (req, res) {
 router.get('/Post/:id', function (req, res) {
     var vacId = req.params.id;
 
-    Vacancy.findById(vacId).exec(
+    Vacancy.findById(vacId).populate('partner', 'name').exec(
         function (err, response) {
             if (err) console.log(err);
-            // console.log(response);
             return res.send(response);
         });
 });
@@ -247,19 +251,20 @@ router.put('/:id/status', function (req, res) {
     var partnerid = req.body.partner;
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Submitted')
-            {
-                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
+            if (vacancy.status == 'Submitted') {
+                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus })
+                .populate('partner', 'name')
+                .exec({
                     function (err, response) {
                         console.log(response);
                         return res.send(response);
-                    });
-                if(vacStatus === 'Approved')
-                {
+                    }
+                });
+                if (vacStatus === 'Approved') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
-                    "Admin has approved your vacancy request and it is no more opened,"
-                    + " please don't try to edit it as long as it is approved" 
-                    + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        "Admin has approved your vacancy request and it is no more opened,"
+                        + " please don't try to edit it as long as it is approved"
+                        + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 }
             }
             else
@@ -358,5 +363,26 @@ router.put('/:id/un-apply', function (req, res) {
         res.send("Application withdrawn");
     }
 });
+
+router.put('/:id/hireMember', function (req, res) {
+    var vacancyID = req.params.id;
+    var memberID = req.body.memberID;
+    var userID = req.body.userID;
+    var userType = req.body.userType;
+    if (userType === 'Partner') {
+        Vacancy.findById(vacancyID).exec(function (err, vacancy) {
+            console.log(vacancy.partner);
+            if (vacancy.partner === userID) {
+                //should i remove him from the applicants or not?????
+                //vacancy.applicants.pull(userID);
+                vacancy.hired.push(memberID);
+                vacancy.save();
+                res.send('Done');
+            }
+            else 
+                res.status(400).send('This vacancy does not belong to you');
+        });
+    }
+})
 
 module.exports = router;

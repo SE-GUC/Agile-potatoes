@@ -12,8 +12,8 @@ export class Navbar extends Component {
 
     logout = () => {
         this.props.changeLoggedInFlag(false)
-
     }
+    
     render() {
         return (
             <nav className="myNav row">

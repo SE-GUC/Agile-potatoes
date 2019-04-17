@@ -40,6 +40,10 @@ const VacancySchema = new Schema({
         type: mongoose.ObjectId,
         ref: 'Member'
     }],
+    hired: [{
+        type: mongoose.ObjectId,
+        ref: 'Member'
+    }],
     commentsByAdmin: [{
         text: String,
         date: {

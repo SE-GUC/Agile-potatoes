@@ -23,7 +23,7 @@ import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
 import MemberProfile from './Profiles/MemberProfile/MemberProfile'
 class App extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       loggedIn: false,
@@ -31,13 +31,13 @@ class App extends Component {
   }
   changeLoggedInFlag = (flag) => {
     this.setState({
-      loggedIn:flag
+      loggedIn: flag
     })
   }
   render() {
     return (
       <div className="App">
-        <Router>
+        {/* <Router>
           <Navbar loggedIn={this.state.loggedIn} changeLoggedInFlag={this.changeLoggedInFlag}/>
           <div>
             <Route exact path="/" component={HomePage}/>
@@ -51,8 +51,9 @@ class App extends Component {
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
-        <Footer/>
+        <Footer/> */}
 
+        <VacancyPost />
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />
