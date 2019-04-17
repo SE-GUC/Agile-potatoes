@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import './VacancyPost.css'
 import axios from 'axios'
+var Router = require('react-router');
+var Link = Router.Link;
 
 class VacancyPost extends Component {
   constructor(props) {
@@ -22,12 +24,11 @@ class VacancyPost extends Component {
 
   async componentDidMount() {
     let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
-    //console.log(vacancy.data);
+    console.log(vacancy.data);
     this.setState({
-      vacancyData: vacancy.data,
-      loaded: true
+      vacancyData: vacancy.data
     })
-    await this.checkIfAlreadyApplied();
+    this.checkIfAlreadyApplied();
 
   }
 
@@ -39,8 +40,8 @@ class VacancyPost extends Component {
   async checkIfAlreadyApplied() {
     // check if user is found in attendees array
     let applied = false;
-    let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
-    let applicants = vacancy.data.applicants;
+    // let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
+    let applicants = this.state.vacancyData.applicants;
     console.log(applicants)
     for (let i = 0; i < applicants.length; i++) {
       if (applicants[i]._id === this.state.userData._id)
@@ -51,6 +52,9 @@ class VacancyPost extends Component {
         userHasApplied: true
       })
     }
+    this.setState({
+      loaded: true
+    });
   }
 
   onClickApply = (e) => {
@@ -103,7 +107,7 @@ class VacancyPost extends Component {
             {
               (this.state.vacancyData.status === "Submitted")
               &&
-              (this.state.userData.userType === "Admin" || this.state.userData.userType === "Partner")
+              (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
               &&
               <div className="comments-section col-sm-12">
                 <h4>Comments</h4>
@@ -129,13 +133,29 @@ class VacancyPost extends Component {
               &&
               (this.state.vacancyData.status === 'Closed')
               &&
-              (this.state.userData.userType === 'Member')
-              &&
               <div className="input-group mb-3">
                 <input type="text" className="form-control" />
                 <div className="input-group-append">
                   <button className="btn btn-primary" type="button" >Submit Feedback</button>
                 </div>
+              </div>
+            }
+
+            {
+              (this.state.vacancyData.status !== 'Submitted')
+              &&
+              (this.state.userData.userType === 'Partner')
+              &&
+              (this.state.userData._id === this.state.vacancyData.partner._id)
+              &&
+              <div className="comments-section col-sm-12">
+                <h4>Applicants</h4>
+                {this.state.vacancyData.applicants.map(applicant => (
+                <div key={applicant.ProfileURL} className="container">
+                  <div class="text-center"><Link to={applicant.ProfileURL}><h3>{applicant.fname} {applicant.lname}</h3></Link>
+                  </div>
+                </div>
+                ))}
               </div>
             }
 

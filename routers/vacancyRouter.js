@@ -152,21 +152,31 @@ router.put('/:id/apply', function (req, res) {
 })
 
 ////////// 16 getting all those who applied to a vacancy
+// router.get('/:id/applicants', function (req, res) {
+//     var userId = req.get('userId'); //should come from session
+//     var vacId = req.params.id;
+//     Partner.findById(userId)
+//         .exec(function (err, partnerDoc) {
+//             if (partnerDoc.vacancies.find(vac => (vac._id == vacId)))   //partner investigating HIS vacancy applicants
+//                 Vacancy.findById(vacId, 'applicants')
+//                     .populate('applicants', 'fname lname ProfileURL')
+//                     .exec(function (err, vacancyDoc) {
+//                         return res.send(vacancyDoc.applicants);
+//                     })
+//             else                                                        //partner try to investigate other partner vacancy applicants
+//                 return res.status(403).send('you are not allowed to view this')
+//         })
+// })
+
 router.get('/:id/applicants', function (req, res) {
-    var userId = req.get('userId'); //should come from session
-    var vacId = req.params.id;
-    Partner.findById(userId)
-        .exec(function (err, partnerDoc) {
-            if (partnerDoc.vacancies.find(vac => (vac._id == vacId)))   //partner investigating HIS vacancy applicants
-                Vacancy.findById(vacId, 'applicants')
-                    .populate('applicants', 'fname lname ProfileURL')
-                    .exec(function (err, vacancyDoc) {
-                        return res.send(vacancyDoc.applicants);
-                    })
-            else                                                        //partner try to investigate other partner vacancy applicants
-                return res.status(403).send('you are not allowed to view this')
+    var vacID = req.params.id;
+    Vacancy.findById(vacID, 'applicants')
+        .populate('applicants', 'fname lname ProfileURL')
+        .exec(function (err, vacancy) {
+            if (err) res.status(400).send('Error vacancy not found');
+            res.send(vacancy.applicants);
         })
-})
+});
 
 //story 11 As a partner I can delete my vacancy request before it is approved
 router.delete('/:vacid/deleteVacancy', function (req, res) {
@@ -253,13 +263,13 @@ router.put('/:id/status', function (req, res) {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted') {
                 Vacancy.findByIdAndUpdate(vacId, { status: vacStatus })
-                .populate('partner', 'name')
-                .exec({
-                    function (err, response) {
-                        console.log(response);
-                        return res.send(response);
-                    }
-                });
+                    .populate('partner', 'name')
+                    .exec({
+                        function(err, response) {
+                            console.log(response);
+                            return res.send(response);
+                        }
+                    });
                 if (vacStatus === 'Approved') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
                         "Admin has approved your vacancy request and it is no more opened,"
@@ -379,7 +389,7 @@ router.put('/:id/hireMember', function (req, res) {
                 vacancy.save();
                 res.send('Done');
             }
-            else 
+            else
                 res.status(400).send('This vacancy does not belong to you');
         });
     }
