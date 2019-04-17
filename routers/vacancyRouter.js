@@ -110,7 +110,7 @@ router.post('/:id/CreateVacancy', async (req, res) => {
 
 //15 getting all comments of a post
 router.get('/:id/comments', function (req, res) {
-    var userType = req.body.userType; //should come from session
+    var userType = req.get('userType'); //should come from session
     var vacId = req.params.id;
     if (userType == 'Admin' || userType == 'Partner') {  //only partners and admins can access vacancies' comments section
         Vacancy.findById(vacId).populate('author').exec(function (err, vacancy) {
@@ -250,11 +250,9 @@ router.get('/RecommendedVacancies', function (req, res, next) {
                             }
                         }
                     }
-                    console.log(vacSortObjArray);
                     vacSortObjArray.sort((vacSortObj1, vacSortObj2) => {
                         return vacSortObj1.key - vacSortObj2.key
                     });
-                    console.log(vacSortObjArray);
                     vacSortObjArray.forEach(vacSortObj => {
                         RecommendedVacancies.push(vacSortObj.vacancy);
                     })
@@ -281,7 +279,7 @@ router.put('/:id/status', function (req, res) {
                 if(vacStatus === 'Approved')
                 {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
-                    "Admin has approved your vacancy request and it is no more opened,"
+                    "Admin has approved your vacancy request and it members can apply for it now,"
                     + " please don't try to edit it as long as it is approved" 
                     + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 }
@@ -381,8 +379,8 @@ router.get('/:id/PartnerPendingVacancies', function (req, res) {
 
 ////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
-    var userType = req.body.userType;  //should come from session
-    var userId = req.body.id;      //should come from session
+    var userType = req.get('userType');  //should come from session
+    var userId = req.get('id');      //should come from session
     var vacId = req.params.id;
 
     Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {

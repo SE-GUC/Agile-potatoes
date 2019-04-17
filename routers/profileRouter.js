@@ -27,8 +27,8 @@ router.get('/:id', function (req, res, next) {
     //jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
 
    // if(err) console.log(err)
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userId; //should come from session
+    var userType = req.get('userType'); //should come from session
+    var userId = req.get('userId'); //should come from session
     var profId = req.params.id;
  
     
