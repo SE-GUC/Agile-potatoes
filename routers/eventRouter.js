@@ -157,12 +157,15 @@ router.get('/RecommendedEvents', function (req, res) {
 	Member.findById(userId, 'url name eventDate address interests events')
 		.populate('events')
 		.exec((err, member) => {
-			if (!member) return res.status(400).send("member not found");
+			if (!member) {
+				res.status(404).send("member not found");
+				return next();
+			}
 			if (err) console.log(err); // getting recommended events
 			member.events.map((event) => {
 				memberPastEventsTypes.push(event.eventType);
 			})
-			Event.find({ 'eventStatus': 'Approved' }, 'name eventType city description eventDate url')
+			Event.find({ 'eventStatus': 'Approved' }, 'name eventType city description eventDate url partner')
 				.exec((err, events) => {
 					if (err) console.log(err);
 					for (event of events) {

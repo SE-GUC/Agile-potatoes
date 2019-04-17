@@ -243,6 +243,7 @@ router.post('/create', function (req, res) {
         var mc = req.body.masterclasses;
         var cert = req.body.certificates;
         var intst = req.body.interests;
+        var avlblty = req.body.availibility
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
 
@@ -262,6 +263,7 @@ router.post('/create', function (req, res) {
             masterclasses: mc,
             certificates: cert,
             interests: intst,
+            availibility: avlblty,
             //tasks: tsks,
             // projects: prjs
         });
@@ -361,6 +363,7 @@ router.put('/:id/update', function (req, res) {
  
     var membershipExpiryDateU = req.body.membershipExpiryDate;
     var membershipStateU = req.body.membershipState;
+    var availibilityU = req.body.availibility;
 
     //Address, Name, Password, Skills, Interests
 
@@ -374,6 +377,7 @@ router.put('/:id/update', function (req, res) {
                 if (passwordU) doc.password = passwordU;
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
+                if (availibilityU) doc.availibility = availibilityU;
                 res.send(doc);
 
                 doc.save();
