@@ -3,7 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const config = require("./config");
 const path = require('path');
-
+const cron = require('node-cron');
+const Event = require('./models/eventModel');
 
 const port = process.env.PORT || config.getDevelopmentPort();
 mongoose.connect(config.getDbConnectionString(), { useNewUrlParser: true, useCreateIndex: true }).then(() => console.log('connected successfully')).catch(err => console.log('got error' + err));
@@ -46,3 +47,21 @@ console.log(`app is up and running ... on http://localhost:${port}`);
 app.listen(port);
 
 
+// passed events should get status of 'Finished'
+cron.schedule('0 0 0 * * *', () => { //running every day at midnight
+    console.log('expired events change status at midnight')
+    try {
+    Event.find({eventStatus: 'Approved'}, 'eventDate eventStatus')
+        .exec((err, events) => {
+            if (err) throw err;
+            for (let event of events) {
+                if ((event.eventDate) && event.eventDate < new Date()) {
+                    event.eventStatus = 'Finished'
+                    event.save();
+                }
+            }
+        })
+    } catch (e) {
+        console.log(e)
+    }
+});

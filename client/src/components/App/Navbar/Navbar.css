@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 .myNav {
     width: 100%;
-    height: 130px;
-    background-color: rgb(0, 98, 102);
+    height: 70px;
+    background-color: #2d3436;
     position: fixed;
     z-index: 999;
     top:0px;
@@ -28,6 +30,12 @@
     padding:0px;
 }
 
+.left-nav img{
+    margin-left: 100px;
+    width: 160px;
+    height: 70px;
+}
+
 .link-button, .brand-button {
     text-decoration: none;
     justify-content: center;        
@@ -39,21 +47,31 @@
     height: 100%;
     padding-top: 20px;
     color: white;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: larger
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: larger;
+    -webkit-transition: color .4s;
+    transition: color .4s linear !important;
 }
 
 .brand-button p {
     height: 100%;
     padding-top: 12px;
     color: white;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
+    font-family:'Montserrat', sans-serif;
+        font-weight: 700;
     font-size: 28px;
 }
 
 .link-button:hover {
     text-decoration: none;
-    background-color: darkcyan;
+    background-color:#e5e8e8;
+}
+
+.link-button:hover p {
+    text-decoration: none;
+    color:#2f3640;
 }
 
 .brand-button:hover {
