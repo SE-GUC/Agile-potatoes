@@ -68,8 +68,11 @@ class PartnerProfile extends Component{
                
             <ul>
               {"Name: " +this.state.userProfile.name}<br/>
+              <br/>
               { "Email: "+this.state.userProfile.email}<br/>
+              <br/>
               { "Workfield: " +this.state.userProfile.workfield}<br/>
+              <br/>
               { "Membership State: "+this.state.userProfile.membershipState}
              </ul>
              <button onClick = {this.getProfile}className="btn btn-primary">SHOW POFILE</button>
@@ -96,9 +99,9 @@ class PartnerProfile extends Component{
                      <button onClick = {this.handleChangeEdit} className="list-group-item list-group-item-action">EDIT PROFILE</button>
                  </div>
                  </div>
-                 <div className='profile-window col-sm-10'>
+                
                  {func}
-                 </div>
+               
                  </div>
                  </div>
                  </div>

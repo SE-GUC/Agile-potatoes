@@ -115,7 +115,7 @@ router.post('/:id/CreateVacancy', async (req, res) => {
 
 //15 getting all comments of a post
 router.get('/:id/comments', function (req, res) {
-    var userType = req.body.userType; //should come from session
+    var userType = req.get('userType'); //should come from session
     var vacId = req.params.id;
     if (userType == 'Admin' || userType == 'Partner') {  //only partners and admins can access vacancies' comments section
         Vacancy.findById(vacId).populate('author').exec(function (err, vacancy) {
@@ -225,29 +225,51 @@ router.get('/:id/pendingVacancies', function (req, res) {
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
-router.get('/RecommendedVacancies', function (req, res) {
-    var userId = req.get('userId');
-    var RecommendedVacancies = [];
-    Member.findById(userId, 'url name availability address skills ')
+router.get('/RecommendedVacancies', function (req, res, next) {
+    let userId = req.get('userId');
+    let vacSortObjArray = [];
+    let LastRecommendedVacancies = [];
+    let RecommendedVacancies = []
+    Member.findById(userId, 'availability address skills')
         .exec((err, member) => {
-            if (err) console.log(err); // getting recommended events
-            if (member.availability !== true) return res.send('member is not available to be hired')
-            Vacancy.find({ 'status': 'Open' }, 'url name location city')
+            if (err) next(err);
+            if (!member) {
+                res.status(404).send("member not found");
+                return next();
+            }
+            if (!member) return res.status(404).send('Member not found');
+            Vacancy.find({ 'status': 'Open' }, 'url name location city dailyHours partner description')
                 .exec((err, vacs) => {
-                    if (err) console.log(err);
+                    if (err) next(err);
                     for (vac of vacs) {
-                        if ((vac.city) && (member.address.includes(vac.city))) {
-                            RecommendedVacancies.push(vac);
+                        if (((vac.city) && (member.address.includes(vac.city)) || ((vac.location) && (member.address.includes(vac.location))))) {
+                            if (vac.dailyHours && member.availability) {
+                                vacSortObjArray.push({ vacancy: vac, key: Math.abs(vac.dailyHours - member.availability) })
+                            }
+                            else {
+                                LastRecommendedVacancies.push(vac);
+                            }
                         } else {
                             for (skill of member.skills) {
                                 if (skill.includes(vac.name) || vac.name.includes(skill)) {
-                                    RecommendedVacancies.push(vac);
+                                    if (vac.dailyHours && member.availability) {
+                                        vacSortObjArray.push({ vacancy: vac, key: Math.abs(vac.dailyHours - member.availability) })
+                                    }
+                                    else {
+                                        LastRecommendedVacancies.push(vac)
+                                    }
                                     break;
                                 }
                             }
                         }
                     }
-                    res.send(RecommendedVacancies);
+                    vacSortObjArray.sort((vacSortObj1, vacSortObj2) => {
+                        return vacSortObj1.key - vacSortObj2.key
+                    });
+                    vacSortObjArray.forEach(vacSortObj => {
+                        RecommendedVacancies.push(vacSortObj.vacancy);
+                    })
+                    return res.send(RecommendedVacancies.concat(LastRecommendedVacancies));
                 })
         })
 })
@@ -271,7 +293,7 @@ router.put('/:id/status', function (req, res) {
                     });
                 if (vacStatus === 'Approved') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
-                        "Admin has approved your vacancy request and it is no more opened,"
+                        "Admin has approved your vacancy request and it members can apply for it now,"
                         + " please don't try to edit it as long as it is approved"
                         + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
                 }
@@ -295,6 +317,66 @@ router.put('/:id/status', function (req, res) {
 
 });
 
+//get all vacancies
+router.get('/:id/GetAllVacancies', function (req, res) {
+    var userid = req.params.id;
+    Member.findById(userid).exec(function (err, memberDoc) {
+        if (memberDoc) {
+            Vacancy.find({ status: 'Open' }).exec(function (err, vacancy) {
+                if (err)
+                    return res.send("Error")
+                else
+                    return res.send(vacancy);
+            });
+        }
+    })
+
+    Partner.findById(userid).exec(function (err, partnerDoc) {
+        if (partnerDoc) {
+            Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
+                if (err)
+                    return res.send("Error")
+
+                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
+                    if (err)
+                        return res.send("Error")
+
+                    Vacancy.find({ status: 'Closed' }).exec(function (err, Closedvacancy) {
+                        if (err)
+                            return res.send("Error")
+
+                        return res.send([...Submittedvacancy, ...Openvacancy, ...Closedvacancy])
+
+                    });
+
+
+                });
+            });
+
+
+
+        }
+    })
+
+    Admin.findById(userid).exec(function (err, adminDoc) {
+        if (adminDoc) {
+            Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
+                if (err)
+                    return res.send("Error")
+
+                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
+                    if (err)
+                        return res.send("Error")
+
+                    return res.send([...Submittedvacancies, ...Openvacancies])
+                });
+            });
+        }
+    })
+
+
+});
+
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
 router.get('/:id/PartnerPendingVacancies', function (req, res) {
     var userType = req.get('userType')
@@ -311,8 +393,8 @@ router.get('/:id/PartnerPendingVacancies', function (req, res) {
 
 ////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
-    var userType = req.body.userType;  //should come from session
-    var userId = req.body.id;      //should come from session
+    var userType = req.get('userType');  //should come from session
+    var userId = req.get('id');      //should come from session
     var vacId = req.params.id;
 
     Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
@@ -326,7 +408,7 @@ router.get('/:id/', function (req, res) {  //showing non approved vacancy to be 
 })
 
 ////////////// Story 22.2 : A partner can update his vacancy
-router.post('/:id/', function (req, res) {  //submitting edited vacancy
+router.put('/:id/', function (req, res) {  //submitting edited vacancy
     var vacId = req.params.id;
     var duration = req.body.duration;
     var location = req.body.location;
@@ -339,14 +421,17 @@ router.post('/:id/', function (req, res) {  //submitting edited vacancy
         if (err) {
             return res.send(err);
         }
+        console.log(vacancy.status)
+        console.log(vacId)
+
         if (vacancy.status == 'Submitted') {
 
             vacancy.duration = duration;
             vacancy.location = location;
             vacancy.description = description;
             vacancy.salary = salary;
-            vacancy.dailyhours = dailyhours;
-
+            vacancy.dailyhours = dailyHours;
+            console.log(duration)
             vacancy.save();
             return res.send(vacancy);
         }

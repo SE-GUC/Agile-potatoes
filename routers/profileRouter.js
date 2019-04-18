@@ -1,3 +1,4 @@
+const config = require('../config/index')
 const Admin = require('../models/adminModel')
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel')
@@ -252,6 +253,7 @@ router.post('/create', function (req, res) {
         var mc = req.body.masterclasses;
         var cert = req.body.certificates;
         var intst = req.body.interests;
+        var avlblty = req.body.availibility
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
 
@@ -369,6 +371,7 @@ router.put('/:id/update', function (req, res) {
 
     var membershipExpiryDateU = req.body.membershipExpiryDate;
     var membershipStateU = req.body.membershipState;
+    var availibilityU = req.body.availibility;
 
     //Address, Name, Password, Skills, Interests
 
@@ -382,6 +385,7 @@ router.put('/:id/update', function (req, res) {
                 if (passwordU) doc.password = passwordU;
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
+                if (availibilityU) doc.availibility = availibilityU;
                 res.send(doc);
 
                 doc.save();
@@ -410,6 +414,20 @@ router.put('/:id/update', function (req, res) {
 
 });
 
+//Any one can send an email to lirtenhub
+router.post('/contact', async (req,res)=>{
+    let email = req.body.email;
+    let name = req.body.name;
+    let msg = req.body.msg;
+    try{
+        await NotifyByEmail('balabezo138116882@gmail.com',`Message from ${name}, ${email}`, msg);
+        res.status(200).send('message sent successfully')
+    }
+    catch(e){
+        console.log(e);
+        res.status(422).send('email not sent')
+    }
+})
 //AUTHENTICATION... 
 //START
 
@@ -510,6 +528,7 @@ router.post('/login', (req, res) => {
             }
     })
 })
+
 
 //END
 module.exports = router;

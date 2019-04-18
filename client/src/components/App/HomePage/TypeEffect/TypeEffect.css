@@ -1,5 +1,7 @@
 /* Adding CSS manually is only necessary in JSFiddle,
    where CSS can't be inserted into the <head> */
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 .typed-cursor {
     opacity: 1;
     animation: typedjsBlink 0.7s infinite;
@@ -32,4 +34,9 @@
     transition: opacity .25s;
     -webkit-animation: 0;
     animation: 0;
+}
+
+span{
+    font-family: 'Montserrat',sans-serif;
+    font-weight: 800;
 }

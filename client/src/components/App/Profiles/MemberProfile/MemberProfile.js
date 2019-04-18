@@ -107,9 +107,9 @@ class MemberProfile extends Component{
                 <button onClick = {this.handleChangeEdit} className="list-group-item list-group-item-action">EDIT PROFILE</button>
             </div>
             </div>
-            <div className='profile-window col-sm-10'>
+            
             {func}
-            </div>
+            
             </div>
             </div>
             </div>

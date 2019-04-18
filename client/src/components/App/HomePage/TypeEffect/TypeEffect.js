@@ -10,8 +10,8 @@ class TypeEffect extends React.Component {
     // You can pass other options here, such as typing speed, back speed, etc.
     const options = {
     	strings: strings,
-      typeSpeed: 80,
-      backSpeed: 80,
+      typeSpeed: 60,
+      backSpeed: 60,
       loopCount: Infinity,
 
     };

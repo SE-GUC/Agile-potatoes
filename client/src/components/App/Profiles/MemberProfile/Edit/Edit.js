@@ -393,7 +393,10 @@ class Edit extends Component{
                 <div className = 'row'>
                    
                         <div className="list-group">
-                        
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
                             <button onClick = {this.handleButtonChange1} type="submit" className="btn btn-primary">UPDATE PASSWORD</button><br/>
                             <button onClick = {this.handleButtonChange2} type="submit"className="btn btn-primary">UPDATE FIRST NAME</button><br/>
                             <button onClick = {this.handleButtonChange3} type="submit" className="btn btn-primary">UPDATE LAST NAME</button><br/>
@@ -403,9 +406,9 @@ class Edit extends Component{
             
                         </div>
                 
-    <div className='profile-window col-sm-10'>
+    {/* <div className='profile-window col-sm-10'> */}
        {func}
-              </div>     
+              {/* </div>      */}
             </div>
         </div>
       </div>
