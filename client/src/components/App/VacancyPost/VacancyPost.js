@@ -449,30 +449,6 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
-                &&
-                (this.state.vacancyData.status === "Approved")
-                &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
-                &&
-                <div>
-                  <br /><br /><br />
-                  <button className="btn btn-warning ctrl-button col-sm-12 ">Close Vacancy</button>
-                </div>
-              }
-              {
-                (this.state.userData.userType === "Partner")
-                &&
-                (this.state.vacancyData.status === "Finished")
-                &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
-                &&
-                <div>
-                  <br /><br /><br />
-                  <button className="btn btn-success ctrl-button col-sm-12 ">Re-Open Vacancy</button>
-                </div>
-              }
-              {
                 (this.state.userData.userType === "Admin")
                 &&
                 (this.state.vacancyData.status === "Submitted")
