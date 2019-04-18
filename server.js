@@ -55,7 +55,7 @@ cron.schedule('0 0 0 * * *', () => { //running every day at midnight
         .exec((err, events) => {
             if (err) throw err;
             for (let event of events) {
-                if (event.eventDate < new Date()) {
+                if ((event.eventDate) && event.eventDate < new Date()) {
                     event.eventStatus = 'Finished'
                     event.save();
                 }
