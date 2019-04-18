@@ -13,8 +13,8 @@ class VacancyPost extends Component {
       postID: '5cb8b4653da6b4a548c005fb',
       //put user data here until we get them from props
       userData: {
-        _id: '5cb8b44f3da6b4a548c005fa',
-        userType: 'Partner',
+        _id: '5ca11a709b305d4878a54dff',
+        userType: 'Admin',
       },
       loaded: false,
       userHasApplied: false,
@@ -26,7 +26,6 @@ class VacancyPost extends Component {
   async componentDidMount() {
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
     let hired = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/hired`);
-    //let comments = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/comments`);
     this.setState({
       vacancyData: vacancy.data
     })
@@ -42,7 +41,6 @@ class VacancyPost extends Component {
   }
 
   getCommentsSorted() {  // Should sort all comments based on date
-    console.log((this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner))
     return (this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner)
   }
 
@@ -90,44 +88,22 @@ class VacancyPost extends Component {
     }));
   }
 
-  onClickComment = (e) => {
-    axios.post(`http://localhost:3001/api/vacancy/${this.state.postID}/comment`, {
+  async onClickComment(e) {
+    await axios.post(`http://localhost:3001/api/vacancy/${this.state.postID}/comment`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType,
       "comment": this.state.feedback,
     });
     //hopefully getting the updated vacancy with the new comments
-    // let vacancy = axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
-    // this.setState({
-    //   vacancyData: {
-    //     ...this.state.vacancyData,
-    //     commentsByAdmin
-    //   }
-    // })
-    // if(this.state.userData.userType === 'Admin'){
-    //   this.setState({
-    //     vacancyData: {
-    //       ...this.state.vacancyData,
-    //       commentsByAdmin: this.state.vacancyData.commentsByAdmin.push({
-    //         text: this.state.feedback,
-    //         date: Date.now,
-    //         author: this.state.userData._id
-    //       })
-    //     }
-    //   })
-    // }
-    // else {
-    //   this.setState({
-    //     vacancyData: {
-    //       ...this.state.vacancyData,
-    //       commentsByPartner: this.state.vacancyData.commentsByAdmin.push({
-    //         text: this.state.feedback,
-    //         date: Date.now,
-    //         author: this.state.userData._id
-    //       })
-    //     }
-    //   })
-    // }
+    let updatedVacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`)
+    console.log(updatedVacancy);
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        commentsByAdmin: updatedVacancy.data.commentsByAdmin,
+        commentsByPartner: updatedVacancy.data.commentsByPartner
+      }
+    })
   }
 
   onChange = (e) => {
@@ -205,19 +181,13 @@ class VacancyPost extends Component {
               &&
               <div className="comments-section col-sm-12">
                 <h4>Comments</h4>
-                {this.getCommentsSorted().map((comment) => {
-                  return <div className='comment'>
-                    <p className="font-weight-bold">{ comment.author === this.state.userData._id ? 'You' : 'Lirten Hub' }<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
-                    <p>{comment.text}</p>
-                  </div>
-                })}
-
+                <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
 
                 <br />
                 <div className="input-group mb-3">
-                  <input type="text" className="form-control" onChange={this.onChange}/>
+                  <input type="text" className="form-control" onChange={this.onChange} />
                   <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={this.onClickComment}>Add comment</button>
+                    <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
                   </div>
                 </div>
               </div>
@@ -348,6 +318,17 @@ function HiredSubmitFeedbackForm(props) {
         <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
       </div>
     </div>
+  )
+}
+
+function CommentsSection(props) {
+  return (
+    props.allComments.map((comment) => {
+      return <div className='comment'>
+        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin')? 'Partner' : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
+        <p>{comment.text}</p>
+      </div>
+    })
   )
 }
 
