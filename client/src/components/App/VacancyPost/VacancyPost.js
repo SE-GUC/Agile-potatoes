@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import './VacancyPost.css'
 import axios from 'axios'
-var Router = require('react-router');
-var Link = Router.Link;
+import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
 class VacancyPost extends Component {
   constructor(props) {
@@ -13,8 +12,8 @@ class VacancyPost extends Component {
     this.state = {
       //put user data here until we get them from props
       userData: {
-        _id: '5ca11a709b305d4878a54dfe',
-        userType: 'Member',
+        _id: '5cab5d2d22a833137c7acd37',
+        userType: 'Partner',
       },
       loaded: false,
       userHasApplied: false,
@@ -25,9 +24,16 @@ class VacancyPost extends Component {
 
   async componentDidMount() {
     let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
+    let hired = await axios.get("http://localhost:3001/api/vacancy/5cb7226dc984592c541ac1a8/hired")
     console.log(vacancy.data);
     this.setState({
       vacancyData: vacancy.data
+    })
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        hired: hired.data
+      }
     })
     this.checkIfAlreadyApplied();
 
@@ -84,17 +90,39 @@ class VacancyPost extends Component {
     this.setState({ feedback: e.target.value });
   }
 
-  submitFeedback = (e) => {
+  //member submitting feedback on partner
+  submitFeedbackMember = (e) => {
     e.preventDefault();
     axios.post(`http://localhost:3001/api/profile/${this.state.vacancyData.partner._id}/feedback`, {
       "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
+      "personID": this.state.userData._id,
       "comment": this.state.feedback
     })
   }
 
-  onClickHire = (e) => {
+  submitFeedbackPartner = (employee) => {
+    //employee.preventDefault();
+    console.log('feedback being added by partner to member')
+    axios.post(`http://localhost:3001/api/profile/${employee._id}/feedback`, {
+      "userType": this.state.userData.userType,
+      "personID": this.state.userData._id,
+      "comment": this.state.feedback
+    })
+  }
 
+  onClickHire = (applicant) => {
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.vacancyData._id}/hireMember`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+      "memberID": applicant.id
+    })
+    let filteredApplicants = this.state.vacancyData.applicants.filter(a => a._id !== applicant._id)
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        applicants: filteredApplicants
+      }
+    });
   }
 
   render() {
@@ -156,7 +184,7 @@ class VacancyPost extends Component {
               <div className="input-group mb-3">
                 <input type="text" className="form-control" onChange={this.onChangeFeedback} />
                 <div className="input-group-append">
-                  <button className="btn btn-primary" type="button" onClick={this.submitFeedback}>Submit Feedback</button>
+                  <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
                 </div>
               </div>
             }
@@ -171,7 +199,22 @@ class VacancyPost extends Component {
               <div className="comments-section col-sm-12">
                 <h4>Applicants</h4>
                 {this.state.vacancyData.applicants.map(applicant => (
-                  <ApplicantItem lname={applicant.lname} fname={applicant.fname} url={applicant.ProfileURL} key={applicant._id} onClickHire={this.onClickHire} />
+                  <ApplicantItem lname={applicant.lname} fname={applicant.fname} url={applicant.ProfileURL} key={applicant._id} _id={applicant._id} onClickHire={this.onClickHire} />
+                ))}
+              </div>
+            }
+
+            {
+              (this.state.vacancyData.status !== 'Submitted')
+              &&
+              (this.state.userData.userType === 'Partner')
+              &&
+              (this.state.userData._id === this.state.vacancyData.partner._id)
+              &&
+              <div className="comments-section col-sm-12">
+                <h3>Hired People that you can submit feedback on</h3>
+                {this.state.vacancyData.hired.map(emp => (
+                  <HiredSubmitFeedbackForm lname={emp.lname} fname={emp.fname} url={emp.ProfileURL} key={emp._id} _id={emp._id} submitFeedbackPartner={this.submitFeedbackPartner}  onChangeFeedback={this.onChangeFeedback}/>
                 ))}
               </div>
             }
@@ -236,7 +279,19 @@ function ApplicantItem(props) {
       {/* <Link to={props.ProfileURL}></Link> */}
       <div className="input-group-append">
         <h4>{props.fname} {props.lname}</h4>
-        <button className="btn btn-danger" type="button" onClick={this.onClickHire}>Hire!</button>
+        <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
+      </div>
+    </div>
+  )
+}
+
+function HiredSubmitFeedbackForm(props) {
+  return (
+    <div className="input-group mb-3">
+      <h4>{props.fname} {props.lname}</h4>
+      <input type="text" className="form-control" onChange={props.onChangeFeedback}/>
+      <div className="input-group-append">
+        <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
       </div>
     </div>
   )
