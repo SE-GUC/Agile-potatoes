@@ -1,6 +1,6 @@
 import React from 'react'
 import './TypeEffect.css'
-import Typed from 'Typed.js';
+import Typed from 'typed.js';
 
 class TypeEffect extends React.Component {
   componentDidMount() {

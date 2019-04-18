@@ -148,6 +148,8 @@ class VacancyPost extends Component {
   }
 
   onChange = (e) => {
+    console.log('Name ' + e.target.name)
+    console.log('Value ' + e.target.value)
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -346,7 +348,7 @@ class VacancyPost extends Component {
 
                   <br />
                   <div className="input-group mb-3">
-                    <input type="text" className="form-control" onChange={this.onChange} />
+                    <input type="text" name="feedback" className="form-control" onChange={this.onChange} />
                     <div className="input-group-append">
                       <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
                     </div>
@@ -392,7 +394,7 @@ class VacancyPost extends Component {
                 <div className="comments-section col-sm-12">
                   <h4>Hired People that you can submit feedback on:</h4>
                   {this.state.vacancyData.hired.map(emp => (
-                    <HiredSubmitFeedbackForm lname={emp.lname} fname={emp.fname} url={emp.ProfileURL} key={emp._id} _id={emp._id} submitFeedbackPartner={this.submitFeedbackPartner} onChange={this.onChange} />
+                    <HiredSubmitFeedbackForm lname={emp.lname} fname={emp.fname} url={emp.ProfileURL} key={emp._id} _id={emp._id} submitFeedbackPartner={this.submitFeedbackPartner} onChange={this.onChange} name="feedback"/>
                   ))}
                 </div>
               }
@@ -427,16 +429,6 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Admin")
-                &&
-                (this.state.vacancyData.status === "Submitted")
-                &&
-                <div>
-                  <br /><br /><br />
-                  <button class="btn btn-success ctrl-button col-sm-12 " onClick={() => this.onClickApprove()}>Approve Vacancy</button>
-                </div>
-              }
-              {
                 (this.state.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Submitted")
@@ -451,13 +443,13 @@ class VacancyPost extends Component {
               {
                 (this.state.userData.userType === "Partner")
                 &&
-                (this.state.vacancyData.status === "Approved")
+                (this.state.vacancyData.status === "Open")
                 &&
                 (this.state.vacancyData.partner._id === this.state.userData._id)
                 &&
                 <div>
                   <br /><br /><br />
-                  <button className="btn btn-warning ctrl-button col-sm-12 ">Close Vacancy</button>
+                  <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose} >Close Vacancy</button>
                 </div>
               }
               {
@@ -469,7 +461,7 @@ class VacancyPost extends Component {
                 &&
                 <div>
                   <br /><br /><br />
-                  <button className="btn btn-success ctrl-button col-sm-12 ">Re-Open Vacancy</button>
+                  <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
                 </div>
               }
               {
@@ -490,28 +482,6 @@ class VacancyPost extends Component {
                 &&
                 <div><br /><br /><br />
                   <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
-                </div>
-              }
-              {
-                (this.state.userData.userType === "Partner")
-                &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
-                &&
-                (this.state.vacancyData.status === "Approved")
-                &&
-                <div><br /><br /><br />
-                  <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose}>Close Vacancy</button>
-                </div>
-              }
-              {
-                (this.state.userData.userType === "Partner")
-                &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
-                &&
-                (this.state.vacancyData.status === "Finished")
-                &&
-                <div><br /><br /><br />
-                  <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
                 </div>
               }
             </div>
@@ -540,7 +510,7 @@ function HiredSubmitFeedbackForm(props) {
     <div className="input-group mb-3">
       <Link to={props.url}><h6>{props.fname} {props.lname}</h6></Link>
 
-      <input type="text" className="form-control" onChange={props.onChange} />
+      <input type="text" className="form-control" onChange={props.onChange} name="feedback"/>
       <div className="input-group-append">
         <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
       </div>
