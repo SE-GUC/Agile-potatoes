@@ -18,7 +18,8 @@ class VacancyPost extends Component {
       },
       loaded: false,
       userHasApplied: false,
-      vacancyData: {}
+      vacancyData: {},
+      feedback: ''
     }
   }
 
@@ -40,11 +41,9 @@ class VacancyPost extends Component {
   async checkIfAlreadyApplied() {
     // check if user is found in attendees array
     let applied = false;
-    // let vacancy = await axios.get("http://localhost:3001/api/vacancy/Post/5cb7226dc984592c541ac1a8");
-    let applicants = this.state.vacancyData.applicants;
-    console.log(applicants)
-    for (let i = 0; i < applicants.length; i++) {
-      if (applicants[i]._id === this.state.userData._id)
+    let applicants = await axios.get("http://localhost:3001/api/vacancy/5cb7226dc984592c541ac1a8/applicants");
+    for (let i = 0; i < applicants.data.length; i++) {
+      if (applicants.data[i]._id === this.state.userData._id)
         applied = true;
     }
     if (applied) {
@@ -53,7 +52,11 @@ class VacancyPost extends Component {
       })
     }
     this.setState({
-      loaded: true
+      loaded: true,
+      vacancyData: {
+        ...this.state.vacancyData,
+        applicants: applicants.data
+      }
     });
   }
 
@@ -75,6 +78,23 @@ class VacancyPost extends Component {
     }).then(this.setState({
       userHasApplied: false
     }));
+  }
+
+  onChangeFeedback = (e) => {
+    this.setState({ feedback: e.target.value });
+  }
+
+  submitFeedback = (e) => {
+    e.preventDefault();
+    axios.post(`http://localhost:3001/api/profile/${this.state.vacancyData.partner._id}/feedback`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+      "comment": this.state.feedback
+    })
+  }
+
+  onClickHire = (e) => {
+
   }
 
   render() {
@@ -134,9 +154,9 @@ class VacancyPost extends Component {
               (this.state.vacancyData.status === 'Closed')
               &&
               <div className="input-group mb-3">
-                <input type="text" className="form-control" />
+                <input type="text" className="form-control" onChange={this.onChangeFeedback} />
                 <div className="input-group-append">
-                  <button className="btn btn-primary" type="button" >Submit Feedback</button>
+                  <button className="btn btn-primary" type="button" onClick={this.submitFeedback}>Submit Feedback</button>
                 </div>
               </div>
             }
@@ -151,10 +171,7 @@ class VacancyPost extends Component {
               <div className="comments-section col-sm-12">
                 <h4>Applicants</h4>
                 {this.state.vacancyData.applicants.map(applicant => (
-                <div key={applicant.ProfileURL} className="container">
-                  <div class="text-center"><Link to={applicant.ProfileURL}><h3>{applicant.fname} {applicant.lname}</h3></Link>
-                  </div>
-                </div>
+                  <ApplicantItem lname={applicant.lname} fname={applicant.fname} url={applicant.ProfileURL} key={applicant._id} onClickHire={this.onClickHire} />
                 ))}
               </div>
             }
@@ -209,6 +226,20 @@ class VacancyPost extends Component {
       </div>
     )
   }
+}
+
+
+function ApplicantItem(props) {
+  return (
+    //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
+    <div className="input-group mb-3">
+      {/* <Link to={props.ProfileURL}></Link> */}
+      <div className="input-group-append">
+        <h4>{props.fname} {props.lname}</h4>
+        <button className="btn btn-danger" type="button" onClick={this.onClickHire}>Hire!</button>
+      </div>
+    </div>
+  )
 }
 
 export default VacancyPost
