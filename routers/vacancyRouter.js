@@ -458,34 +458,4 @@ router.put('/:id/un-apply', function (req, res) {
     }
 });
 
-router.put('/:id/hireMember', function (req, res) {
-    var vacancyID = req.params.id;
-    var memberID = req.body.memberID;
-    var userType = req.body.userType;
-    var userID = req.body.userID;
-    if (userType === 'Partner') {
-        Vacancy.findById(vacancyID).exec(function (err, vacancy) {
-            if (vacancy.partner == userID) {
-                //must remove him from applicants so when the post re-renders it doesnt add him again
-                vacancy.applicants.pull(memberID);
-                vacancy.hired.push(memberID);
-                vacancy.save();
-                res.send('Done');
-            }
-            else
-                res.status(400).send('This vacancy does not belong to you');
-        });
-    }
-})
-
-router.get('/:id/hired', function (req, res) {
-    var vacID = req.params.id;
-    Vacancy.findById(vacID, 'hired')
-        .populate('hired', 'fname lname ProfileURL')
-        .exec(function (err, vacancy) {
-            if (err) res.status(400).send('Error vacancy not found');
-            res.send(vacancy.hired);
-        })
-});
-
 module.exports = router;
