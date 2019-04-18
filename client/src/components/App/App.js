@@ -37,23 +37,22 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        {/* <Router>
+        <Router>
           <Navbar loggedIn={this.state.loggedIn} changeLoggedInFlag={this.changeLoggedInFlag}/>
           <div>
-            <Route exact path="/" component={HomePage}/>
+            <Route exact path="/x" component={HomePage}/>
             <Route exact path="/events" component={EventsContainer}/>
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={HomePage}/>
-            <Route exact path="/vacancies/:id" component={VacancyPost}/>
+            {/* <Route exact path="/vacancies/:id" component={VacancyPost}/> */}
+            <Route exact path="/" component={VacancyPost}/>
             <Route exact path="/partnerprofile" component={PartnerProfile}/>
             <Route exact path="/memberprofile" component={MemberProfile}/>
             <Route exact path="/notifications" component={HomePage}/>
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
-        <Footer/> */}
-
-        <VacancyPost />
+        <Footer/>
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />

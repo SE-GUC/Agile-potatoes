@@ -51,7 +51,7 @@ const VacancySchema = new Schema({
             default: Date.now
         },
         author: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.ObjectId,
             ref: 'Admin'
         }
     }],
@@ -62,7 +62,7 @@ const VacancySchema = new Schema({
             default: Date.now
         },
         author: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.ObjectId,
             ref: 'Partner'
         }
     }]

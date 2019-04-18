@@ -15,7 +15,7 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 /////////// 7 Add comment to vacancy (admin-partner negotiation) 
 router.post('/:id/comment', (req, res, next) => {
     var userType = req.body.userType; //should come from session
-    var userId = req.body.userId;    //should come from session
+    var userId = req.body.userID;    //should come from session
     var comment = req.body.comment;
     var vacId = req.params.id;
     if (userType == 'Admin') {
@@ -203,11 +203,13 @@ router.delete('/:vacid/deleteVacancy', function (req, res) {
 router.get('/Post/:id', function (req, res) {
     var vacId = req.params.id;
 
-    Vacancy.findById(vacId).populate('partner', 'name').exec(
-        function (err, response) {
-            if (err) console.log(err);
-            return res.send(response);
-        });
+    Vacancy.findById(vacId)
+        .populate('partner', 'name')
+        .exec(
+            function (err, response) {
+                if (err) console.log(err);
+                return res.send(response);
+            });
 });
 
 //////Story 17 As an admin I cana view pending vacancies announcments requests

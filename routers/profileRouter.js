@@ -231,12 +231,12 @@ router.post('/create', function (req, res) {
                     email: em,
                     workfield: wf
                 });
-                newPartner.ProfileURL = '/api/profile/' + newPartner._id;
                 newPartner.save(function (err, p) {
                     if (err) throw err;
                     console.log(p);
 
                 });
+                newPartner.ProfileURL = '/api/profile/' + newPartner._id;
                 res.send("Added a partner")
             }
         })
@@ -274,13 +274,12 @@ router.post('/create', function (req, res) {
                     //tasks: tsks,
                     // projects: prjs
                 });
-                newMember.ProfileURL = '/api/profile/' + newMember._id;
-
                 newMember.save(function (err, m) {
                     if (err) throw err;
                     console.log(m);
 
                 });
+                newMember.ProfileURL = '/api/profile/' + newMember._id;
                 res.send("Added a member");
             }
         })
