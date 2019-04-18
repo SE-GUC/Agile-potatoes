@@ -1,6 +1,6 @@
 
-const DbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
-const TestingDbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
+const DbConnectionString = "";
+const TestingDbConnectionString = "";
 
 const EmailCredentials = {
     gmail: 'write a valid gmail address',
