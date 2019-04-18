@@ -231,5 +231,6 @@ section h1 {
 #contacts .button {
     margin-top: 20px;
     width: 40%;
-    transform: translateX(75%);
+    /* transform: translateX(75%); */
+    width: 100%
 }

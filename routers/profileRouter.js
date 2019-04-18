@@ -1,3 +1,4 @@
+const config = require('../config/index')
 const Admin = require('../models/adminModel')
 const Member = require('../models/memberModel')
 const Partner = require('../models/partnerModel')
@@ -406,6 +407,20 @@ router.put('/:id/update', function (req, res) {
    
 });
 
+//Any one can send an email to lirtenhub
+router.post('/contact', async (req,res)=>{
+    let email = req.body.email;
+    let name = req.body.name;
+    let msg = req.body.msg;
+    try{
+        await NotifyByEmail('balabezo138116882@gmail.com',`Message from ${name}, ${email}`, msg);
+        res.status(200).send('message sent successfully')
+    }
+    catch(e){
+        console.log(e);
+        res.status(422).send('email not sent')
+    }
+})
 //AUTHENTICATION... 
 //START
 
@@ -508,6 +523,7 @@ router.post('/login', (req,res) =>{
         }   
         })
     })
+
 
 //END
 module.exports = router;
