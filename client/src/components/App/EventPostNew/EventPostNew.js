@@ -5,7 +5,6 @@ import axios from "axios";
 class EventPostNew extends Component {
   constructor(props) {
     super(props);
-
     /*  
       props should have the user data
     */
@@ -75,9 +74,6 @@ class EventPostNew extends Component {
   }
 
   handleChange(e) {
-    console.log(e.target.name)
-    console.log(e.target.value)
-
     this.setState({
       eventEditedData: { [e.target.name]: e.target.value }
     });
@@ -92,10 +88,13 @@ class EventPostNew extends Component {
     await this.checkIfAlreadyBooked();
   }
 
-  getCommentsSorted() {
-    // Should sort all comments based on date
-    return this.state.eventData.commentsByAdmin.concat(this.state.eventData.commentsByPartner
-    );
+  getCommentsSorted() {  // Should sort all comments based on date
+    var allComments = (this.state.eventData.commentsByAdmin).concat(this.state.eventData.commentsByPartner)
+    return allComments.sort(function (a, b) {
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(a.date) - new Date(b.date);
+    });
   }
 
   async checkIfAlreadyBooked() {
@@ -275,7 +274,8 @@ class EventPostNew extends Component {
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
-                  {this.getCommentsSorted().map(comment => {
+                  <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
+                  {/* {this.getCommentsSorted().map(comment => {
                     return (
                       <div key={comment.date} className="comment">
                         <p className="font-weight-bold">
@@ -287,7 +287,7 @@ class EventPostNew extends Component {
                         <p>{comment.text}</p>
                       </div>
                     );
-                  })}
+                  })} */}
 
                   <br />
                   <div className="input-group mb-3">
@@ -366,6 +366,17 @@ class EventPostNew extends Component {
         </div>
       );
   }
+}
+
+function CommentsSection(props) {
+  return (
+    props.allComments.map((comment) => {
+      return <div className='comment'>
+        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin') ? 'Partner' : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
+        <p>{comment.text}</p>
+      </div>
+    })
+  )
 }
 
 export default EventPostNew;

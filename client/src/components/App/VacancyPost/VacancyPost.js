@@ -19,21 +19,28 @@ class VacancyPost extends Component {
       loaded: false,
       userHasApplied: false,
       vacancyData: {},
-      feedback: ''
+      feedback: '',
+
+      duration: "",
+      location: "",
+      description: "",
+      salary: 0,
+      dailyHours: 0
     }
   }
-async onClickApprove(){
-  
-  await axios.put(
-    "http://localhost:3001/api/vacancy/5ca0e1d3b7f968175873e4f0/status",
-    {
-      "userType" : "Admin",
-      "status" : "Open"
-    }
-  );
-  window.location.reload();
+  async onClickApprove() {
+    await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "userType": "Admin",
+      "status": "Open"
+    });
+    this.setState({
+      vacancyDate: {
+        ...this.state.vacancyData,
+        status: 'Open'
+      }
+    })
+  }
 
-}
   async componentDidMount() {
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
     let hired = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/hired`);
@@ -43,26 +50,28 @@ async onClickApprove(){
     this.setState({
       vacancyData: {
         ...this.state.vacancyData,
-        hired: hired.data
-
+        hired: hired.data,
+        duration: vacancy.data.duration,
+        location: vacancy.data.location,
+        description: vacancy.data.description,
+        salary: vacancy.data.salary,
+        dailyHours: vacancy.data.dailyHours
       }
     })
     this.checkIfAlreadyApplied();
-
   }
 
   getCommentsSorted() {  // Should sort all comments based on date
     var allComments = (this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner)
-    return allComments.sort(function(a,b){
+    return allComments.sort(function (a, b) {
       // Turn your strings into dates, and then subtract them
       // to get a value that is either negative, positive, or zero.
-      return new Date(a.date) - new Date(b.date) ;
+      return new Date(a.date) - new Date(b.date);
     });
   }
 
-  //EDIT THIS!!!
   async checkIfAlreadyApplied() {
-    // check if user is found in attendees array
+    // check if user is found in applicants array
     let applied = false;
     let applicants = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/applicants`);
     for (let i = 0; i < applicants.data.length; i++) {
@@ -84,7 +93,23 @@ async onClickApprove(){
     console.log(this.state.vacancyData);
   }
 
-  onClickApply = e => {
+  async onClickSubmit() {
+    const resp = await axios.put(
+      "http://localhost:3001/api/vacancy/5ca0e1d3b7f968175873e4f0",
+      {
+        "duration": this.state.duration,
+        "location": this.state.location,
+        "description": this.state.description,
+        "salary": this.state.salary,
+        "dailyHours": this.state.dailyHours
+      }
+    );
+    console.log(resp);
+    this.setState({ Edit: false });
+    //window.location.reload();
+  }
+
+  onClickApply = (e) => {
     e.preventDefault();
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {
       "userID": this.state.userData._id,
@@ -94,7 +119,7 @@ async onClickApprove(){
     }));
   }
 
-  onClickCancel = e => {
+  onClickCancel = (e) => {
     e.preventDefault();
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/un-apply`, {
       "userID": this.state.userData._id,
@@ -123,7 +148,7 @@ async onClickApprove(){
   }
 
   onChange = (e) => {
-    this.setState({ feedback: e.target.value });
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   //member submitting feedback on partner
@@ -133,8 +158,7 @@ async onClickApprove(){
       "userType": this.state.userData.userType,
       "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
-    this.setState({ feedback: '' });
+    }).then(this.setState({ feedback: '' }));
   }
 
   submitFeedbackPartner = (employee) => {
@@ -144,8 +168,7 @@ async onClickApprove(){
       "userType": this.state.userData.userType,
       "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
-    this.setState({ feedback: '' });
+    }).then(this.setState({ feedback: '' }));
   }
 
   onClickHire = (applicant) => {
@@ -201,7 +224,7 @@ async onClickApprove(){
 
     //need to rereoute to home page somehow now
   }
-  
+
   onClickReOpen = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
       "userType": this.state.userData.userType,
@@ -277,233 +300,224 @@ async onClickApprove(){
           </div>
         </div>
       );
-    return (
-      <div>
-        <div className="vacancy-post offset-sm-2 col-sm-8 row ">
-          <div className="left-of-post col-sm-9">
-            <div className="vacancy-post-header">
-              <p className="text-muted">
-                <i className="fas fa-calendar-day" />{" "}
-                {this.state.vacancyData.postDate}
-              </p>
-              <h2>{this.state.vacancyData.name}</h2>
-              <p>
-                <span className="text-muted">Posted by </span>
-                {this.state.vacancyData.partner.name}
-              </p>
-              <p className="text-muted">
-                <i className="fas fa-map-marker-alt" />{" "}
-                {this.state.vacancyData.location}, {this.state.vacancyData.city}
-              </p>
-            </div>
-            <div className="vacancy-post-info">
-              <h4>Details</h4>
-              <p>{this.state.vacancyData.description}</p>
-              <br />
-              <h4>Daily Hours</h4>
-              <p>{this.state.vacancyData.dailyHours}</p>
-              <br />
-              <h4>Duration</h4>
-              <p>{this.state.vacancyData.duration}</p>
-              <br />
-              <h4>URL</h4>
-              <p>{this.state.vacancyData.url}</p>
-              <br />
-            </div>
-
-            {
-              (this.state.vacancyData.status === "Submitted")
-              &&
-              (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
-              &&
-              <div className="comments-section col-sm-12">
-                <h4>Comments</h4>
-                <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
-
+    else
+      return (
+        <div>
+          <div className="vacancy-post offset-sm-2 col-sm-8 row ">
+            <div className="left-of-post col-sm-9">
+              <div className="vacancy-post-header">
+                <p className="text-muted">
+                  <i className="fas fa-calendar-day" />{" "}
+                  {this.state.vacancyData.postDate}
+                </p>
+                <h2>{this.state.vacancyData.name}</h2>
+                <p>
+                  <span className="text-muted">Posted by </span>
+                  {this.state.vacancyData.partner.name}
+                </p>
+                <p className="text-muted">
+                  <i className="fas fa-map-marker-alt" />{" "}
+                  {this.state.vacancyData.location}, {this.state.vacancyData.city}
+                </p>
+              </div>
+              <div className="vacancy-post-info">
+                <h4>Details</h4>
+                <p>{this.state.vacancyData.description}</p>
                 <br />
+                <h4>Daily Hours</h4>
+                <p>{this.state.vacancyData.dailyHours}</p>
+                <br />
+                <h4>Duration</h4>
+                <p>{this.state.vacancyData.duration}</p>
+                <br />
+                <h4>URL</h4>
+                <p>{this.state.vacancyData.url}</p>
+                <br />
+              </div>
+
+              {
+                (this.state.vacancyData.status === "Submitted")
+                &&
+                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
+                &&
+                <div className="comments-section col-sm-12">
+                  <h4>Comments</h4>
+                  <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
+
+                  <br />
+                  <div className="input-group mb-3">
+                    <input type="text" className="form-control" onChange={this.onChange} />
+                    <div className="input-group-append">
+                      <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              {
+                (this.state.vacancyData.hired.includes(this.state.userData._id))
+                &&
+                (this.state.vacancyData.status === 'Closed')
+                &&
                 <div className="input-group mb-3">
                   <input type="text" className="form-control" onChange={this.onChange} />
                   <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
+                    <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
                   </div>
                 </div>
-              </div>
-            }
+              }
 
-            {
-              (this.state.vacancyData.hired.includes(this.state.userData._id))
-              &&
-              (this.state.vacancyData.status === 'Closed')
-              &&
-              <div className="input-group mb-3">
-                <input type="text" className="form-control" onChange={this.onChange} />
-                <div className="input-group-append">
-                  <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
+              {
+                (this.state.vacancyData.status !== 'Submitted')
+                &&
+                (this.state.userData.userType === 'Partner')
+                &&
+                (this.state.userData._id === this.state.vacancyData.partner._id)
+                &&
+                <div className="comments-section col-sm-12">
+                  <h4>Applicants</h4>
+                  {this.state.vacancyData.applicants.map(applicant => (
+                    <ApplicantItem lname={applicant.lname} fname={applicant.fname} url={applicant.ProfileURL} key={applicant._id} _id={applicant._id} onClickHire={this.onClickHire} />
+                  ))}
                 </div>
-              </div>
-            }
+              }
 
-            {
-              (this.state.vacancyData.status !== 'Submitted')
-              &&
-              (this.state.userData.userType === 'Partner')
-              &&
-              (this.state.userData._id === this.state.vacancyData.partner._id)
-              &&
-              <div className="comments-section col-sm-12">
-                <h4>Applicants</h4>
-                {this.state.vacancyData.applicants.map(applicant => (
-                  <ApplicantItem lname={applicant.lname} fname={applicant.fname} url={applicant.ProfileURL} key={applicant._id} _id={applicant._id} onClickHire={this.onClickHire} />
-                ))}
-              </div>
-            }
+              {
+                (this.state.vacancyData.status !== 'Submitted')
+                &&
+                (this.state.userData.userType === 'Partner')
+                &&
+                (this.state.userData._id === this.state.vacancyData.partner._id)
+                &&
+                <div className="comments-section col-sm-12">
+                  <h4>Hired People that you can submit feedback on:</h4>
+                  {this.state.vacancyData.hired.map(emp => (
+                    <HiredSubmitFeedbackForm lname={emp.lname} fname={emp.fname} url={emp.ProfileURL} key={emp._id} _id={emp._id} submitFeedbackPartner={this.submitFeedbackPartner} onChange={this.onChange} />
+                  ))}
+                </div>
+              }
 
-            {
-              (this.state.vacancyData.status !== 'Submitted')
-              &&
-              (this.state.userData.userType === 'Partner')
-              &&
-              (this.state.userData._id === this.state.vacancyData.partner._id)
-              &&
-              <div className="comments-section col-sm-12">
-                <h4>Hired People that you can submit feedback on:</h4>
-                {this.state.vacancyData.hired.map(emp => (
-                  <HiredSubmitFeedbackForm lname={emp.lname} fname={emp.fname} url={emp.ProfileURL} key={emp._id} _id={emp._id} submitFeedbackPartner={this.submitFeedbackPartner} onChange={this.onChange} />
-                ))}
-              </div>
-            }
+            </div>
 
-          </div>
-
-          <div className="right-of-post col-sm-3">
-            <p className="text-center h3">
-              {this.state.vacancyData.salary} EGP
+            <div className="right-of-post col-sm-3">
+              <p className="text-center h3">
+                {this.state.vacancyData.salary} EGP
             </p>
-            {this.state.userHasApplied ? (
-              <button
-                className="btn btn-danger offset-sm-1 col-sm-10 book-button"
-                disabled={this.state.vacancyData.status === "Closed"}
-                onClick={this.onClickCancel}
-              >
-                CANCEL
-              </button>
-            ) : (
-              <button
-                className="btn btn-outline-success offset-sm-1 col-sm-10 book-button"
-                disabled={
-                  this.state.userData.userType !== "Member" ||
-                  this.state.vacancyData.status === "Closed"
-                }
-                onClick={this.onClickApply}
-              >
-                APPLY NOW
-              </button>
-            )}
-            {this.state.userData.userType === "Partner" &&
-              this.state.vacancyData.status === "Submitted" &&
-              this.state.vacancyData.partner === this.state.userData._id && (
-                <div>
-                  <br />
-                  <br />
-                  <br />
-                  <button
-                    className="btn btn-success ctrl-button col-sm-12 "
-                    onClick={() => this.setState({ Edit: true })}
-                  >
-                    Edit
+              {this.state.userHasApplied ?
+                (
+                  <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.vacancyData.status === "Closed"} onClick={this.onClickCancel}>
+                    CANCEL
+                </button>
+                ) :
+                (
+                  <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.vacancyData.status === "Closed"} onClick={this.onClickApply}>
+                    APPLY NOW
                   </button>
-                </div>
-              )}
-            {this.state.userData.userType === "Admin" &&
-              this.state.vacancyData.status === "Submitted" && (
+                )
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.status === "Submitted")
+                &&
+                (this.state.vacancyData.partner === this.state.userData._id) &&
                 <div>
-                  <br />
-                  <br />
-                  <br />
-                  <button class="btn btn-success ctrl-button col-sm-12 " onClick={()=>this.onClickApprove()}>
-                    Approve Vacancy
-                  </button>
+                  <br /><br /> <br />
+                  <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })} >Edit</button>
                 </div>
-              )}
-            {this.state.userData.userType === "Partner" &&
-              this.state.vacancyData.status === "Submitted" && (
+              }
+              {
+                (this.state.userData.userType === "Admin")
+                &&
+                (this.state.vacancyData.status === "Submitted")
+                &&
                 <div>
-                  <br />
-                  <br />
-                  <br />
-                  <button className="btn btn-danger ctrl-button col-sm-12 ">
-                    Delete Vacancy
-                  </button>
+                  <br /><br /><br />
+                  <button class="btn btn-success ctrl-button col-sm-12 " onClick={() => this.onClickApprove()}>Approve Vacancy</button>
                 </div>
-              )}
-            {this.state.userData.userType === "Partner" &&
-              this.state.vacancyData.status === "Approved" && (
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.status === "Submitted")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
                 <div>
-                  <br />
-                  <br />
-                  <br />
-                  <button className="btn btn-warning ctrl-button col-sm-12 ">
-                    Close Vacancy
-                  </button>
+                  <br /><br /><br />
+                  <button className="btn btn-danger ctrl-button col-sm-12 ">Delete Vacancy</button>
                 </div>
-              )}
-            {this.state.userData.userType === "Partner" &&
-              this.state.vacancyData.status === "Finished" && (
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.status === "Approved")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
                 <div>
-                  <br />
-                  <br />
-                  <br />
-                  <button className="btn btn-success ctrl-button col-sm-12 ">
-                    Re-Open Vacancy
-                  </button>
+                  <br /><br /><br />
+                  <button className="btn btn-warning ctrl-button col-sm-12 ">Close Vacancy</button>
                 </div>
-              )}
-            {
-              (this.state.userData.userType === "Admin")
-              &&
-              (this.state.vacancyData.status === "Submitted")
-              &&
-              <div><br /><br /><br />
-                <button class="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickApprove}>Approve Vacancy</button>
-              </div>
-            }
-            {
-              (this.state.userData.userType === "Partner")
-              &&
-              (this.state.userData._id === this.state.vacancyData.partner._id)
-              &&
-              (this.state.vacancyData.status === "Submitted")
-              &&
-              <div><br /><br /><br />
-                <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
-              </div>
-            }
-            {
-              (this.state.userData.userType === "Partner")
-              &&
-              (this.state.userData._id === this.state.vacancyData.partner._id)
-              &&
-              (this.state.vacancyData.status === "Approved")
-              &&
-              <div><br /><br /><br />
-                <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose}>Close Vacancy</button>
-              </div>
-            }
-            {
-              (this.state.userData.userType === "Partner")
-              &&
-              (this.state.userData._id === this.state.vacancyData.partner._id)
-              &&
-              (this.state.vacancyData.status === "Finished")
-              &&
-              <div><br /><br /><br />
-                <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
-              </div>
-            }
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.status === "Finished")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
+                <div>
+                  <br /><br /><br />
+                  <button className="btn btn-success ctrl-button col-sm-12 ">Re-Open Vacancy</button>
+                </div>
+              }
+              {
+                (this.state.userData.userType === "Admin")
+                &&
+                (this.state.vacancyData.status === "Submitted")
+                &&
+                <div><br /><br /><br />
+                  <button class="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickApprove}>Approve Vacancy</button>
+                </div>
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
+                (this.state.vacancyData.status === "Submitted")
+                &&
+                <div><br /><br /><br />
+                  <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
+                </div>
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
+                (this.state.vacancyData.status === "Approved")
+                &&
+                <div><br /><br /><br />
+                  <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose}>Close Vacancy</button>
+                </div>
+              }
+              {
+                (this.state.userData.userType === "Partner")
+                &&
+                (this.state.vacancyData.partner._id === this.state.userData._id)
+                &&
+                (this.state.vacancyData.status === "Finished")
+                &&
+                <div><br /><br /><br />
+                  <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
+                </div>
+              }
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
   }
 }
 
