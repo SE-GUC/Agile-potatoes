@@ -473,7 +473,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.partner._id === this.state.userData._id)
                 &&
-                (this.state.vacancyData.status === "Approved")
+                (this.state.vacancyData.status === "Open")
                 &&
                 <div><br /><br /><br />
                   <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose}>Close Vacancy</button>
