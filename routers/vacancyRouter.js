@@ -139,11 +139,11 @@ router.put('/:id/apply', function (req, res) {
                     res.status(404).send('vacancy not found')
                 } else {
                     if (vac.status != "Open") {
-                        res.status(404).send('vacancy is not open at the momnent')
+                        res.status(400).send('vacancy is not open at the moment')
                     } else {
                         vac.applicants.push(uid);
                         vac.save();
-                        return res.status(201).send('Application successful')
+                        return res.send('Application successful')
                     }
                 }
             })
@@ -179,23 +179,20 @@ router.get('/:id/applicants', function (req, res) {
 });
 
 //story 11 As a partner I can delete my vacancy request before it is approved
-router.delete('/:vacid/deleteVacancy', function (req, res) {
+router.delete('/:id/deleteVacancy', function (req, res) {
     var userType = req.body.userType;
-    var vacId = req.params.vacid;
-    var userId = req.body.userId;
+    var vacId = req.params.id;
+    var userId = req.body.userID;
     if (userType == 'Partner') {
         Vacancy.findById(vacId)
             .exec(function (err, vacancy) {
                 if (vacancy.status == 'Submitted' && vacancy.partner == userId) {
-                    Vacancy.findByIdAndDelete(vacancy, function (err, result) {
-                        if (err) {
-                            handleError(err);
-                        }
-                        vacancy.save();
-                    })
+                    Vacancy.findByIdAndDelete(vacId)
+                        .exec(res.send("deleted vacancy successfully"));
                 }
+                else
+                    res.status(400).send("This vacancy is Open or Closed so it can't be deleted. Or it is simply not yours.")
             })
-        return res.send("deleted vacancy successfully");
     }
 });
 
