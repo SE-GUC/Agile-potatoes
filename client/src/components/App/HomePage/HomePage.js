@@ -2,6 +2,7 @@ import React,{Component} from 'react'
 import './HomePage.css' 
 import {NavLink} from 'react-router-dom'
 import TypeEffect from './TypeEffect/TypeEffect'
+import Axios from 'axios';
 class HomePage extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +17,19 @@ class HomePage extends Component {
     })
   }
 
+  sendMsg(e){
+    e.preventDefault();
+    let name = this.refs.cname.value;
+    let email = this.refs.cemail.value;
+    let msg = this.refs.cmessage.value;
+    if(name && email && msg){
+      Axios.post(`http://localhost:3001/api/profile/contact`, {
+        email: email,
+        msg: msg,
+        name: name
+      });
+    }
+  }
   render(){
   return (
     this.state.isLoading ? <div className="spinner"></div>
@@ -108,12 +122,12 @@ class HomePage extends Component {
               <form>
                 <div className="form-group">
                   <label htmlFor="name">Name</label>
-                  <input className="form-control" type="text" id="name" name="Name" placeholder="Your Name"/><br/>
+                  <input className="form-control" ref="cname" type="text" id="name" name="Name" placeholder="Your Name"/><br/>
                   <label htmlFor="email">Email</label>
-                  <input className="form-control"  type="email" id="email" name="Email" placeholder="Your Email"/><br/>
+                  <input className="form-control" ref="cemail" type="email" id="email" name="Email" placeholder="Your Email"/><br/>
                   <label htmlFor="msg">Message</label>
-                  <textarea className="form-control" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
-                  <input className="btn btn-lg btn-success button" type="submit" value="Send"/>
+                  <textarea rows="4" className="form-control" ref="cmessage" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
+                  <input className="btn btn-lg btn-success button" type="submit" value="Send" onClick={this.sendMsg.bind(this)}/>
                 </div>
               </form>
           </div>

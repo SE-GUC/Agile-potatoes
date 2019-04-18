@@ -15,10 +15,7 @@ const MemberSchema = new Schema({
         description: String
     }],
     membershipExpiryDate: Date,
-    availability: {
-        type: Boolean,
-        default: true
-    },
+    availability: Number,
     skills: [{
         type: String,
         lowercase: true,
