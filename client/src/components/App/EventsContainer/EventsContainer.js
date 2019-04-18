@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import './EventsContainer.css'
 import EventsDisplayer from './EventsDisplayer/EventsDisplayer'
 import axios from 'axios'
+import CreateEvent from '../CreateEvent/CreateEvent'
 class EventsContainer extends Component {
   state = {
     events: [
@@ -24,7 +25,12 @@ class EventsContainer extends Component {
     ],
     partnerEvents:[
       
-    ]
+    ],
+    eventsList: [
+      
+    ],
+    toggle:0,
+ 
   }
   getRecommendedEvents = async ()=>{
     try {
@@ -36,6 +42,7 @@ class EventsContainer extends Component {
     }
   }
   getPartnerEvents= async()=>{
+    this.setState({eventsList:[],events:[],partnerEvents:[],toggle:0})
     try {
       let events = await axios.get(`http://localhost:3001/api/event/5caf1006305a701ee155610a/PartnerEvents`, { 'headers': { 'userType': 'Partner' } });
       this.setState({partnerEvents:this.state.partnerEvents.concat(events.data)})
@@ -44,7 +51,27 @@ class EventsContainer extends Component {
       console.log('GOT ERROR '+error)
     }
   }
+
+  getPendingEventsAdmin= async()=> {
+    this.setState({eventsList:[],events:[],partnerEvents:[],toggle:0})
+    await axios.get('http://localhost:3001/api/event/PendingEventsAdmin',{'headers':{'usertype':'Admin'}})
+    .then(response => {
+      console.log(response);
+      this.setState({eventsList:this.state.eventsList.concat(response.data)})
+      })
+  }
+
+  handletoggle=()=>
+  {
+    this.setState({eventsList:[],events:[],partnerEvents:[],toggle:1})
+  }
   render() {
+    let func;
+    if(this.state.toggle ==1)
+    {
+      func =  <CreateEvent/>
+      
+    }
     return (
       <div className='container-fluid'>
         <div className='row'>
@@ -53,11 +80,15 @@ class EventsContainer extends Component {
                   <button type="button" id="allEvents" className="list-group-item list-group-item-action">All Events</button>
                   <button type="button" onClick={this.getRecommendedEvents} id="recommendedEvents" className="list-group-item list-group-item-action">Recommended Events</button>
                   <button type="button" onClick={this.getPartnerEvents} id="partnerEvents" className="list-group-item list-group-item-action">Partner Events</button>
+                  <button type="button" onClick={this.getPendingEventsAdmin} id="partnerEvents" className="list-group-item list-group-item-action">Admin Pending Events</button>
+                  <button type="button" onClick={this.handletoggle} id="partnerEvents" className="list-group-item list-group-item-action">Create Event</button>
                 </div>
             </div>
             <div className='events-window col-sm-10'>
               <EventsDisplayer events={this.state.events}/>
               <EventsDisplayer events={this.state.partnerEvents}/>
+              <EventsDisplayer events={this.state.eventsList}/>
+              {func}
             </div>
         </div>
       </div>

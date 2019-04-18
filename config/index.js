@@ -1,5 +1,6 @@
 const DbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/lirtenDB?retryWrites=true";
 const TestingDbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/TestinglirtenDB?retryWrites=true";
+
 const EmailCredentials = {
     gmail: 'agilePotatoesForLirten@gmail.com',
     password: 'WasIstDasNaniii'

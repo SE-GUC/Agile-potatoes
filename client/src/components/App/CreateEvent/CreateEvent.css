@@ -1,5 +1,5 @@
-.side-bar {
-    /* position: fixed; */
+/* .side-bar {
+   
     left: 0px;
     height: 1000px;
     padding-top: 250px;
@@ -14,25 +14,30 @@
     padding-left: 0px ;
     margin-left: 0px ; 
 }
-.profile-window {
+.event-window {
     height: 100 px;
     float: right;
     padding-top: 50px;
-}
+} */
 
-.profileCard {
+.event1Card {
     width: 18rem;
     background-color: aquamarine;
-    margin-right: 100px;
-    margin-bottom: 100px;
-    margin-top: 100px; 
-    margin-left: 50px; 
-    height:350px;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+   
+    height:200;
     position: relative;
+   
 }
 
-
-.profileCard span{
+.eventCard a {
+    float:right;
+    position: absolute;
+    right:15px;
+    bottom: 15px;
+}
+.eventCard span{
     float: left;
     position: absolute;
     left:20px;
