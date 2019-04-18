@@ -41,7 +41,12 @@ class VacancyPost extends Component {
   }
 
   getCommentsSorted() {  // Should sort all comments based on date
-    return (this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner)
+    var allComments = (this.state.vacancyData.commentsByAdmin).concat(this.state.vacancyData.commentsByPartner)
+    return allComments.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(a.date) - new Date(b.date) ;
+    });
   }
 
   //EDIT THIS!!!
@@ -133,7 +138,7 @@ class VacancyPost extends Component {
   }
 
   onClickHire = (applicant) => {
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.vacancyData._id}/hireMember`, {
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/hireMember`, {
       "userType": this.state.userData.userType,
       "userID": this.state.userData._id,
       "memberID": applicant.id
@@ -145,6 +150,60 @@ class VacancyPost extends Component {
         applicants: filteredApplicants
       }
     });
+  }
+
+  onClickApprove = (e) => {
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+      "status": "Approved"
+    });
+
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        status: 'Approved'
+      }
+    })
+  }
+
+  onClickClose = (e) => {
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+      "status": "Closed"
+    });
+
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        status: 'Closed'
+      }
+    })
+  }
+
+  onClickDelete = (e) => {
+    axios.delete(`http://localhost:3001/api/vacancy/${this.state.postID}/deleteVacancy`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+    })
+
+    //need to rereoute to home page somehow now
+  }
+  
+  onClickReOpen = (e) => {
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "userType": this.state.userData.userType,
+      "userID": this.state.userData._id,
+      "status": "Open"
+    });
+
+    this.setState({
+      vacancyData: {
+        ...this.state.vacancyData,
+        status: 'Open'
+      }
+    })
   }
 
   render() {
@@ -251,7 +310,7 @@ class VacancyPost extends Component {
               (this.state.vacancyData.status === "Submitted")
               &&
               <div><br /><br /><br />
-                <button class="btn btn-success ctrl-button col-sm-12 ">Approve Vacancy</button>
+                <button class="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickApprove}>Approve Vacancy</button>
               </div>
             }
             {
@@ -262,7 +321,7 @@ class VacancyPost extends Component {
               (this.state.vacancyData.status === "Submitted")
               &&
               <div><br /><br /><br />
-                <button className="btn btn-danger ctrl-button col-sm-12 ">Delete Vacancy</button>
+                <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
               </div>
             }
             {
@@ -273,7 +332,7 @@ class VacancyPost extends Component {
               (this.state.vacancyData.status === "Approved")
               &&
               <div><br /><br /><br />
-                <button className="btn btn-warning ctrl-button col-sm-12 ">Close Vacancy</button>
+                <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose}>Close Vacancy</button>
               </div>
             }
             {
@@ -284,7 +343,7 @@ class VacancyPost extends Component {
               (this.state.vacancyData.status === "Finished")
               &&
               <div><br /><br /><br />
-                <button className="btn btn-success ctrl-button col-sm-12 ">Re-Open Vacancy</button>
+                <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
               </div>
             }
           </div>
@@ -325,7 +384,7 @@ function CommentsSection(props) {
   return (
     props.allComments.map((comment) => {
       return <div className='comment'>
-        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin')? 'Partner' : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
+        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin') ? 'Partner' : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
         <p>{comment.text}</p>
       </div>
     })
