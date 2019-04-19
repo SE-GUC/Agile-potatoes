@@ -40,8 +40,13 @@ export class Login extends Component{
             })
         }
         catch(e){
-            this.refs.alert1.innerText = e.response.data;
-            this.refs.alert1.style.display = "block";
+            if(e.response.data){
+                this.refs.alert1.innerText = e.response.data;
+                this.refs.alert1.style.display = "block";
+            }
+            else{
+                console.log(e);
+            }
         };
         
         // localStorage.setItem('LoggedIn', true);
