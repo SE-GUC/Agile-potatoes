@@ -2,7 +2,7 @@ import React , {Component} from 'react';
 import './Login.css';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import {NavLink} from 'react-router-dom'
+import {NavLink,Redirect} from 'react-router-dom'
 
 export class Login extends Component{
 
@@ -12,26 +12,38 @@ export class Login extends Component{
         this.state = {
             email:"",
             password: "",
-           
+            toHome:false
         }
-        console.log(this.props)
     }
 
     handleChange = (e) => {
         this.setState({
             email: document.getElementById("emailInput").value,
-            password: document.getElementById("passwordInput").value
+            password: document.getElementById("passwordInput").value,
+            toHome: this.state.toHome
         })
     }
 
     login = async () => {
-        let token = await axios.post('http://localhost:3001/api/profile/login', {
-            email: this.state.email,
-            password: this.state.password
-        })
+        try {
+            let token = await axios.post('http://localhost:3001/api/profile/login', {
+                email: this.state.email,
+                password: this.state.password
+            })
+            localStorage.setItem('token', JSON.stringify(token));
+            this.setState({
+                ...this.state,
+                toHome: true
+            },()=> {
+                console.log(this.state.toHome)  
+                this.props.changeLoggedInFlag(true);
+            })
+        }
+        catch(e){
+            this.refs.alert1.innerText = e.response.data;
+            this.refs.alert1.style.display = "block";
+        };
         
-        this.props.changeLoggedInFlag(true);
-        localStorage.setItem('token',JSON.stringify(token));
         // localStorage.setItem('LoggedIn', true);
 
       
@@ -51,18 +63,26 @@ export class Login extends Component{
     }
 
     render(){
+        if (this.state.toHome) {
+            return <Redirect to = '/' />
+        }
 
         return(
-            <div>
-          <div className = "MyLogin">
-          <form onSubmit = {this.handleSubmit}>
-                <label>E_mail: </label><input id="emailInput" className="i1" type="text" name = "email" onChange={this.handleChange}/><br/>
-                <label>Password: </label><input id="passwordInput" className="i2" type="text" name = "password" onChange={this.handleChange}/><br/>
-                <button>Submit</button>
-                </form>
-          <NavLink  className="btn btn-success" type="submit" onClick = {this.login} to="/Home">Login</NavLink>
+        <div className="row">
+          <div className = "MyLogin col-sm-4 offset-sm-4">
+            <form className="form-group" onSubmit = {this.handleSubmit}>
+                <label htmlFor="emailInput">E_mail: </label><input className="form-control" id="emailInput" type="text" name = "email" onChange={this.handleChange}/>
+                <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
+                <br/><br/>
+                <label htmlFor="passwordInput">Password: </label><input className="form-control" id="passwordInput" type="password" name = "password" onChange={this.handleChange}/>
+                          <div ref="alert1"className="alert alert-danger alert-dev2"role="alert">This is a primary alert—check it out</div>
+
+            </form>
+          {/* <NavLink className="btn btn-success" type="submit" onClick = {this.login} to="/Home">LOG IN</NavLink> */}
+            <button className="btn btn-success" type="submit" onClick = {this.login}>LOG IN</button>
+
           </div>
-</div>
+        </div>
         )
     }
 }
