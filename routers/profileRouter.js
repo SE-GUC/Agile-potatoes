@@ -451,7 +451,7 @@ router.post('/login', (req,res) =>{
                     }
                     else{
                     
-                        res.send("Either your E-mail or Password is wrong.")
+                        res.status(401).send("Either your E-mail or Password is wrong.")
                     } 
                 })
             
@@ -483,7 +483,7 @@ router.post('/login', (req,res) =>{
                         
                         else{
                            
-                            res.send("Either your E-mail or Password is wrong.")
+                            res.status(401).send("Either your E-mail or Password is wrong.")
                         } 
                     })
             }
@@ -511,12 +511,12 @@ router.post('/login', (req,res) =>{
                             }
                             else{
                               
-                                res.send("Either your E-mail or Password is wrong.")
+                                res.status(401).send("Either your E-mail or Password is wrong.")
                             } 
                         })
                 }
                 else
-                res.send("You don't have an account, Please Sign-Up to create an Account and try again.")
+                res.status(401).send("You don't have an account, Please Sign-Up to create an Account and try again.")
                 })
             }
             })
