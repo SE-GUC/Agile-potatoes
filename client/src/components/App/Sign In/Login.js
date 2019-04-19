@@ -40,7 +40,7 @@ export class Login extends Component{
             })
         }
         catch(e){
-            if(e.response.data){
+            if(e.response){
                 this.refs.alert1.innerText = e.response.data;
                 this.refs.alert1.style.display = "block";
             }
