@@ -524,6 +524,49 @@ router.post('/login', (req,res) =>{
         })
     })
 
+router.get('/:id/viewAllExpiredPartners', jwtVerifier({ secret: secret }), function (req, res, next) {
+    jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function (err, decoded) {
+        var userType = decoded.userType;
+        var userId = req.params.userId;
+        if (userType == 'Admin') {
+            Partner.find().exec(function (err, partner) {
+                if (err) return res.send(err)
+                else {
+                    if (partner.membershipExpiryDate < Date.now) {
+                        return res.send(partner)
+                    }
+                    else {
+                        return ("No Expired Partners")
+                    }
+      }
+            });
+        }
+        else
+            return res.send("You are not an admin")
+    })
 
+})
+router.get('/:id/viewAllExpiredMembers', jwtVerifier({ secret: secret }), function (req, res, next) {
+    jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function (err, decoded) {
+        var userType = decoded.userType;
+        var userId = req.params.userId;
+        if (userType == 'Admin') {
+            Member.find().exec(function (err, member) {
+                if (err) return res.send(err)
+                else {
+                    if (member.membershipExpiryDate < Date.now) {
+                        return res.send(member)
+                    }
+                    else {
+                        return ("No Expired Members")
+                    }
+                }
+            });
+        }
+        else
+            return res.send("You are not an admin")
+    })
+
+})
 //END
 module.exports = router;
