@@ -524,6 +524,37 @@ router.post('/login', (req,res) =>{
         })
     })
 
+    router.get('/viewAllPartners',(req,res) =>{
+        var userType = req.body.userType;
+            if(userType=='Admin'){
+               Partner.find().exec(function(err,partner){
+                   if(err) return res.send(err)
+                   else return res.send(partner)
+               });
+            }
+            else
+            return res.send("You are not an admin")
+           }) 
+       
+       
+   
+        router.get('/viewAllMembers',(req,res) =>{
+        var userType = req.body.userType;
+           if(userType=='Admin'){
+               Member.find().exec(function(err,member){
+                   if(err) return res.send(err)
+                   else return res.send(member)
+               });
+           }
+           else
+           return res.send("You are not an admin")
+        })
+   
+       
+   
+   
+
+
 
 //END
 module.exports = router;
