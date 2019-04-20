@@ -451,7 +451,7 @@ router.post('/login', (req,res) =>{
                     }
                     else{
                     
-                        res.send("Either your E-mail or Password is wrong.")
+                        res.status(401).send("Either your E-mail or Password is wrong.")
                     } 
                 })
             
@@ -483,7 +483,7 @@ router.post('/login', (req,res) =>{
                         
                         else{
                            
-                            res.send("Either your E-mail or Password is wrong.")
+                            res.status(401).send("Either your E-mail or Password is wrong.")
                         } 
                     })
             }
@@ -511,12 +511,12 @@ router.post('/login', (req,res) =>{
                             }
                             else{
                               
-                                res.send("Either your E-mail or Password is wrong.")
+                                res.status(401).send("Either your E-mail or Password is wrong.")
                             } 
                         })
                 }
                 else
-                res.send("You don't have an account, Please Sign-Up to create an Account and try again.")
+                res.status(401).send("You don't have an account, Please Sign-Up to create an Account and try again.")
                 })
             }
             })
@@ -566,6 +566,36 @@ router.get('/:id/viewAllExpiredMembers', jwtVerifier({ secret: secret }), functi
         else
             return res.send("You are not an admin")
     })
+
+    router.get('/viewAllPartners',(req,res) =>{
+        var userType = req.body.userType;
+            if(userType=='Admin'){
+               Partner.find().exec(function(err,partner){
+                   if(err) return res.send(err)
+                   else return res.send(partner)
+               });
+            }
+            else
+            return res.send("You are not an admin")
+           }) 
+       
+       
+   
+        router.get('/viewAllMembers',(req,res) =>{
+        var userType = req.body.userType;
+           if(userType=='Admin'){
+               Member.find().exec(function(err,member){
+                   if(err) return res.send(err)
+                   else return res.send(member)
+               });
+           }
+           else
+           return res.send("You are not an admin")
+        })
+   
+       
+   
+   
 
 })
 //END
