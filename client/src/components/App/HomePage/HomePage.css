@@ -230,10 +230,10 @@ section h1 {
 #contacts .formy{
     padding-top:70px;
 }
-#contacts .button {
+/* #contacts .button {
     margin-top: 20px;
     width: 40%;
     background-color: #2d3436;
-    /* transform: translateX(75%); */
-    width: 100%
-}
+    /* transform: translateX(75%); 
+    width: 100%;
+} */
