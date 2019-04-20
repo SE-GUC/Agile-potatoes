@@ -1,12 +1,26 @@
 .btn{
-    margin-top: 70px
+    margin-top: 50px;
+    transform: translateX(50%);
+    width:50%;
+    height: 50px;
+    font-size: 26px;
+    background-color: #2d3436;
+}
+#emailInput{
+    margin-bottom: 0px;
+    padding-bottom: 0px;
 }
 .MyLogin {
-    margin: 0%
+    margin-top:100px;
+    margin-bottom: 200px;
+    padding:20px;
+    padding-top: 50px;
+    height: 500px;
+    background-color: #ecf0f1;
+    box-shadow: 10px 10px #888888;
+    /* text-align: center; */
 }
-.i1 {
-    margin-top: 80px
-}
-.i2 {
-    margin-top: 90px
+
+.alert-dev2{
+    display: none;
 }
