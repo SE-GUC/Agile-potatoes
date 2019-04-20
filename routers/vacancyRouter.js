@@ -413,33 +413,31 @@ router.put('/:id/', function (req, res) {  //submitting edited vacancy
     var duration = req.body.duration;
     var location = req.body.location;
     var description = req.body.description;
+    var city = req.body.city
     var salary = req.body.salary;
-    var dailyhours = req.body.dailyHours;
+    var dailyHours = req.body.dailyHours;
+    var name = req.body.name;
 
     Vacancy.findById(vacId).exec(function (err, vacancy) {
-
         if (err) {
-            return res.send(err);
+            return res.status(404).send(err);
         }
-        console.log(vacancy.status)
-        console.log(vacId)
-
         if (vacancy.status == 'Submitted') {
-
+            vacancy.name = name;
+            vacancy.city = city;
             vacancy.duration = duration;
             vacancy.location = location;
             vacancy.description = description;
             vacancy.salary = salary;
-            vacancy.dailyhours = dailyHours;
-            console.log(duration)
-            vacancy.save();
-            return res.send(vacancy);
+            vacancy.dailyHours = dailyHours;
+            vacancy.save(function(err, done) {
+                if(err) res.status(400).send("Very weird error, sorry, can't handle it.")
+                else res.send(vacancy);
+            });
         }
-
         else {
-            return res.send('Vacancy cannot be edited after being approved');
+            return res.status(400).send('Vacancy cannot be edited after being approved');
         }
-
     })
 });
 
@@ -457,5 +455,35 @@ router.put('/:id/un-apply', function (req, res) {
         res.send("Application withdrawn");
     }
 });
+
+router.get('/:id/hired', function (req, res) {
+    var vacID = req.params.id;
+    Vacancy.findById(vacID, 'hired')
+        .populate('hired', 'fname lname ProfileURL')
+        .exec(function (err, vacancy) {
+            if (err) res.status(400).send('Error vacancy not found');
+            res.send(vacancy.hired);
+        })
+});
+
+router.put('/:id/hireMember', function (req, res) {
+    var vacancyID = req.params.id;
+    var memberID = req.body.memberID;
+    var userType = req.body.userType;
+    var userID = req.body.userID;
+    if (userType === 'Partner') {
+        Vacancy.findById(vacancyID).exec(function (err, vacancy) {
+            if (vacancy.partner == userID) {
+                //must remove him from applicants so when the post re-renders it doesnt add him again
+                vacancy.applicants.pull(memberID);
+                vacancy.hired.push(memberID);
+                vacancy.save();
+                res.send('Done');
+            }
+            else
+                res.status(400).send('This vacancy does not belong to you');
+        });
+    }
+})
 
 module.exports = router;

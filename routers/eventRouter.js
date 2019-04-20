@@ -430,9 +430,11 @@ router.put('/:id/attending', function (req, res) {
 		Event.findById(eventID).exec(function (err, event) {
 			event.attendees.push(userID);
 			event.remainingPlaces = event.remainingPlaces - 1;
-			event.save();
+			event.save(function (err, done) {
+				if (err) res.status(400).send(err);
+				else res.send("Marked you as attending");
+			});
 		});
-		res.send("Marked you as attending");
 	}
 });
 //As an admin I can approve events
@@ -448,10 +450,10 @@ router.put('/:id/approve', function (req, res) {
 						return res.send("updated");
 					});
 			else
-				return res.send("this event is already approved")
+				return res.status(400).send("this event is already approved")
 		})
 	}
-	else res.send("only admin can approve")
+	else res.status(400).send("only admin can approve")
 })
 //As a member I can mark myself as not going to an event that I 
 //previously marked myself as going to

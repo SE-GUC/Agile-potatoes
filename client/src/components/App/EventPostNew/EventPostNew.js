@@ -9,10 +9,11 @@ class EventPostNew extends Component {
       props should have the user data
     */
     this.state = {
+      postID: '5cab5d3222a833137c7acd38',
       //put user data here until we get them from props
       userData: {
-        _id: "5ca0e380b487d0228811cf44",
-        userType: "Partner"
+        _id: '5cb8a6d59f411b9204befd64',
+        userType: 'Member'
       },
       loaded: false,
       userHasBooked: false,
@@ -37,14 +38,21 @@ class EventPostNew extends Component {
   async onClickApprove() {
     await axios.put(`http://localhost:3001/api/event/${this.state.postID}/approve`, {
       "userType": "Admin"
-    });
-    // window.location.reload();
-    this.setState({
-      eventData: {
-        ...this.state.eventData,
-        eventStatus: 'Approved'
-      }
     })
+      .then(res =>
+        // window.location.reload();
+        this.setState({
+          eventData: {
+            ...this.state.eventData,
+            eventStatus: 'Approved'
+          }
+        }))
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      });
   }
 
   async onClickSubmit() {
@@ -81,10 +89,20 @@ class EventPostNew extends Component {
 
   async componentDidMount() {
 
-    let event = await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`);
-    this.setState({
-      eventData: event.data
-    });
+    await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
+      .then(res => {
+        console.log(res)
+        this.setState({
+          eventData: res.data
+        })
+      })
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      });
+
     await this.checkIfAlreadyBooked();
   }
 
@@ -119,17 +137,23 @@ class EventPostNew extends Component {
   }
 
   onClickBook = (e) => {
-    e.preventDefault();
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
-    }).then(this.setState({
-      eventData: {
-        ...this.state.eventData,
-        remainingPlaces: this.state.eventData.remainingPlaces - 1
-      },
-      userHasBooked: true
-    }));
+    }).then(res => 
+      this.setState({
+        eventData: {
+          ...this.state.eventData,
+          remainingPlaces: this.state.eventData.remainingPlaces - 1
+        },
+        userHasBooked: true
+      }))
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      });
   }
 
   onClickCancel = (e) => {
@@ -137,13 +161,14 @@ class EventPostNew extends Component {
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
-    }).then(this.setState({
-      eventData: {
-        ...this.state.eventData,
-        remainingPlaces: this.state.eventData.remainingPlaces + 1
-      },
-      userHasBooked: false,
-    }));
+    }).then(res=>
+      this.setState({
+        eventData: {
+          ...this.state.eventData,
+          remainingPlaces: this.state.eventData.remainingPlaces + 1
+        },
+        userHasBooked: false,
+      }));
   }
 
   closeEvent() {
@@ -304,9 +329,9 @@ class EventPostNew extends Component {
               <p className="text-center h3">{this.state.eventData.price} EGP</p>
               {
                 this.state.userHasBooked ? (
-                  <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} onClick={this.onClickCancel()} >CANCEL</button>
+                  <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} onClick={this.onClickCancel} >CANCEL</button>
                 ) : (
-                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} onClick={() => this.onClickBook} >BOOK NOW</button>
+                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} onClick={this.onClickBook} >BOOK NOW</button>
                   )
               }
               <p className="text-muted text-center">remaining seats: {this.state.eventData.remainingPlaces} </p>
@@ -333,8 +358,12 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner") &&
-                (this.state.eventData.eventStatus === "Submitted") &&
+                (this.state.userData.userType === "Partner") 
+                &&
+                (this.state.eventData.eventStatus === "Submitted") 
+                &&
+                (this.state.userData._id === this.state.eventData.partner)
+                &&
                 <div>
                   <br /><br /><br />
                   <button className="btn btn-danger ctrl-button col-sm-12 ">Delete Event</button>
