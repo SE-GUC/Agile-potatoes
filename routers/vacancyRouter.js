@@ -278,20 +278,18 @@ router.get('/RecommendedVacancies', function (req, res, next) {
 router.put('/:id/status', function (req, res) {
     var userType = req.body.userType;
     var vacId = req.params.id;
-    var vacStatus = req.body.status;
-    var partnerid = req.body.partner;
+    var status = req.body.status;
+    var partner = req.body.partner;
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted') {
-                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus })
-                    .populate('partner', 'name')
-                    .exec({
+                Vacancy.findByIdAndUpdate(vacId, { status: status },
                         function(err, response) {
                             console.log(response);
-                            return res.send(response);
+                            return res.send("Status Updated");
                         }
-                    });
-                if (vacStatus === 'Approved') {
+                    );
+                if (status === 'Open') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
                         "Admin has approved your vacancy request and it members can apply for it now,"
                         + " please don't try to edit it as long as it is approved"
@@ -299,19 +297,19 @@ router.put('/:id/status', function (req, res) {
                 }
             }
             else
-                return res.send("This vacancy is already opened and you are not allowed to change its status")
+                return res.send("This vacancy is either opened or closed and you are not allowed to change its status")
         })
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open' && vacancy.partner == partnerid)
-                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
+            if (vacancy.status == 'Open' && vacancy.partner == partner)
+                Vacancy.findByIdAndUpdate(vacId, { status: status },
                     function (err, response) {
                         console.log(response);
-                        return res.send(response);
+                        return res.send("Status Updated");
                     });
             else
-                return res.send("You are not allowed to change the status of this vacancy")
+                return res.send("This vacancy may be opened or closed, or may not belong to you and you are not allowed to change its status")
         })
     }
 

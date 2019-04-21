@@ -1,6 +1,8 @@
 import React,{Component} from 'react'
 import axios from 'axios'
 import './AdminProfile.css'
+import '../CreateEvent/CreateEvent'
+import { NavLink } from 'react-router-dom'
 class AdminProfile extends Component{
     constructor(props){
         super(props);
@@ -17,7 +19,7 @@ class AdminProfile extends Component{
     }
 
     increment=async()=> {
-        console.log("enta ya zeft")
+       
         this.setState({
             oldPass: this.state.oldPass + '',
             newPass: this.state.newPass + '',
@@ -36,7 +38,7 @@ class AdminProfile extends Component{
    let currentPassword;
   let currentPass =await axios.get('http://localhost:3001/api/profile/5cb3a64f1c9d4400000ae718/GetPassword');
   currentPassword = currentPass.data;
-  console.log("FUCKING DATA" + currentPassword)
+  
 
 
   if(oldPassword !== currentPassword)
@@ -188,7 +190,7 @@ class AdminProfile extends Component{
           
           <button onClick = {this.handlerender} type="submit" >Change Password</button><br/>
           <button onClick = {this.handlerender1} type="submit">Change Name</button><br/>
-         
+          <NavLink to="/createEvent" onClick = {this.handleChangeCreate} className="link-button"><p>CREATE EVENT</p></NavLink>
          </div>
         </div>
         <div className='profile-window col-sm-10'>
