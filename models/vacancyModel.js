@@ -40,6 +40,10 @@ const VacancySchema = new Schema({
         type: mongoose.ObjectId,
         ref: 'Member'
     }],
+    hired: [{
+        type: mongoose.ObjectId,
+        ref: 'Member'
+    }],
     commentsByAdmin: [{
         text: String,
         date: {
@@ -47,7 +51,7 @@ const VacancySchema = new Schema({
             default: Date.now
         },
         author: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.ObjectId,
             ref: 'Admin'
         }
     }],
@@ -58,7 +62,7 @@ const VacancySchema = new Schema({
             default: Date.now
         },
         author: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.ObjectId,
             ref: 'Partner'
         }
     }]

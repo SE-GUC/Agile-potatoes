@@ -28,7 +28,7 @@ import AdminProfile from './AdminProfile/AdminProfile'
 import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
 class App extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       loggedIn: false,
@@ -36,7 +36,7 @@ class App extends Component {
   }
   changeLoggedInFlag = (flag) => {
     this.setState({
-      loggedIn:flag
+      loggedIn: flag
     })
   }
   render() {
@@ -58,7 +58,6 @@ class App extends Component {
           </div>
         </Router>
         <Footer/>
-
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />
