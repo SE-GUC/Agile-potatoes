@@ -1,5 +1,5 @@
-const DbConnectionString = " ";
-const TestingDbConnectionString = " ";
+const DbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
+const TestingDbConnectionString = "mongodb+srv://gskhaled:12345@cluster0-wmsit.mongodb.net/test?retryWrites=true";
 
 const EmailCredentials = {
     gmail: 'agilePotatoesForLirten@gmail.com',

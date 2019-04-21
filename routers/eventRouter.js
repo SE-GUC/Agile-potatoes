@@ -24,9 +24,11 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
-	let eventDate = moment();
-	eventDate = moment(req.body.eventDate + '');
-	eventDate.day(eventDate.day() + 1)
+	//wtf??
+	// let eventDate = moment();
+	// eventDate = moment(req.body.eventDate + '');
+	// eventDate.day(eventDate.day() + 1)
+	var eventDate = req.body.eventDate;
 	var remainingPlaces = req.body.places;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
@@ -49,17 +51,16 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			speakers: speakers,
 			topics: topics
 		});
-		event.url = '/api/event/Post/' + event._id
 		event.save(function (err, eve) {
-			if (err) throw err;
-			console.log(eve);
+			if (err) return res.status(400).send(err);
+			else res.send('created event for admin successfully');
 		})
+		event.url = '/api/event/Post/' + event._id
 		Admin.findById(userId).exec(function (err, admin) {
-			console.log(admin.event);
+			if (err) return res.send(err);
 			admin.events.push(event._id)
 			admin.save();
 		});
-		return res.send('created event for admin successfully');
 	}
 	else if (userType == 'Partner') {
 		var event = new Event({
@@ -75,20 +76,19 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			topics: topics,
 			partner: userId
 		});
-
-		event.url = '/api/event/Post' + event._id
 		event.save(function (err, eve) {
-			if (err) throw err;
-			console.log(eve);
+			if (err) return res.send(err);
+			else res.send('created event for partner successfully');
 		})
+		event.url = '/api/event/Post' + event._id
 		Partner.findById(userId).exec(function (err, partner) {
-			console.log(partner.event);
+			//console.log(partner.event);
 			partner.events.push(event._id)
 			partner.save();
 		});
-
-		return res.send('created event for partner successfully');
 	}
+	else
+		return res.status(400).send('Cannot create event');
 });
 
 //15

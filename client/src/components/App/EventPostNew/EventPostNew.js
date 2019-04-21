@@ -9,11 +9,11 @@ class EventPostNew extends Component {
       props should have the user data
     */
     this.state = {
-      postID: '5cab5d3222a833137c7acd38',
+      postID: '5cbbbea760006f509880af3b',
       //put user data here until we get them from props
       userData: {
-        _id: '5cb8a6d59f411b9204befd64',
-        userType: 'Member'
+        _id: '5cbbb65c9800133ed8898a09',
+        userType: 'Partner'
       },
       loaded: false,
       userHasBooked: false,
@@ -35,52 +35,6 @@ class EventPostNew extends Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  async onClickApprove() {
-    await axios.put(`http://localhost:3001/api/event/${this.state.postID}/approve`, {
-      "userType": "Admin"
-    })
-      .then(res =>
-        // window.location.reload();
-        this.setState({
-          eventData: {
-            ...this.state.eventData,
-            eventStatus: 'Approved'
-          }
-        }))
-      .catch(err => {
-        console.log(err.response.data);
-        this.refs.alert.innerText = err.response.data;
-        console.log(this.refs.alert);
-        this.refs.alert.style.display = "block";
-      });
-  }
-
-  async onClickSubmit() {
-
-    const resp = await axios.put(
-      `http://localhost:3001/api/event/${this.state.postID}`, {
-        'userType': this.state.userData.userType,
-        'userID': this.state.userData._id,
-        'eventID': this.state.eventData._id,
-        'date': this.state.eventEditedData.date,
-        'location': this.state.eventEditedData.location,
-        'desc': this.state.eventEditedData.desc,
-        'price': this.state.eventEditedData.price,
-        'type': this.state.eventEditedData.type,
-        'topics': this.state.eventData.topics,
-        'speakers': this.state.eventData.speakers,
-        'attendees': this.state.eventData.attendees,
-        'remPlaces': this.state.eventEditedData.remPlaces
-      }
-
-    )
-    console.log(resp)
-    this.setState({
-      Edit: false
-    });
-    // window.location.reload();
-  }
-
   handleChange(e) {
     this.setState({
       eventEditedData: { [e.target.name]: e.target.value }
@@ -88,7 +42,6 @@ class EventPostNew extends Component {
   }
 
   async componentDidMount() {
-
     await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
       .then(res => {
         console.log(res)
@@ -136,11 +89,81 @@ class EventPostNew extends Component {
     console.log(this.state.eventData);
   }
 
+  async onClickComment(e) {
+    await axios.post(`http://localhost:3001/api/event/${this.state.postID}/comment`, {
+      "userID": this.state.userData._id,
+      "userType": this.state.userData.userType,
+      "comment": this.state.feedback,
+    });
+    //hopefully getting the updated vacancy with the new comments
+    await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`)
+      .then(updatedVacancy => {
+        console.log(updatedVacancy);
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            commentsByAdmin: updatedVacancy.data.commentsByAdmin,
+            commentsByPartner: updatedVacancy.data.commentsByPartner
+          }
+        })
+      })
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      });
+  }
+
+  async onClickApprove() {
+    await axios.put(`http://localhost:3001/api/event/${this.state.postID}/approve`, {
+      "userType": "Admin"
+    })
+      .then(res =>
+        // window.location.reload();
+        this.setState({
+          eventData: {
+            ...this.state.eventData,
+            eventStatus: 'Approved'
+          }
+        }))
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      });
+  }
+
+  async onClickSubmit() {
+    await axios.put(`http://localhost:3001/api/event/${this.state.postID}`, {
+      'userType': this.state.userData.userType,
+      'userID': this.state.userData._id,
+      'eventID': this.state.eventData._id,
+      'date': this.state.eventEditedData.date,
+      'location': this.state.eventEditedData.location,
+      'desc': this.state.eventEditedData.desc,
+      'price': this.state.eventEditedData.price,
+      'type': this.state.eventEditedData.type,
+      'topics': this.state.eventData.topics,
+      'speakers': this.state.eventData.speakers,
+      'attendees': this.state.eventData.attendees,
+      'remPlaces': this.state.eventEditedData.remPlaces
+    }).then(res => {
+      console.log(res)
+      this.setState({
+        Edit: false
+      });
+    })
+    // window.location.reload();
+  }
+
+
   onClickBook = (e) => {
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
-    }).then(res => 
+    }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -161,7 +184,7 @@ class EventPostNew extends Component {
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
-    }).then(res=>
+    }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -318,7 +341,7 @@ class EventPostNew extends Component {
                   <div className="input-group mb-3">
                     <input type="text" className="form-control" />
                     <div className="input-group-append">
-                      <button className="btn btn-primary" type="button">Add comment</button>
+                      <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
                     </div>
                   </div>
                 </div>
@@ -358,9 +381,9 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner") 
+                (this.state.userData.userType === "Partner")
                 &&
-                (this.state.eventData.eventStatus === "Submitted") 
+                (this.state.eventData.eventStatus === "Submitted")
                 &&
                 (this.state.userData._id === this.state.eventData.partner)
                 &&

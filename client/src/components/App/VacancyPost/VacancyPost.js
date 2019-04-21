@@ -30,19 +30,6 @@ class VacancyPost extends Component {
       name: "",
     }
   }
-  async onClickApprove() {
-    await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": "Admin",
-      "status": "Open"
-    }).then(res => {
-      this.setState({
-        vacancyDate: {
-          ...this.state.vacancyData,
-          status: 'Open'
-        }
-      })
-    })
-  }
 
   async componentDidMount() {
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
@@ -97,6 +84,20 @@ class VacancyPost extends Component {
     });
     console.log(this.state.vacancyData);
   }
+  
+  async onClickApprove() {
+    await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "userType": "Admin",
+      "status": "Open"
+    }).then(res => {
+      this.setState({
+        vacancyDate: {
+          ...this.state.vacancyData,
+          status: 'Open'
+        }
+      })
+    })
+  }
 
   async onClickSubmit() {
     const resp = await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}`, {
@@ -114,7 +115,7 @@ class VacancyPost extends Component {
   }
 
   onClickApply = (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
