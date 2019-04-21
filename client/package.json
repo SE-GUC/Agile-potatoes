@@ -27,6 +27,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "install-peers": "^1.0.3",
     "prop-types": "^15.7.2"
   }
 }

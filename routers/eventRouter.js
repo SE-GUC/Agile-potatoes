@@ -395,7 +395,7 @@ router.post('/:id/comment', function (req, res) {
 						description: 'Partner commented on your event request'
 					});
 					NotifyByEmail(event.partner.email, 'New comment on event that you added before',
-					`Admin commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
+					`Admin commented on your event request \n go to link: http://localhost:3000/events/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByAdmin);
@@ -413,7 +413,7 @@ router.post('/:id/comment', function (req, res) {
 						description: 'Partner commented on your event request'
 					});
 					NotifyByEmail(event.admin.email, 'New comment on event that you follow',
-					`Partner commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
+					`Partner commented on your event request \n go to link: http://localhost:3000/events/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByPartner);
