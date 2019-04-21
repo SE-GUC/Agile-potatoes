@@ -430,8 +430,8 @@ router.put('/:id/', function (req, res) {  //submitting edited vacancy
             vacancy.description = description;
             vacancy.salary = salary;
             vacancy.dailyHours = dailyHours;
-            vacancy.save(function(err, done) {
-                if(err) res.status(400).send("Very weird error, sorry, can't handle it.")
+            vacancy.save(function (err, done) {
+                if (err) res.status(400).send("Very weird error, sorry, can't handle it.")
                 else res.send(vacancy);
             });
         }
@@ -475,6 +475,18 @@ router.put('/:id/hireMember', function (req, res) {
                 res.status(400).send('This vacancy does not belong to you');
         });
     }
+})
+
+
+
+router.get('/:id/hired', function (req, res) {
+    var vacID = req.params.id;
+    Vacancy.findById(vacID, 'hired')
+        .populate('hired', 'fname lname ProfileURL')
+        .exec(function (err, vacancy) {
+            if (err) res.status(400).send('Error vacancy not found');
+            res.send(vacancy.hired);
+        })
 })
 
 module.exports = router;
