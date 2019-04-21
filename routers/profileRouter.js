@@ -551,7 +551,31 @@ router.post('/login', (req,res) =>{
         })
    
        
-   
+router.get('/viewAllExpiredPartners', (req, res) => {
+    var userType = req.body.userType;
+    if (userType == 'Admin') {
+        Partner.find({ membershipExpiryDate: membershipExpiryDate < Date.now }).exec(function (err, partner) {
+            if (err) return res.send(err)
+            else return res.send(partner)
+        });
+    }
+    else
+        return res.send("You are not an admin")
+})
+
+
+
+router.get('/viewAllExpiredMembers', (req, res) => {
+    var userType = req.body.userType;
+    if (userType == 'Admin') {
+        Member.find({ membershipExpiryDate: membershipExpiryDate < Date.now }).exec(function (err, member) {
+            if (err) return res.send(err)
+            else return res.send(member)
+        });
+    }
+    else
+        return res.send("You are not an admin")
+})
    
 
 
