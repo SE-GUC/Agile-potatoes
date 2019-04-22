@@ -8,6 +8,15 @@
     padding-right: 0px;
     text-align: center;
 }
+.eventCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1px;
+    height:50px;
+    position: relative;
+}
 
 .side-bar button {
     width: 100%;
@@ -26,13 +35,9 @@
     background-color: aquamarine;
     margin-right: 1rem;
     margin-bottom: 1rem;
-
-
-
-    margin-top: 100px;
+    margin-top: 200px;
     margin-left: 50px;
-    height:400px;
-
+    height:210px;
     position: relative;
 }
 
@@ -51,4 +56,5 @@
     -webkit-transition: background-color .4s;
     transition: background-color .4s;
 }
+
 

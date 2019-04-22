@@ -1,6 +1,7 @@
 import React,{Component} from 'react'
 import axios from 'axios'
 import Edit from './Edit/Edit'
+import SkyLight from "react-skylight";
 import './PartnerProfile.css'
 
 import { NavLink } from 'react-router-dom'
@@ -24,7 +25,6 @@ class PartnerProfile extends Component{
                 boardMembers:[],
                 notifications:[],
                 feedbacks:[],
-
                 toggle:4,
             }
         }
@@ -50,7 +50,7 @@ class PartnerProfile extends Component{
     getProfile = async()=>
         {
             try{
-            let profile = await axios.get('http://localhost:3001/api/profile/5caf1006305a701ee155610a',{'header':{'userType':'Partner','userId':'5caf1006305a701ee155610a'}})
+            let profile = await axios.get('http://localhost:3001/api/profile/5ca0e380b487d0228811cf44',{'header':{'userType':'Partner','userId':'5ca0e380b487d0228811cf44'}})
             console.log(profile);
             this.setState({userProfile:{
                 vacancies:profile.data.vacancies,
@@ -65,7 +65,9 @@ class PartnerProfile extends Component{
                 boardMembers:profile.data.boardMembers,
                 notifications:profile.data.notifications,
                 feedbacks:profile.data.feedbacks
-            }})
+            },showFeedback:true
+        })
+
             }
             catch(err)
             {
@@ -91,8 +93,7 @@ class PartnerProfile extends Component{
               <br/>
               { "Membership State: "+this.state.userProfile.membershipState}
              </ul>
-
-             <button onClick = {this.getProfile}className="btn btn-primary">SHOW PROFILE</button>
+             <button onClick = {this.getProfile}className="btn btn-primary">SHOW POFILE</button>
 
            </div> 
            </div>
@@ -104,7 +105,6 @@ class PartnerProfile extends Component{
             {
                 func = <Edit/>
             }
-
             else{
                 if(this.state.toggle == 2)
                 {
@@ -121,8 +121,37 @@ class PartnerProfile extends Component{
              <div className='side-bar col-sm-2 ' >
              <div className="list-group">
              <h1>PARTNER PROFILE</h1>
-                     <button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
+                    { this.state.showFeedback == false ? (<button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
+                    ):(
+                        <div>
+                          <button
+                            className="list-group-item list-group-item-action"
+                            onClick={() => this.simpleDialog.show()}
+                          >
+                            Show Feedback
+                          </button>
+                          <SkyLight
+                            hideOnOverlayClicked
+                            ref={ref => (this.simpleDialog = ref)}
+                            title="Feedbacks"
+                          >
+                            {this.state.userProfile.feedbacks.map(feedback => {
+                              return (
+                                <div className="card eventCard">
+                                  <div className="card-body">
+                                    <h5 className="card-title">{feedback.text}</h5>
+                                    <span className="card-text"><small className="text-muted">{new Date(feedback.date).toLocaleDateString()}</small></span>
+      
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </SkyLight>
+                        </div>
+                      )}
+                     
                      <button onClick = {this.handleChangeEdit} className="list-group-item list-group-item-action">EDIT PROFILE</button>
+                     <button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
 
                      <NavLink to="/createEvent" onClick = {this.handleChangeCreate} className="link-button"><p>CREATE EVENT</p></NavLink>
                      <NavLink to="/createEvent" onClick = {this.handleChangeCreateVac} className="link-button"><p>CREATE VACANCY</p></NavLink>

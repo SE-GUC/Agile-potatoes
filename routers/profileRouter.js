@@ -541,7 +541,7 @@ router.post('/login', (req, res) => {
            else
            return res.send("You are not an admin")
         })
-   
+    }) 
        
 router.get('/viewAllExpiredPartners', (req, res) => {
     var userType = req.body.userType;
