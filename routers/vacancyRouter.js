@@ -38,7 +38,7 @@ router.post('/:id/comment', (req, res, next) => {
                     description: 'Admin commented on your vacancy request'
                 });
                 NotifyByEmail(vacancy.partner.email, 'New comment on vacancy that you follow',
-                    `Admin commented on your vacancy request \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                    `Admin commented on your vacancy request \n go to link: http://localhost:3000/vacancies/${vacId}`)
                 await vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
                 return res.status(201).send(vacancy.commentsByAdmin);
             })
@@ -64,7 +64,7 @@ router.post('/:id/comment', (req, res, next) => {
                         description: 'Partner commented on his vacancy request'
                     });
                     NotifyByEmail(vacancy.admin.email, 'New comment on vacancy that you follow',
-                        `Partner commented on his vacancy \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        `Partner commented on his vacancy \n go to link: http://localhost:3000/vacancies/${vacId}`)
                 }
                 await vacancy.save();
                 return res.status(201).send(vacancy.commentsByPartner);
@@ -295,7 +295,7 @@ router.put('/:id/status', function (req, res) {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
                         "Admin has approved your vacancy request and it members can apply for it now,"
                         + " please don't try to edit it as long as it is approved"
-                        + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        + `\n go to link: http://localhost:3000/vacancies/${vacId}`)
                 }
             }
             else
@@ -430,8 +430,8 @@ router.put('/:id/', function (req, res) {  //submitting edited vacancy
             vacancy.description = description;
             vacancy.salary = salary;
             vacancy.dailyHours = dailyHours;
-            vacancy.save(function(err, done) {
-                if(err) res.status(400).send("Very weird error, sorry, can't handle it.")
+            vacancy.save(function (err, done) {
+                if (err) res.status(400).send("Very weird error, sorry, can't handle it.")
                 else res.send(vacancy);
             });
         }
@@ -455,5 +455,38 @@ router.put('/:id/un-apply', function (req, res) {
         res.send("Application withdrawn");
     }
 });
+
+
+router.put('/:id/hireMember', function (req, res) {
+    var vacancyID = req.params.id;
+    var memberID = req.body.memberID;
+    var userType = req.body.userType;
+    var userID = req.body.userID;
+    if (userType === 'Partner') {
+        Vacancy.findById(vacancyID).exec(function (err, vacancy) {
+            if (vacancy.partner == userID) {
+                //must remove him from applicants so when the post re-renders it doesnt add him again
+                vacancy.applicants.pull(memberID);
+                vacancy.hired.push(memberID);
+                vacancy.save();
+                res.send('Done');
+            }
+            else
+                res.status(400).send('This vacancy does not belong to you');
+        });
+    }
+})
+
+
+
+router.get('/:id/hired', function (req, res) {
+    var vacID = req.params.id;
+    Vacancy.findById(vacID, 'hired')
+        .populate('hired', 'fname lname ProfileURL')
+        .exec(function (err, vacancy) {
+            if (!vacancy) res.status(400).send('Error vacancy not found');
+            res.send(vacancy.hired);
+        })
+})
 
 module.exports = router;
