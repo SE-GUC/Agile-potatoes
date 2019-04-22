@@ -1,36 +1,35 @@
-.loading{
-    position: absolute;
-    width: 100%;
-    height: 9000px;
-    background-color: aliceblue;
-    z-index: 9999999999;
-    text-align: center;
-    padding-top: 300px
-}
-.loading i{
-    font-size: 50px ;
-    color: black
-}
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
 
 @keyframes spinner {
       to {transform: rotate(360deg);}
 }
-
+.spinnerContainer{
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    height: 3800px;
+    background-color: #e5e8e8;
+}
+.spinner{
+    position: relative;
+    padding-top: 600px
+}
 .spinner:before {
     content: '';
     box-sizing: border-box;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 50px;
-    height: 50px;
+    top: 53%;
+    left: 48%;
+    width: 60px;
+    height: 60px;
     margin-top: -10px;
     margin-left: -10px;
     border-radius: 50%;
     border: 3px solid #ccc;
-    border-top-color: rgb(0, 98, 102);
+    border-top-color: #2d3436;
     animation: spinner .6s linear infinite;
 }
+
 
 
 section{
@@ -40,8 +39,10 @@ section{
 section h1 {
     text-align: center;
     margin-bottom: 70px;
-    font-weight: 900;
-    font-size: 42px
+    font-weight: bolder !important;
+    font-size: 42px ;
+    font-family: 'Montserrat',sans-serif;
+
 }
 
 #wall{
@@ -82,7 +83,10 @@ section h1 {
     font-size: 60px
 }
 
-
+#services {
+    padding: 30px;
+    background-color: #efefef;
+}
 
 #services h1 {
     padding-top: 150px;
@@ -99,14 +103,10 @@ section h1 {
     color: white;
 }
 
-#services {
-    padding: 30px;  
-    background-color: #efefef;
-}
-
 #services .card {
     padding: 3px;
-    height: 405px;
+    /* height: 405px; */
+    height: 20vw;   /*height relative to screen width*/
     position: relative;
     overflow: hidden;
 }
@@ -119,12 +119,13 @@ section h1 {
     position: absolute;
     top: 0px;
     left: 0px;
+    height: 100%;
+    width: 100%;
     max-width:100%;
     max-height:100%;
     transition: transform 400ms;
     -webkit-backface-visibility: hidden;/* add to fix webkit bug jitter */
     -webkit-transform: perspective(1000px); /* add to fix webkit bug jitter */
-
 }
 
 #services .card:hover img {
@@ -145,9 +146,9 @@ section h1 {
 }
 
 #services .innerCard .view {
-    height: 40px;
+    height: 15%;
     border: solid 3px white;
-    transform: translateY(250%);
+    margin-top: 2.5vw;
     text-align: center;
     cursor: pointer;
 }
@@ -161,6 +162,7 @@ section h1 {
 }
 #services .innerCard p {
     color: white;
+
 }
 
 #vision {
@@ -228,8 +230,10 @@ section h1 {
 #contacts .formy{
     padding-top:70px;
 }
-#contacts .button {
+/* #contacts .button {
     margin-top: 20px;
     width: 40%;
-    transform: translateX(75%);
-}
+    background-color: #2d3436;
+    /* transform: translateX(75%); 
+    width: 100%;
+} */

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NotificationsArray from './NotificationsArray';
-import Header from './Header';
+import {Link} from 'react-router-dom';
+import './Notifications.css'
 
 const axios = require('axios');
 
@@ -11,17 +12,38 @@ class Notifications extends Component {
         notif: []
     }
 
+    getStyleHeader = () => {
+      return {
+        background: '#808000',
+        textalign:'right'
+      }
+    }
+
+    getStyleHome = () => {
+      return {
+        background: '#132180',
+        textalign:'right',
+      }
+    }
+
     componentDidMount() {
-      axios.get('http://localhost:3001/api/notification/')
+      axios.get('http://localhost:3001/api/notification', {
+            'headers': {
+                'userId': '',
+                'userType': ''
+            }
+        })
       .then(res => this.setState({ notif: res.data }))
+      .catch(err=>{
+        console.log(err);
+      })
     }
 
   render() {
     return (
       <div className="Notifications">
-      <Header />
-      <p>You are seeing Notifications</p>
-      <NotificationsArray notifications = {this.state.notif}/>
+        <h5 className='styleHead'>You are seeing Notifications</h5>
+        <NotificationsArray notifications = {this.state.notif}/>
       </div>
     );
   }

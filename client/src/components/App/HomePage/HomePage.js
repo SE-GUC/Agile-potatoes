@@ -2,30 +2,59 @@ import React,{Component} from 'react'
 import './HomePage.css' 
 import {NavLink} from 'react-router-dom'
 import TypeEffect from './TypeEffect/TypeEffect'
+import Axios from 'axios';
 class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true
+      imagesLoaded : 0
+    }
+  }
+  componentDidUpdate(){
+    if(this.state.imagesLoaded == 6){
+      console.log(this.refs.spinner.style);
+      this.refs.spinner.style.display= "none"
     }
   }
 
-  componentDidMount() {
-    this.setState({
-      isLoading: false
-    })
+  handleImageLoaded(){
+    let currCount = this.state.imagesLoaded;
+    this.setState({imagesLoaded:++currCount})
+  }
+  handleImageErrored(){
+    let currCount = this.state.imagesLoaded;
+    this.setState({imagesLoaded:++currCount})
   }
 
+  sendMsg(e){
+    e.preventDefault();
+    let name = this.refs.cname.value;
+    let email = this.refs.cemail.value;
+    let msg = this.refs.cmessage.value;
+    if(name && email && msg){
+      Axios.post(`http://localhost:3001/api/profile/contact`, {
+        email: email,
+        msg: msg,
+        name: name
+      });
+    }
+  }
   render(){
   return (
-    this.state.isLoading ? <div className="spinner"></div>
- : 
+//     this.state.imagesLoaded != 6? 
+//  : 
     <div>
+    <div ref="spinner" className="spinnerContainer">
+      <div className="spinner"></div>
+    </div>          
     <section id="wall" className="container-fluid">
       <img className="figure-img img-fluid" alt="" src={process.env.PUBLIC_URL + '/cam-coffee.jpg'}></img>
       <div className="transparent-layer row">
         <div className="bigTextContainer">
-          <TypeEffect strings={['Create Your Future']}/>
+          {/* <TypeEffect strings={['Create Your Future']}/> */}
+          {/* <TypeEffect strings={['small actions ^600 =>  MAJOR IMPACTS !']}/> */}
+          <TypeEffect strings={['small actions','MAJOR IMPACTS']}/>
+
         </div>
       </div>
     </section>
@@ -35,7 +64,7 @@ class HomePage extends Component {
           <div className="container-fluid">              
               <div className='row'>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="freelancer doing task" src={process.env.PUBLIC_URL + '/task.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="freelancer doing task" src={process.env.PUBLIC_URL + '/task.jpg'}/>
                     <div className="innerCard">
                         <h2>TASKS</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -43,7 +72,7 @@ class HomePage extends Component {
                     </div>
                 </div>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="people working" src={process.env.PUBLIC_URL + '/job.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="people working" src={process.env.PUBLIC_URL + '/job.jpg'}/>
                     <div className="innerCard">
                         <h2>VACANCIES</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -51,7 +80,7 @@ class HomePage extends Component {
                     </div>
                 </div>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="compass pointing at the word career" src={process.env.PUBLIC_URL + '/compass.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="compass pointing at the word career" src={process.env.PUBLIC_URL + '/compass.jpg'}/>
                     <div className="innerCard">
                         <h2>ROAD MAP</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -61,7 +90,7 @@ class HomePage extends Component {
               </div>
               <div className='row'>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="man reviewing other man's work" src={process.env.PUBLIC_URL + '/coach.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="man reviewing other man's work" src={process.env.PUBLIC_URL + '/coach.jpg'}/>
                     <div className="innerCard">
                         <h2>LIFE COACHING</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -69,7 +98,7 @@ class HomePage extends Component {
                     </div>
                 </div>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="tickets" src={process.env.PUBLIC_URL + '/ticket.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="tickets" src={process.env.PUBLIC_URL + '/ticket.jpg'}/>
                     <div className="innerCard">
                         <h2>LIVE EVENTS</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -77,7 +106,7 @@ class HomePage extends Component {
                     </div>
                 </div>
                 <div className="col-sm-4 card">
-                    <img className="img-responsive" alt="man signs on a certificate" src={process.env.PUBLIC_URL + '/cert.jpg'}/>
+                    <img onLoad={this.handleImageLoaded.bind(this)} onError={this.handleImageErrored.bind(this)} className="img-responsive" alt="man signs on a certificate" src={process.env.PUBLIC_URL + '/cert.jpg'}/>
                     <div className="innerCard">
                         <h2>CERTIFICATIONS</h2>
                         <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries</p>
@@ -108,12 +137,12 @@ class HomePage extends Component {
               <form>
                 <div className="form-group">
                   <label htmlFor="name">Name</label>
-                  <input className="form-control" type="text" id="name" name="Name" placeholder="Your Name"/><br/>
+                  <input className="form-control" ref="cname" type="text" id="name" name="Name" placeholder="Your Name"/><br/>
                   <label htmlFor="email">Email</label>
-                  <input className="form-control"  type="email" id="email" name="Email" placeholder="Your Email"/><br/>
+                  <input className="form-control" ref="cemail" type="email" id="email" name="Email" placeholder="Your Email"/><br/>
                   <label htmlFor="msg">Message</label>
-                  <textarea className="form-control" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
-                  <input className="btn btn-lg btn-success button" type="submit" value="Send"/>
+                  <textarea rows="4" className="form-control" ref="cmessage" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
+                  <input className="btn btn-lg btn-dark" type="submit" value="Send" onClick={this.sendMsg.bind(this)}/>
                 </div>
               </form>
           </div>

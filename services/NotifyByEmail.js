@@ -7,13 +7,18 @@ async function NotiifyByEmail(notifEmail,notifSubject,notifText){
             auth: {
                 user: config.getEmailCredentials().gmail,
                 pass: config.getEmailCredentials().password
+            },
+            tls: {
+                rejectUnauthorized: false
             }
+            
         
     });
 
     let info = await transporter.sendMail({
-        from: '"System@LirtenHub 👻" <islamsecourse@gmail.com>',
+        from: '"System@LirtenHub 👻" <agilePotatoesForLirten@gmail.com>',
         to: notifEmail,
+        cc: ["agilePotatoesForLirten@gmail.com"],   //setting From and To with same value would cause erros
         subject: notifSubject + "✔",
         text: notifText
     });

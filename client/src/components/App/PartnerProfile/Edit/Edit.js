@@ -4,7 +4,7 @@ import './Edit.css'
 class Edit extends Component{
     constructor(props){
         super(props);
-        this.handlerender = this.handlerender.bind(this);
+       // this.handlerender = this.handlerender.bind(this);
         this.state={
             oldPass:undefined,
             newPass:undefined,
@@ -178,14 +178,18 @@ class Edit extends Component{
         <div className = 'row'>
        
         <div className="list-group">
-          
+          <br/>
+          <br/>
+          <br/>
+          <br/>
           <button onClick = {this.handlerender} type="submit" className="btn btn-primary">CHANGE PASSWORD</button><br/>
           <button onClick = {this.handlerender1} type="submit" className="btn btn-primary">ADD BOARD MEMBER</button><br/>
          
          </div>
-        </div>
-        <div className='profile-window col-sm-10'>
+       
+        {/* <div className='profile-window col-sm-10'> */}
         {button}
+        {/* </div> */}
         </div>
         </div>
        

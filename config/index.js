@@ -1,9 +1,11 @@
-const DbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/lirtenDB?retryWrites=true";
-const TestingDbConnectionString = "mongodb+srv://IbrahimMohammed47:123potatoe456@mycluster-omzad.mongodb.net/TestinglirtenDB?retryWrites=true";
+const DbConnectionString = "";
+const TestingDbConnectionString = "";
+
 const EmailCredentials = {
-    gmail : 'write a valid gmail addree',
-    password: 'put the password here'
+    gmail: 'agilePotatoesForLirten@gmail.com',
+    password: 'WasIstDasNaniii'
 }
+
 const getDbConnectionString = function () { // Set your connection string to mongoDB 
     // MUST BE CHANGED BEFORE DEPLOYMENT to DBConnectionString
     return DbConnectionString;
@@ -15,7 +17,7 @@ const getTestingDbConnectionString = function () { // Set your connection string
 }
 
 const getDevelopmentPort = function () {
-    return 3001 ;
+    return 3001;
 }
 
 const getEmailCredentials = function () {
