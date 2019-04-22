@@ -443,8 +443,8 @@ router.put('/:id/approve', function (req, res) {
 	var eveId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(eveId).exec(function (err, event) {
-			if (event.eventStatus !== 'Open')
-				Event.findByIdAndUpdate(eveId, { eventStatus: "Open" },
+			if (event.eventStatus !== 'Approved')
+				Event.findByIdAndUpdate(eveId, { eventStatus: "Approved" },
 					function (err, response) {
 						response.save();
 						return res.send("updated");
