@@ -1,0 +1,6 @@
+.link-button, .brand-button {
+    text-decoration: none;
+    justify-content: center;        
+    -webkit-transition: background-color .4s;
+    transition: background-color .4s;
+}

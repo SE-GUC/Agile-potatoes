@@ -25,6 +25,9 @@ import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
 import MemberProfile from './Profiles/MemberProfile/MemberProfile'
 import AdminProfile from './AdminProfile/AdminProfile'
 import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
+import PartnerForm from './CreatePartnerForm/CreatePartnerForm'
+import MemberForm from './CreateMemberForm/CreateMemberForm'
+import SignUp from './SignUp/SignUp'
 class App extends Component {
 
   constructor(props) {
@@ -52,7 +55,14 @@ class App extends Component {
             <Route exact path="/adminprofile" component={AdminProfile}/>
             <Route exact path="/partnerprofile" component={PartnerProfile}/>
             <Route exact path="/memberprofile" component={MemberProfile}/>
+
+            <Route exact path="/signupmember" component={MemberForm}/>
+            <Route exact path="/signuppartner" component={PartnerForm}/>
+            <Route exact path="/signup" component={SignUp}/>
+
+
             <Route exact path="/notifications" component={Notifications}/>
+
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
