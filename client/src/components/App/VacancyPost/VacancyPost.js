@@ -42,13 +42,13 @@ class VacancyPost extends Component {
         ...this.state.vacancyData,
         hired: hired.data,
       },
-        duration: vacancy.data.duration,
-        location: vacancy.data.location,
-        description: vacancy.data.description,
-        salary: vacancy.data.salary,
-        dailyHours: vacancy.data.dailyHours,
-        name: vacancy.data.name,
-        city: vacancy.data.city
+      duration: vacancy.data.duration,
+      location: vacancy.data.location,
+      description: vacancy.data.description,
+      salary: vacancy.data.salary,
+      dailyHours: vacancy.data.dailyHours,
+      name: vacancy.data.name,
+      city: vacancy.data.city
     })
     this.checkIfAlreadyApplied();
   }
@@ -84,7 +84,7 @@ class VacancyPost extends Component {
     });
     console.log(this.state.vacancyData);
   }
-  
+
   async onClickApprove() {
     await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
       "userType": "Admin",
@@ -116,16 +116,16 @@ class VacancyPost extends Component {
 
   onClickApply = (e) => {
     let flag = true;
-    if(this.state.vacancyData.status !== 'Open')
+    if (this.state.vacancyData.status !== 'Open')
       flag = false;
-    
+
     //e.preventDefault();
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {
       "userID": this.state.userData._id,
       "userType": this.state.userData.userType
     }).then(
       this.setState({
-        userHasApplied: (true&flag)
+        userHasApplied: (true & flag)
       }))
       .catch(err => {
         console.log(err.response.data);
@@ -270,9 +270,14 @@ class VacancyPost extends Component {
   }
 
   onClickDelete = (e) => {
-    axios.delete(`http://localhost:3001/api/vacancy/${this.state.postID}/deleteVacancy`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
+    //delete has to be called this way because axios does not support body with delete requests
+    axios({
+      method: 'DELETE',
+      url: `http://localhost:3001/api/vacancy/${this.state.postID}/deleteVacancy`,
+      data: {
+        "userType": this.state.userData.userType,
+        "userID": this.state.userData._id
+      }
     })
 
     //need to rereoute to home page somehow now

@@ -186,24 +186,37 @@ router.get('/RecommendedEvents', function (req, res) {
 router.delete('/:evid/deleteEvent', function (req, res) {
 	var userType = req.body.userType;
 	var evId = req.params.evid;
-	var userId = req.body.userid;
-
+	var userID = req.body.userID;
+	console.log("I am deleting event")
 	if (userType == 'Partner') {
 		Event.findById(evId)
 			.exec(function (err, event) {
-				if (event.status == 'Submitted' && event.partner == userId) {
-					Event.findByIdAndRemove(event, function (err, result) {
-						if (err) {
-							console.log(err);
-							handleError(err);
-						}
-						event.save();
-					});
+				if(err) res.status(400).send
+				if (event.eventStatus == 'Submitted' && event.partner == userID) {
+					Event.findByIdAndRemove(evId, function (err, event1) {
+						if (err) res.status(400).send('Got a database error while deleting')
+						if(!event1) res.status(404).send('Cannot find event')
+						console.log(event1)
+						event1.save();
+					}).then(res.send('Deleted successfully'));
 				}
 
 			});
 	}
-	return res.send("deleted event successfully");
+	
+	// if (userType == 'Partner') {
+	// 	Event.findById(evId)
+	// 		.exec(function (err, event) {
+	// 			if (event.status == 'Submitted' && event.partner == userId) {
+	// 				Event.findByIdAndRemove(evId, function (err, result) {
+	// 					if (err) res.status(400).send('Got a database error while deleting')
+	// 					if(!event) res.status(404).send('Cannot find event')
+	// 					event.save();
+	// 				});
+	// 			}
+
+	// 		});
+	// }
 });
 
 // Story 21.2 display an event post for partner/admin/member

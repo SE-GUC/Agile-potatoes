@@ -88,7 +88,8 @@ class EventPostNew extends Component {
       this.setState({
         loaded: true
       });
-
+    console.log(this.state.eventData.partner._id)
+    console.log(this.state.userData._id)
     console.log(this.state.eventData);
   }
 
@@ -217,7 +218,7 @@ class EventPostNew extends Component {
     axios
       .put(
         `http://localhost:3001/api/event/${
-        this.state.eventData._id
+        this.state.postID
         }/closeMyEvent`,
         {
           "userType": this.state.userData.userType,
@@ -247,7 +248,7 @@ class EventPostNew extends Component {
     axios
       .put(
         `http://localhost:3001/api/event/${
-        this.state.eventData._id
+        this.state.postID
         }/reOpenMyEvent`,
         {
           "userType": this.state.userData.userType,
@@ -269,6 +270,23 @@ class EventPostNew extends Component {
         this.refs.alert.innerText = err.response.data;
         this.refs.alert.style.display = "block";
       });
+  }
+
+  onClickDelete = (e) => {
+    //delete has to be called this way because axios does not support body with delete requests
+    axios({
+      method: 'DELETE',
+      url: `http://localhost:3001/api/event/${this.state.postID}/deleteEvent`,
+      data: {
+        "userType": this.state.userData.userType,
+        "userID": this.state.userData._id
+      }
+    })
+      .catch(err => {
+        this.refs.alert.innerText = err.response.data;
+        this.refs.alert.style.display = "block";
+      });
+    //need to rereoute to home page somehow now
   }
 
   render() {
@@ -407,7 +425,7 @@ class EventPostNew extends Component {
                 &&
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
-                (this.state.userData._id === this.state.eventData.partner)
+                (this.state.userData._id === this.state.eventData.partner._id)
                 &&
                 <div>
                   <br /><br /><br />
@@ -419,11 +437,11 @@ class EventPostNew extends Component {
                 &&
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
-                (this.state.userData._id === this.state.eventData.partner)
+                (this.state.userData._id === this.state.eventData.partner._id)
                 &&
                 <div>
                   <br /><br /><br />
-                  <button className="btn btn-danger ctrl-button col-sm-12 ">Delete Event</button>
+                  <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Event</button>
                 </div>
               }
               {
