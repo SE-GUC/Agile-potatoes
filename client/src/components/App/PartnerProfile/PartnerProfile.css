@@ -8,6 +8,15 @@
     padding-right: 0px;
     text-align: center;
 }
+.eventCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1px;
+    height:50px;
+    position: relative;
+}
 
 .side-bar button {
     width: 100%;
@@ -39,4 +48,13 @@
     left:20px;
     bottom: 20px;
 }
+
+
+.link-button, .brand-button {
+    text-decoration: none;
+    justify-content: center;        
+    -webkit-transition: background-color .4s;
+    transition: background-color .4s;
+}
+
 

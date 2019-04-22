@@ -27,8 +27,10 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	// let eventDate = moment();
 	// eventDate = moment(req.body.eventDate + '');
 	// eventDate.day(eventDate.day() + 1)
-	var eventDate = req.body.eventDate;
-	var remainingPlaces = req.body.places;
+	// var eventDate = req.body.eventDate;
+	// var remainingPlaces = req.body.places;
+	var eventDate = req.body.eventDate
+	var remainingPlaces = req.body.remainingPlaces;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
@@ -43,12 +45,13 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			price: price,
 			location: location,
 			city: city,
-			eventDate: eventDate,
+			eventDate: Date(eventDate),
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
 			speakers: speakers,
-			topics: topics
+			topics: topics,
+			admin: userId
 		});
 		event.save(function (err, eve) {
 			if (err) return res.status(400).send(err);
@@ -67,7 +70,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			description: description,
 			price: price,
 			location: location,
-			eventDate: eventDate,
+			eventDate: Date(eventDate),
 			eventStatus: 'Submitted',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
@@ -191,11 +194,11 @@ router.delete('/:evid/deleteEvent', function (req, res) {
 	if (userType == 'Partner') {
 		Event.findById(evId)
 			.exec(function (err, event) {
-				if(err) res.status(400).send
+				if (err) res.status(400).send
 				if (event.eventStatus == 'Submitted' && event.partner == userID) {
 					Event.findByIdAndRemove(evId, function (err, event1) {
 						if (err) res.status(400).send('Got a database error while deleting')
-						if(!event1) res.status(404).send('Cannot find event')
+						if (!event1) res.status(404).send('Cannot find event')
 						console.log(event1)
 						event1.save();
 					}).then(res.send('Deleted successfully'));
@@ -203,7 +206,7 @@ router.delete('/:evid/deleteEvent', function (req, res) {
 
 			});
 	}
-	
+
 	// if (userType == 'Partner') {
 	// 	Event.findById(evId)
 	// 		.exec(function (err, event) {
@@ -408,7 +411,7 @@ router.post('/:id/comment', function (req, res) {
 						description: 'Partner commented on your event request'
 					});
 					NotifyByEmail(event.partner.email, 'New comment on event that you added before',
-						`Admin commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
+						`Admin commented on your event request \n go to link: http://localhost:3000/events/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByAdmin);
@@ -426,7 +429,7 @@ router.post('/:id/comment', function (req, res) {
 						description: 'Partner commented on your event request'
 					});
 					NotifyByEmail(event.admin.email, 'New comment on event that you follow',
-						`Partner commented on your event request \n go to link: http://localhost:3000/api/event/Post/${evId}`)
+						`Partner commented on your event request \n go to link: http://localhost:3000/events/${evId}`)
 				}
 				await event.save();
 				return res.status(201).send(event.commentsByPartner);

@@ -38,7 +38,7 @@ router.post('/:id/comment', (req, res, next) => {
                     description: 'Admin commented on your vacancy request'
                 });
                 NotifyByEmail(vacancy.partner.email, 'New comment on vacancy that you follow',
-                    `Admin commented on your vacancy request \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                    `Admin commented on your vacancy request \n go to link: http://localhost:3000/vacancies/${vacId}`)
                 await vacancy.save(); //DON'T FORGET TO SAVE DOCUMENT INTO DATABASEs
                 return res.status(201).send(vacancy.commentsByAdmin);
             })
@@ -64,7 +64,7 @@ router.post('/:id/comment', (req, res, next) => {
                         description: 'Partner commented on his vacancy request'
                     });
                     NotifyByEmail(vacancy.admin.email, 'New comment on vacancy that you follow',
-                        `Partner commented on his vacancy \n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        `Partner commented on his vacancy \n go to link: http://localhost:3000/vacancies/${vacId}`)
                 }
                 await vacancy.save();
                 return res.status(201).send(vacancy.commentsByPartner);
@@ -278,40 +278,38 @@ router.get('/RecommendedVacancies', function (req, res, next) {
 router.put('/:id/status', function (req, res) {
     var userType = req.body.userType;
     var vacId = req.params.id;
-    var vacStatus = req.body.status;
-    var partnerid = req.body.partner;
+    var status = req.body.status;
+    var partner = req.body.partner;
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted') {
-                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus })
-                    .populate('partner', 'name')
-                    .exec({
+                Vacancy.findByIdAndUpdate(vacId, { status: status },
                         function(err, response) {
                             console.log(response);
-                            return res.send(response);
+                            return res.send("Status Updated");
                         }
-                    });
-                if (vacStatus === 'Approved') {
+                    );
+                if (status === 'Open') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
                         "Admin has approved your vacancy request and it members can apply for it now,"
                         + " please don't try to edit it as long as it is approved"
-                        + `\n go to link: http://localhost:3000/api/vacancy/Post/${vacId}`)
+                        + `\n go to link: http://localhost:3000/vacancies/${vacId}`)
                 }
             }
             else
-                return res.send("This vacancy is already opened and you are not allowed to change its status")
+                return res.send("This vacancy is either opened or closed and you are not allowed to change its status")
         })
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open' && vacancy.partner == partnerid)
-                Vacancy.findByIdAndUpdate(vacId, { status: vacStatus },
+            if (vacancy.status == 'Open' && vacancy.partner == partner)
+                Vacancy.findByIdAndUpdate(vacId, { status: status },
                     function (err, response) {
                         console.log(response);
-                        return res.send(response);
+                        return res.send("Status Updated");
                     });
             else
-                return res.send("You are not allowed to change the status of this vacancy")
+                return res.send("This vacancy may be opened or closed, or may not belong to you and you are not allowed to change its status")
         })
     }
 
