@@ -14,7 +14,7 @@ class NotificationsArray extends Component {
 
   getStyleBackground = () => {
     return {
-      background: '#A9A9A9'
+      background: '#A9A9A9',
     }
   }
 
@@ -28,10 +28,11 @@ class NotificationsArray extends Component {
 
   render() {
     return this.props.notifications.map((notification) => (
-      //<NotificationElement notification={notification} />
-      <p style={this.getStyleBackground()}> <p style={this.getStyleDescription()}> {notification.description} </p>
-      <p style={this.getStyleLink()}> <Link to ={notification.srcURL} > "go to link" </Link> </p>
-      </p>
+      <div key={notification._id}>
+        <p style={this.getStyleBackground()}> <p style={this.getStyleDescription()}> {notification.description} </p>
+        <p style={this.getStyleLink()}> <Link to ={notification.srcURL} > "go to link" </Link> </p>
+        </p>
+      </div>
     ));
   }
 }
