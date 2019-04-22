@@ -378,12 +378,13 @@ router.put('/:id', async (req, res) => {
 
 router.post('/:id/comment', function (req, res) {
 	var userType = req.body.userType;
-	var userId = req.body.userId;
+	var userId = req.body.userID;
 	var comment = req.body.comment;
 	var evId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(evId).populate('partner') //notifying partner
 			.exec(async (err, event) => {
+				console.log('pushing into admin comment section!')
 				event.commentsByAdmin.push({
 					text: comment,
 					author: userId
