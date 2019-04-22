@@ -19,6 +19,7 @@ class EventPostNew extends Component {
       userHasBooked: false,
       Edit: false,
       eventData: {},
+      feedback: '',
       eventEditedData: {
         date: "",
         location: "",
@@ -36,9 +37,14 @@ class EventPostNew extends Component {
   }
 
   handleChange(e) {
-    this.setState({
-      eventEditedData: { [e.target.name]: e.target.value }
-    });
+    if (e.targer.name === 'feedback')
+      this.setState({
+        feedback: e.target.value
+      })
+    else
+      this.setState({
+        eventEditedData: { [e.target.name]: e.target.value }
+      });
   }
 
   async componentDidMount() {
@@ -339,7 +345,7 @@ class EventPostNew extends Component {
 
                   <br />
                   <div className="input-group mb-3">
-                    <input type="text" className="form-control" />
+                    <input type="text" name ="feedback" className="form-control" />
                     <div className="input-group-append">
                       <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
                     </div>
