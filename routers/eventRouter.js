@@ -24,10 +24,8 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
-	let eventDate = moment();
-	eventDate = moment(req.body.eventDate + '');
-	eventDate.day(eventDate.day() + 1)
-	var remainingPlaces = req.body.places;
+	var eventDate = req.body.eventDate
+	var remainingPlaces = req.body.remainingPlaces;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
@@ -42,12 +40,13 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			price: price,
 			location: location,
 			city: city,
-			eventDate: eventDate,
+			eventDate: Date(eventDate),
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
 			speakers: speakers,
-			topics: topics
+			topics: topics,
+			admin:userId
 		});
 		event.url = '/api/event/Post/' + event._id
 		event.save(function (err, eve) {
@@ -67,7 +66,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			description: description,
 			price: price,
 			location: location,
-			eventDate: eventDate,
+			eventDate: Date(eventDate),
 			eventStatus: 'Submitted',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
