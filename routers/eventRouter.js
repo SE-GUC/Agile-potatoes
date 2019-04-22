@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
@@ -470,6 +469,26 @@ router.put('/:id/notAttending', function (req, res) {
 		res.send("Marked you as not-attending");
 	}
 });
+
+//as a member i can submit feedback on an event
+router.put('/:id/feedback', function (req, res) {
+	var eventID = req.params.id;
+	var feedback = req.body.feedback;
+	var userType = req.body.userType;
+	if (userType === 'Member') {
+		Event.findById(eventID).exec(function (err, event) {
+			if (!event) req.status(404).send('Cannot find event');
+			else {
+				event.feedbacks.push(feedback);
+				event.save(res => {
+					req.send('Feedback added successfully');
+				})
+			}
+		})
+	}
+	else
+		res.status(400).send('Invalid user type');
+})
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }))
