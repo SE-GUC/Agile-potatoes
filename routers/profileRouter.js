@@ -515,6 +515,7 @@ router.post('/login', (req, res) => {
                     })
                 }
             })
+        })
     router.get('/viewAllPartners',(req,res) =>{
         var userType = req.body.userType;
             if(userType=='Admin'){

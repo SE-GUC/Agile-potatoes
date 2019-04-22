@@ -40,7 +40,7 @@ export class Navbar extends Component {
                         ) : (
                             <div className="right-nav col-sm-4 row">
                                 <NavLink to="/login" className="link-button offset-sm-6 col-sm-3"><p className="text-center">Log In  <i className="fas fa-sign-in-alt"></i></p></NavLink>
-                                <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Sign Up</p></NavLink>
+                                <NavLink to="/signup" className="link-button col-sm-3"><p className="text-center">Sign Up</p></NavLink>
                             </div>)
                 }
             </nav>
