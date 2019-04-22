@@ -20,19 +20,25 @@
     padding-top: 50px;
 }
 
-.memprofileCard {
+
+.profileCard {
+
     width: 18rem;
     background-color: aquamarine;
     margin-right: 100px;
     margin-bottom: 100px;
     margin-top: 100px; 
     margin-left: 50px; 
-    height:450px;
+
+    height:350px;
+
     position: relative;
 }
 
 
-.memprofileCard span{
+.profileCard span{
+
+
     float: left;
     position: absolute;
     left:20px;
