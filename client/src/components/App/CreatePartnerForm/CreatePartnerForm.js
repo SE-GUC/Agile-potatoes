@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import '../Profiles/PartnerProfile/PartnerProfile.css'
+import '../PartnerProfile/PartnerProfile.css'
 class CreatePartnerForm extends Component {
     constructor(props){
         super(props);
