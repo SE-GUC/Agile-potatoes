@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
@@ -24,6 +23,12 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
+	//wtf??
+	// let eventDate = moment();
+	// eventDate = moment(req.body.eventDate + '');
+	// eventDate.day(eventDate.day() + 1)
+	// var eventDate = req.body.eventDate;
+	// var remainingPlaces = req.body.places;
 	var eventDate = req.body.eventDate
 	var remainingPlaces = req.body.remainingPlaces;
 	var eventType = req.body.eventtype;
@@ -46,19 +51,18 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			eventType: eventType,
 			speakers: speakers,
 			topics: topics,
-			admin:userId
+			admin: userId
 		});
-		event.url = '/api/event/Post/' + event._id
 		event.save(function (err, eve) {
-			if (err) throw err;
-			console.log(eve);
+			if (err) return res.status(400).send(err);
+			else res.send('created event for admin successfully');
 		})
+		event.url = '/api/event/Post/' + event._id
 		Admin.findById(userId).exec(function (err, admin) {
-			console.log(admin.event);
+			if (err) return res.send(err);
 			admin.events.push(event._id)
 			admin.save();
 		});
-		return res.send('created event for admin successfully');
 	}
 	else if (userType == 'Partner') {
 		var event = new Event({
@@ -74,20 +78,19 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			topics: topics,
 			partner: userId
 		});
-
-		event.url = '/api/event/Post' + event._id
 		event.save(function (err, eve) {
-			if (err) throw err;
-			console.log(eve);
+			if (err) return res.send(err);
+			else res.send('created event for partner successfully');
 		})
+		event.url = '/api/event/Post' + event._id
 		Partner.findById(userId).exec(function (err, partner) {
-			console.log(partner.event);
+			//console.log(partner.event);
 			partner.events.push(event._id)
 			partner.save();
 		});
-
-		return res.send('created event for partner successfully');
 	}
+	else
+		return res.status(400).send('Cannot create event');
 });
 
 //15
@@ -186,24 +189,37 @@ router.get('/RecommendedEvents', function (req, res) {
 router.delete('/:evid/deleteEvent', function (req, res) {
 	var userType = req.body.userType;
 	var evId = req.params.evid;
-	var userId = req.body.userid;
-
+	var userID = req.body.userID;
+	console.log("I am deleting event")
 	if (userType == 'Partner') {
 		Event.findById(evId)
 			.exec(function (err, event) {
-				if (event.status == 'Submitted' && event.partner == userId) {
-					Event.findByIdAndRemove(event, function (err, result) {
-						if (err) {
-							console.log(err);
-							handleError(err);
-						}
-						event.save();
-					});
+				if (err) res.status(400).send
+				if (event.eventStatus == 'Submitted' && event.partner == userID) {
+					Event.findByIdAndRemove(evId, function (err, event1) {
+						if (err) res.status(400).send('Got a database error while deleting')
+						if (!event1) res.status(404).send('Cannot find event')
+						console.log(event1)
+						event1.save();
+					}).then(res.send('Deleted successfully'));
 				}
 
 			});
 	}
-	return res.send("deleted event successfully");
+
+	// if (userType == 'Partner') {
+	// 	Event.findById(evId)
+	// 		.exec(function (err, event) {
+	// 			if (event.status == 'Submitted' && event.partner == userId) {
+	// 				Event.findByIdAndRemove(evId, function (err, result) {
+	// 					if (err) res.status(400).send('Got a database error while deleting')
+	// 					if(!event) res.status(404).send('Cannot find event')
+	// 					event.save();
+	// 				});
+	// 			}
+
+	// 		});
+	// }
 });
 
 // Story 21.2 display an event post for partner/admin/member
@@ -378,12 +394,13 @@ router.put('/:id', async (req, res) => {
 
 router.post('/:id/comment', function (req, res) {
 	var userType = req.body.userType;
-	var userId = req.body.userId;
+	var userId = req.body.userID;
 	var comment = req.body.comment;
 	var evId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(evId).populate('partner') //notifying partner
 			.exec(async (err, event) => {
+				console.log('pushing into admin comment section!')
 				event.commentsByAdmin.push({
 					text: comment,
 					author: userId
@@ -442,8 +459,8 @@ router.put('/:id/approve', function (req, res) {
 	var eveId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(eveId).exec(function (err, event) {
-			if (event.eventStatus !== 'Open')
-				Event.findByIdAndUpdate(eveId, { eventStatus: "Open" },
+			if (event.eventStatus !== 'Approved')
+				Event.findByIdAndUpdate(eveId, { eventStatus: "Approved" },
 					function (err, response) {
 						response.save();
 						return res.send("updated");
@@ -469,6 +486,26 @@ router.put('/:id/notAttending', function (req, res) {
 		res.send("Marked you as not-attending");
 	}
 });
+
+//as a member i can submit feedback on an event
+router.put('/:id/feedback', function (req, res) {
+	var eventID = req.params.id;
+	var feedback = req.body.feedback;
+	var userType = req.body.userType;
+	if (userType === 'Member') {
+		Event.findById(eventID).exec(function (err, event) {
+			if (!event) res.status(404).send('Cannot find event');
+			else {
+				event.feedbacks.push(feedback);
+				event.save(e => {
+					res.send('Feedback added successfully');
+				})
+			}
+		})
+	}
+	else
+		res.status(400).send('Invalid user type');
+})
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }))
