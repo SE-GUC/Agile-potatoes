@@ -484,7 +484,7 @@ router.get('/:id/hired', function (req, res) {
     Vacancy.findById(vacID, 'hired')
         .populate('hired', 'fname lname ProfileURL')
         .exec(function (err, vacancy) {
-            if (err) res.status(400).send('Error vacancy not found');
+            if (!vacancy) res.status(400).send('Error vacancy not found');
             res.send(vacancy.hired);
         })
 })
