@@ -1,5 +1,5 @@
-const DbConnectionString = " ";
-const TestingDbConnectionString = " ";
+const DbConnectionString = "";
+const TestingDbConnectionString = "";
 
 const EmailCredentials = {
     gmail: 'agilePotatoesForLirten@gmail.com',

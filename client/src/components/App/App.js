@@ -8,8 +8,7 @@ import EventsContainer from './EventsContainer/EventsContainer'
 // import EventPost from './EventPost/Event'
 // import GetApplicants from '../GetApplicants/GetApplicants.js';
 // import { BrowserRouter as Router, Route } from 'react-router-dom';
-// import Notifications from '../Notifications/Notifications';
-// import Header from '../Notifications/AppHeader';
+ import Notifications from '../Notifications/Notifications';
 // import GetPendingEventsAdmin from './GetPendingEventsAdmin/GetPendingEventsAdmin'
 // import CreatingVacForm from './CreatingVacForm'
 // import GetPendingVacanciesAdmin from './GetPendingVacanciesAdmin'
@@ -22,10 +21,13 @@ import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
 import Login from './Sign In/Login';
 import Footer from './Footer/Footer'
-import PartnerProfile from './Profiles/PartnerProfile/PartnerProfile'
-import MemberProfile from './Profiles/MemberProfile/MemberProfile'
+import PartnerProfile from './PartnerProfile/PartnerProfile'
+import MemberProfile from './MemberProfile/MemberProfile'
 import AdminProfile from './AdminProfile/AdminProfile'
 import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
+import PartnerForm from './CreatePartnerForm/CreatePartnerForm'
+import MemberForm from './CreateMemberForm/CreateMemberForm'
+import SignUp from './SignUp/SignUp'
 class App extends Component {
 
   constructor(props) {
@@ -53,7 +55,14 @@ class App extends Component {
             <Route exact path="/adminprofile" component={AdminProfile}/>
             <Route exact path="/partnerprofile" component={PartnerProfile}/>
             <Route exact path="/memberprofile" component={MemberProfile}/>
-            <Route exact path="/notifications" component={HomePage}/>
+
+            <Route exact path="/signupmember" component={MemberForm}/>
+            <Route exact path="/signuppartner" component={PartnerForm}/>
+            <Route exact path="/signup" component={SignUp}/>
+
+
+            <Route exact path="/notifications" component={Notifications}/>
+
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
@@ -69,7 +78,6 @@ class App extends Component {
             <CreatingVacForm />
         <Router>
           <div className="App1">
-            <Header />
             <Route exact path="/notifications" render={props => (
               <React.Fragment>
                 <Notifications />

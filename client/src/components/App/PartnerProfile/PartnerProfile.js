@@ -2,9 +2,11 @@ import React,{Component} from 'react'
 import axios from 'axios'
 import Edit from './Edit/Edit'
 import './PartnerProfile.css'
+
 import { NavLink } from 'react-router-dom'
 import CreateEvent from '../CreateEvent/CreateEvent'
 import CreateVacany from '../CreatingVacForm'
+
 class PartnerProfile extends Component{
     constructor(props){
         super(props);
@@ -22,6 +24,7 @@ class PartnerProfile extends Component{
                 boardMembers:[],
                 notifications:[],
                 feedbacks:[],
+
                 toggle:4,
             }
         }
@@ -34,10 +37,12 @@ class PartnerProfile extends Component{
     {
         this.setState({toggle:1})
     }
+
     handleChangeCreate=()=>
     {
         this.setState({toggle:2})
     }
+
     handleChangeProf=()=>
     {
         this.setState({toggle:0})
@@ -86,7 +91,9 @@ class PartnerProfile extends Component{
               <br/>
               { "Membership State: "+this.state.userProfile.membershipState}
              </ul>
+
              <button onClick = {this.getProfile}className="btn btn-primary">SHOW PROFILE</button>
+
            </div> 
            </div>
            
@@ -97,12 +104,14 @@ class PartnerProfile extends Component{
             {
                 func = <Edit/>
             }
+
             else{
                 if(this.state.toggle == 2)
                 {
                     func = <CreateEvent/>
                 }
             }
+
         }
         return (
            
@@ -114,8 +123,10 @@ class PartnerProfile extends Component{
              <h1>PARTNER PROFILE</h1>
                      <button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
                      <button onClick = {this.handleChangeEdit} className="list-group-item list-group-item-action">EDIT PROFILE</button>
+
                      <NavLink to="/createEvent" onClick = {this.handleChangeCreate} className="link-button"><p>CREATE EVENT</p></NavLink>
                      <NavLink to="/createEvent" onClick = {this.handleChangeCreateVac} className="link-button"><p>CREATE VACANCY</p></NavLink>
+
                  </div>
                  </div>
                 
