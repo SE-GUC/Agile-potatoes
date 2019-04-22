@@ -419,25 +419,25 @@ router.put('/:id/', function (req, res) {  //submitting edited vacancy
     var name = req.body.name;
 
     Vacancy.findById(vacId).exec(function (err, vacancy) {
-        if (err) {
-            return res.status(404).send(err);
-        }
-        if (vacancy.status == 'Submitted') {
-            vacancy.name = name;
-            vacancy.city = city;
-            vacancy.duration = duration;
-            vacancy.location = location;
-            vacancy.description = description;
-            vacancy.salary = salary;
-            vacancy.dailyHours = dailyHours;
-            vacancy.save(function (err, done) {
-                if (err) res.status(400).send("Very weird error, sorry, can't handle it.")
-                else res.send(vacancy);
-            });
-        }
-        else {
-            return res.status(400).send('Vacancy cannot be edited after being approved');
-        }
+        if (!vacancy)
+            return res.status(404).send('Vacancy not found')
+        else
+            if (vacancy.status == 'Submitted') {
+                vacancy.name = name;
+                vacancy.city = city;
+                vacancy.duration = duration;
+                vacancy.location = location;
+                vacancy.description = description;
+                vacancy.salary = salary;
+                vacancy.dailyHours = dailyHours;
+                vacancy.save(function (err, done) {
+                    if (err)
+                        res.status(400).send("Very weird error, sorry, can't handle it.")
+                    else res.send(vacancy);
+                });
+            }
+            else
+                return res.status(400).send('Vacancy cannot be edited after being approved');
     })
 });
 

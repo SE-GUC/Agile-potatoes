@@ -50,13 +50,6 @@ class VacancyPost extends Component {
         name: vacancy.data.name,
         city: vacancy.data.city
     })
-    console.log(this.state.description);
-    console.log(this.state.location);
-    console.log(this.state.salary);
-    console.log(this.state.dailyHours);
-    console.log(this.state.name);
-    console.log(this.state.city);
-    console.log(this.state.vacancyData.hired.includes(this.state.userData._id))
     this.checkIfAlreadyApplied();
   }
 
@@ -118,7 +111,7 @@ class VacancyPost extends Component {
     });
     console.log(resp.data);
     this.setState({ Edit: false });
-    //window.location.reload();
+    window.location.reload();
   }
 
   onClickApply = (e) => {
@@ -436,6 +429,7 @@ class VacancyPost extends Component {
                 (this.state.vacancyData.status === 'Closed')
                 &&
                 <div className="input-group mb-3">
+                  <span className="text-muted"> Submit your feedback on this Partner </span>
                   <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>

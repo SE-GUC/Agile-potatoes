@@ -32,12 +32,10 @@ class EventPostNew extends Component {
         remPlaces: ""
       }
     };
-
-    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange(e) {
-    if (e.targer.name === 'feedback')
+  handleChange = (e) => {
+    if (e.target.name === 'feedback')
       this.setState({
         feedback: e.target.value
       })
@@ -50,7 +48,6 @@ class EventPostNew extends Component {
   async componentDidMount() {
     await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
       .then(res => {
-        console.log(res)
         this.setState({
           eventData: res.data
         })
@@ -101,15 +98,15 @@ class EventPostNew extends Component {
       "userType": this.state.userData.userType,
       "comment": this.state.feedback,
     });
-    //hopefully getting the updated vacancy with the new comments
-    await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`)
-      .then(updatedVacancy => {
-        console.log(updatedVacancy);
+    //hopefully getting the updated event with the new comments
+    await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
+      .then(updatedEvent => {
+        console.log(updatedEvent);
         this.setState({
-          vacancyData: {
-            ...this.state.vacancyData,
-            commentsByAdmin: updatedVacancy.data.commentsByAdmin,
-            commentsByPartner: updatedVacancy.data.commentsByPartner
+          eventData: {
+            ...this.state.eventData,
+            commentsByAdmin: updatedEvent.data.commentsByAdmin,
+            commentsByPartner: updatedEvent.data.commentsByPartner
           }
         })
       })
@@ -161,7 +158,7 @@ class EventPostNew extends Component {
         Edit: false
       });
     })
-    // window.location.reload();
+    window.location.reload();
   }
 
 
@@ -200,6 +197,22 @@ class EventPostNew extends Component {
       }));
   }
 
+  submitFeedbackEvent = (e) => {
+    axios.put(`http://localhost:3001/api/event/${this.state.postID}/feedback`, {
+      "userType": this.state.userData.userType,
+      "feedback": this.state.feedback
+    })
+      .then(this.setState({
+        feedback: ''
+      }))
+      .catch(err => {
+        console.log(err.response.data);
+        this.refs.alert.innerText = err.response.data;
+        console.log(this.refs.alert);
+        this.refs.alert.style.display = "block";
+      })
+  }
+
   closeEvent() {
     axios
       .put(
@@ -207,8 +220,8 @@ class EventPostNew extends Component {
         this.state.eventData._id
         }/closeMyEvent`,
         {
-          userType: this.state.userData.userType,
-          userId: this.state.userData._id
+          "userType": this.state.userData.userType,
+          "userId": this.state.userData._id
         }
       )
       .then(res => {
@@ -237,8 +250,8 @@ class EventPostNew extends Component {
         this.state.eventData._id
         }/reOpenMyEvent`,
         {
-          userType: this.state.userData.userType,
-          userId: this.state.userData._id
+          "userType": this.state.userData.userType,
+          "userId": this.state.userData._id
         }
       )
       .then(res => {
@@ -345,10 +358,24 @@ class EventPostNew extends Component {
 
                   <br />
                   <div className="input-group mb-3">
-                    <input type="text" name ="feedback" className="form-control" />
+                    <input type="text" name="feedback" className="form-control" onChange={this.handleChange} />
                     <div className="input-group-append">
                       <button className="btn btn-primary" type="button" onClick={this.onClickComment.bind(this)}>Add comment</button>
                     </div>
+                  </div>
+                </div>
+              }
+
+              {
+                (this.state.eventData.attendees.some(attendee => attendee._id === this.state.userData._id))
+                &&
+                (this.state.eventData.eventStatus === 'Finished')
+                &&
+                <div className="input-group mb-3">
+                  <span className="text-muted"> Submit your feedback on this Event</span>
+                  <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
+                  <div className="input-group-append">
+                    <button className="btn btn-primary" type="button" onClick={this.submitFeedbackEvent}>Submit Feedback</button>
                   </div>
                 </div>
               }
@@ -358,12 +385,13 @@ class EventPostNew extends Component {
               <p className="text-center h3">{this.state.eventData.price} EGP</p>
               {
                 this.state.userHasBooked ? (
-                  <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0} onClick={this.onClickCancel} >CANCEL</button>
+                  <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickCancel} >CANCEL</button>
                 ) : (
-                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0} onClick={this.onClickBook} >BOOK NOW</button>
+                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickBook} >BOOK NOW</button>
                   )
               }
               <p className="text-muted text-center">remaining seats: {this.state.eventData.remainingPlaces} </p>
+
               {
                 (this.state.userData.userType === "Admin")
                 &&

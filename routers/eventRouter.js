@@ -478,11 +478,11 @@ router.put('/:id/feedback', function (req, res) {
 	var userType = req.body.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
-			if (!event) req.status(404).send('Cannot find event');
+			if (!event) res.status(404).send('Cannot find event');
 			else {
 				event.feedbacks.push(feedback);
-				event.save(res => {
-					req.send('Feedback added successfully');
+				event.save(e => {
+					res.send('Feedback added successfully');
 				})
 			}
 		})
