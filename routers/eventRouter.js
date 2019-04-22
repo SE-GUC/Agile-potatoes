@@ -14,7 +14,6 @@ const NotifyByEmail = require('../services/NotifyByEmail');
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-
 // Story 3, 4: creating events	
 router.post(`/:id/CreateEvent`, function (req, res) {
 	var userType = req.body.userType; //should come from session
@@ -24,9 +23,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
-	let eventDate = moment();
-	eventDate = moment(req.body.eventDate + '');
-	eventDate.day(eventDate.day() + 1)
+	var eventDate = req.body.eventDate
 	var remainingPlaces = req.body.places;
 	var eventType = req.body.eventtype;
 	var speakers = req.body.speakers;
@@ -42,7 +39,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			price: price,
 			location: location,
 			city: city,
-			eventDate: eventDate,
+			eventDate: Date(eventDate),
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
