@@ -18,7 +18,7 @@ export class Navbar extends Component {
         return (
             <nav className="myNav row container-fluid">
                 <div className="left-nav col-sm-4 row">
-                    <NavLink to="/"><img className="img-responsive" alt="people working" src={process.env.PUBLIC_URL + '/logo.png'} /></NavLink>
+                    <NavLink to="/"><img className="img-responsive" alt="lirten logo" src={process.env.PUBLIC_URL + '/Logo.png'} /></NavLink>
                 </div>
                 <div className="middle-nav col-sm-4 row">
                     <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Home</p></NavLink>
