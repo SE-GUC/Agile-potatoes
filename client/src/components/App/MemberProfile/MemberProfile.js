@@ -25,24 +25,43 @@ class MemberProfile extends Component {
         lname: "",
         address: "",
         notifications: [],
-        reviews: [],
-        toggle: 2
+        reviews: [{
+          text: 'asasasas',
+          date: new Date()-1
+        }, {
+          text: 'asasasas',
+          date: new Date()
+        }, {
+          text: 'asasasas',
+          date: new Date()+1
+        }, {
+          text: 'asasasas',
+          date: new Date()+2
+        }, {
+          text: 'asasasas',
+          date: new Date()+3
+        }, {
+          text: 'asasasas',
+          date: new Date()+4
+        }],
       },
+      toggle: 0,
       showFeedback: false
     };
   }
-
   handleChangeEdit = () => {
-    this.setState({ toggle: 1 });
+    this.setState({ toggle: 1 ,userProfile:this.state.userProfile});
   };
   handleChangeProf = () => {
-    this.setState({ toggle: 0 });
+    this.setState({ toggle: 0 ,userProfile:this.state.userProfile});
   };
-  getProfile = async () => {
+  componentDidMount = async () => {
+    
     try {
+      let tokenData = JSON.parse(localStorage.getItem('token')).data;
       let profile = await axios.get(
-        "http://localhost:3001/api/profile/5ca0e380b487d0228811cf43",
-        { header: { userType: "Member", userId: "5ca0e380b487d0228811cf43" } }
+        `http://localhost:3001/api/profile/${tokenData.userData.userId}`,
+        { headers: { Authorization: 'Bearer '+ tokenData.authData } }
       );
       console.log(profile);
       this.setState({
@@ -66,7 +85,7 @@ class MemberProfile extends Component {
           notifications: profile.data.notifications,
           reviews: profile.data.reviews
         },
-        showFeedback: true
+        toggle:this.state.toggle
       });
     } catch (err) {
       console.log("GOT ERROR" + err);
@@ -74,91 +93,87 @@ class MemberProfile extends Component {
   };
 
   render() {
-    let func;
-    console.log(this.state.userProfile.reviews);
-    if (this.state.toggle == 0) {
-      func = (
-        <div>
-          <div className="card profileCard">
-            <div className="card-body">
-              <ul>
-                {"First Name: " + this.state.userProfile.fname}
-                <br />
-                {"Last Name: " + this.state.userProfile.lname}
-                <br />
-                {"Email: " + this.state.userProfile.email}
-                <br />
-                {"Address: " + this.state.userProfile.address}
-                <br />
-                {"Membership State: " + this.state.userProfile.membershipState}
-              </ul>
-              <button onClick={this.getProfile} className="btn btn-primary">
-                SHOW POFILE
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      if (this.state.toggle == 1) {
-        func = <Edit />;
-      }
-    }
     return (
-      <div className="card-group">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="side-bar col-sm-2 ">
-              <div className="list-group">
-                <h1>MEMBER PROFILE</h1>
-                {this.state.showFeedback == false ? (
-                  <button
-                    onClick={this.handleChangeProf}
-                    className="list-group-item list-group-item-action"
-                  >
-                    SHOW POFILE
-                  </button>
-                ) : (
-                  <div>
-                    <button
-                      className="list-group-item list-group-item-action"
-                      onClick={() => this.simpleDialog.show()}
-                    >
-                      Show Feedback
-                    </button>
-                    <SkyLight
-                      hideOnOverlayClicked
-                      ref={ref => (this.simpleDialog = ref)}
-                      title="Feedbacks"
-                    >
-                      {this.state.userProfile.reviews.map(review => {
-                        return (
-                          <div className="card eventCard">
-                            <div className="card-body">
-                              <h5 className="card-title">{review.text}</h5>
-                              <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
-
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </SkyLight>
-                  </div>
-                )}
-                <button
-                  onClick={this.handleChangeEdit}
-                  className="list-group-item list-group-item-action"
-                >
-                  EDIT PROFILE
-                </button>
-              </div>
-            </div>
-
-            {func}
-          </div>
+      this.state.toggle == 0 ? 
+      (<div className="row push-down">
+        <div className=" offset-sm-2 col-sm-6 profPanel">
+          <div className="attrContainer"><p>First name: {this.state.userProfile.fname} </p></div>
+          <div className="attrContainer"><p>Last name: {this.state.userProfile.lname}</p></div>
+          <div className="attrContainer"><p>Email: {this.state.userProfile.email} </p></div>
+          <div className="attrContainer"><p>Address: {this.state.userProfile.address}</p></div>
+          <div className="attrContainer"><p>Membership State: {this.state.userProfile.membershipState}</p></div>
+          <div className="attrContainer"><p>Availability: {this.state.userProfile.availability}</p></div>
+          <div className="attrContainer"><p>Skills: {this.state.userProfile.skills}</p></div>
+          <div className="attrContainer"><p>Master classes: {this.state.userProfile.masterClasses}</p></div>
+          <div className="attrContainer"><p>Certificates: {this.state.userProfile.certificates}</p></div>
+          <div className="attrContainer"><p>Interests: {this.state.userProfile.interests}</p></div>
+          <div className="attrContainer"><p>Events: {this.state.userProfile.events}</p></div>
+          <div className="attrContainer"><p>Vacancies: {this.state.userProfile.vacancies}</p></div>
         </div>
-      </div>
+
+        <div className="col-sm-2 profOptions " >
+          <div className="btn btn-primary" onClick={this.handleChangeEdit} >Edit</div>
+          <br/><br/>
+          <div className="btn btn-danger" onClick={() => this.simpleDialog.show()} >Show Feedback</div>
+        </div>
+      
+        
+        
+        <SkyLight
+          hideOnOverlayClicked
+          ref={ref => (this.simpleDialog = ref)}
+          title="Feedbacks"
+        >
+        <div className='toto'>
+          {this.state.userProfile.reviews.map(review => {
+            return (
+              <div key={review.date} className="eventCardy">
+                <div className="card-body">
+                  <h5 className="card-title">{review.text}</h5>
+                  <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        </SkyLight>
+      </div>):(<Edit/>)
     );
   }
 }
 export default MemberProfile;
+  {
+/*
+                    <h1>MEMBER PROFILE</h1>
+                    {this.state.showFeedback == false ? (
+                      <button
+                        onClick={this.handleChangeProf}
+                        className="list-group-item list-group-item-action"
+                      >
+                        SHOW POFILE
+                      </button>
+                    ) : (
+                      <div>
+                        <button
+                          className="list-group-item list-group-item-action"
+                          onClick={() => this.simpleDialog.show()}
+                        >
+                          Show Feedback
+                        </button>
+                        
+                      </div>
+                    )}
+                    <button
+                      onClick={this.handleChangeEdit}
+                      className="list-group-item list-group-item-action"
+                    >
+                      EDIT PROFILE
+                    </button>
+                  </div>
+                </div>
+
+                {func}
+              </div>
+            </div>
+          </div> */
+  }

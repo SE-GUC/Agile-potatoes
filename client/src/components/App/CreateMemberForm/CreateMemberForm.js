@@ -232,12 +232,7 @@ class CreateMemberForm extends Component {
         {
             window.alert("Please enter a valid email!")
         }
-        }
-        
-       
-       
-       
-        
+        }  
     }
     render() {
 
@@ -245,24 +240,24 @@ class CreateMemberForm extends Component {
         if(this.state.cond == "button1")
         {
             func =
-            <div className="card memprofileCard">
+            <div className="card push-down memprofileCard">
             <div className="card-body">
             <form onSubmit={this.onSubmit}>
             First Name:<br/>
-             <input type="text" id="d1" class="mytext" name="fname"  onChange={this.handleChange} /><br/>
+             <input type="text" id="d1" className="mytext" name="fname"  onChange={this.handleChange} /><br/>
              Last Name:<br/>
-            <input type="text" id="d2" class="mytext" name="lname"  onChange={this.handleChange} /><br/>
+            <input type="text" id="d2" className="mytext" name="lname"  onChange={this.handleChange} /><br/>
             Email:<br/>
-            <input type="text" id="d3" class="mytext" name="email" onChange={this.handleChange} /><br/>
+            <input type="text" id="d3" className="mytext" name="email" onChange={this.handleChange} /><br/>
             Password:<br/>
-            <input type="text" id="d4" class="mytext" name="password"  onChange={this.handleChange} /><br/>
+            <input type="text" id="d4" className="mytext" name="password"  onChange={this.handleChange} /><br/>
            Confrim Password:<br/>
-            <input type="text" id="d5" class="mytext" name="confirmPass"  onChange={this.handleChange} /><br/>
+            <input type="text" id="d5" className="mytext" name="confirmPass"  onChange={this.handleChange} /><br/>
            Username:<br/>
-            <input type="text" id="d6"  class="mytext" name="username"  onChange={this.handleChange} /><br/>
+            <input type="text" id="d6"  className="mytext" name="username"  onChange={this.handleChange} /><br/>
            Address:<br/>
-            <input type="text" id="d7" class="mytext" name="address" onChange={this.handleChange} />
-            <button onClick = {this.Submit}type="submit" className="btn-primary">SUBMIT</button>
+            <input type="text" id="d7" className="mytext" name="address" onChange={this.handleChange} />
+            <button onClick = {this.Submit}type="submit" className="btn-primary">CHECK</button>
             </form>
             </div>
             </div>
@@ -270,12 +265,12 @@ class CreateMemberForm extends Component {
         if(this.state.cond == "button2")
         {
             func = 
-            <div className="card memprofileCard">
+            <div className="card push-down memprofileCard">
             <div className="card-body">
             <form onSubmit={this.onSubmit}> 
             <label>
             Skill:<br/>
-            <input id = "d8" type="text" class="mytext" name="Skill" onChange= {this.handleChange}/><br/>
+            <input id = "d8" type="text" className="mytext" name="Skill" onChange= {this.handleChange}/><br/>
             </label>
             <br/>
             <label>
@@ -291,12 +286,12 @@ class CreateMemberForm extends Component {
         if(this.state.cond == "button3")
         {
             func=
-            <div className="card memprofileCard">
+            <div className="card push-down memprofileCard">
             <div className="card-body">
             <form onSubmit={this.onSubmit}> 
             <label>
             Interest:<br/>
-            <input id = "d9" type="text" class="mytext" name="Interest" onChange= {this.handleChange}/><br/>
+            <input id = "d9" type="text" className="mytext" name="Interest" onChange= {this.handleChange}/><br/>
             </label>
             <br/>
             <label>
@@ -310,12 +305,12 @@ class CreateMemberForm extends Component {
         if(this.state.cond == "button4")
         {
             func = 
-            <div className="card memprofileCard">
+            <div className="card push-down memprofileCard">
             <div className="card-body">
             <form onSubmit={this.onSubmit}> 
             <label>
             Masterclass:<br/>
-            <input id = "d10" type="text" class="mytext" name="Skill" onChange= {this.handleChange}/><br/>
+            <input id = "d10" type="text" className="mytext" name="Skill" onChange= {this.handleChange}/><br/>
             </label>
             <br/>
             <label>
@@ -331,12 +326,12 @@ class CreateMemberForm extends Component {
         if(this.state.cond == "button5")
         {
             func=
-            <div className="card memprofileCard">
+            <div className="card push-down memprofileCard">
             <div className="card-body">
             <form onSubmit={this.onSubmit}> 
             <label>
             Certificate:<br/>
-            <input id = "d11" type="text" class="mytext" name="Interest" onChange= {this.handleChange}/><br/>
+            <input id = "d11" type="text" className="mytext" name="Interest" onChange= {this.handleChange}/><br/>
             </label>
             <br/>
             <label>

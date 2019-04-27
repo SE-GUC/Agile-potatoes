@@ -73,17 +73,17 @@ class CreatePartnerForm extends Component {
             <div className="card-body">
             <form onSubmit={this.onSubmit}> 
                 Username:<br/>
-                <input type="text" id="d1"  name="username" classname="mytext" onChange={this.onChange} /><br/>
+                <input type="text" id="d1"  name="username" className="mytext" onChange={this.onChange} /><br/>
                 Password:<br/>
-                <input type="text" id="d2"  name="password" classname="mytext" onChange={this.onChange} /><br/>
+                <input type="text" id="d2"  name="password" className="mytext" onChange={this.onChange} /><br/>
                 Confrim Password:<br/>
-                <input type="text" id="d3"  name="confirmpassword" classname="mytext" onChange={this.onChange} /><br/>
+                <input type="text" id="d3"  name="confirmpassword" className="mytext" onChange={this.onChange} /><br/>
                 Full Name:<br/>
-                <input type="text" id="d4"  name="name" classname="mytext" onChange={this.onChange} /><br/>
+                <input type="text" id="d4"  name="name" className="mytext" onChange={this.onChange} /><br/>
                 Email:<br/>
-                <input type="text" id="d5"  name="email" classname="mytext"onChange={this.onChange} /><br/>
+                <input type="text" id="d5"  name="email" className="mytext"onChange={this.onChange} /><br/>
                 Workfield:<br/>
-                <input type="text" id="d6"  name="workfield" classname="mytext" onChange={this.onChange} /><br/>
+                <input type="text" id="d6"  name="workfield" className="mytext" onChange={this.onChange} /><br/>
             </form>
             <button onClick = {this.sub}type="submit" className=" btn-primary">SUBMIT</button>
             </div>

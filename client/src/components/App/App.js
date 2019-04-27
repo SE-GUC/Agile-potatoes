@@ -52,10 +52,17 @@ class App extends Component {
             <Route exact path="/events/:id" component={EventPostNew}/>
             <Route exact path="/vacancies" component={GetAllVacancies}/>
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
-            <Route exact path="/adminprofile" component={AdminProfile}/>
-            <Route exact path="/partnerprofile" component={PartnerProfile}/>
-            <Route exact path="/memberprofile" component={MemberProfile}/>
+            {
+              (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin') ?
+                (<Route exact path="/profile" component={AdminProfile}/>):(
+                  (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner') ?
+                    (<Route exact path="/profile" component={PartnerProfile}/>):(
+                      this.state.loggedIn && <Route exact path="/profile" component={MemberProfile}/>)
+                )
+            }
+            <Route exact path="/profile" component={MemberProfile}/> 
 
+            
             <Route exact path="/signupmember" component={MemberForm}/>
             <Route exact path="/signuppartner" component={PartnerForm}/>
             <Route exact path="/signup" component={SignUp}/>
@@ -66,7 +73,7 @@ class App extends Component {
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
-        <Footer/>
+        {/* <Footer/> */}
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />

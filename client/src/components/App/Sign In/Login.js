@@ -84,7 +84,7 @@ export class Login extends Component{
 
             </form>
           {/* <NavLink className="btn btn-success" type="submit" onClick = {this.login} to="/Home">LOG IN</NavLink> */}
-            <button className="btn btn-success" type="submit" onClick = {this.login}>LOG IN</button>
+            <button className="btn btn-success logBtn" type="submit" onClick = {this.login}>LOG IN</button>
 
           </div>
         </div>
