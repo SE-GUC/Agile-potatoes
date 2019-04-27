@@ -483,7 +483,7 @@ router.get('/:id/hired', function (req, res) {
         .populate('hired', 'fname lname ProfileURL')
         .exec(function (err, vacancy) {
             if (!vacancy) res.status(400).send('Error vacancy not found');
-            res.send(vacancy.hired);
+            if (vacancy.hired) res.send(vacancy.hired);
         })
 })
 
