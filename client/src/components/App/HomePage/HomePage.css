@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+@keyframes spinner {
+      to {transform: rotate(360deg);}
+}
+.spinnerContainer{
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    height: 3800px;
+    background-color: #e5e8e8;
+}
+.spinner{
+    position: relative;
+    padding-top: 600px
+}
+.spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 53%;
+    left: 48%;
+    width: 60px;
+    height: 60px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 3px solid #ccc;
+    border-top-color: #2d3436;
+    animation: spinner .6s linear infinite;
+}
+
+
+
+section{
+    padding-top:100px;
+}
+
+section h1 {
+    text-align: center;
+    margin-bottom: 70px;
+    font-weight: bolder !important;
+    font-size: 42px ;
+    font-family: 'Montserrat',sans-serif;
+
+}
+
+#wall{
+    width: 100%;    height: 974px;
+    position: relative;
+    padding:0px;
+    background-color: #efefef;
+}
+
+#wall img{
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    width: 100%;
+    margin:0px;
+    /* right: 6%; */
+}
+
+#wall .transparent-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.7); 
+    z-index:1;
+    margin:0px;
+
+}
+#wall .bigTextContainer {
+    padding-top: 320px;
+    text-align:center;
+    width:100%;
+    color: white;
+    font-size: 60px
+}
+
+#wall .bigText {
+    color: white;
+    font-size: 60px
+}
+
+#services {
+    padding: 30px;
+    background-color: #efefef;
+}
+
+#services h1 {
+    padding-top: 150px;
+    text-align: center;
+    margin-bottom:100px;
+    font-weight: 900;
+    font-size: 42px
+}
+#services p2 {
+    color: white;
+}
+
+#services .innerCard h2 {
+    color: white;
+}
+
+#services .card {
+    padding: 3px;
+    /* height: 405px; */
+    height: 20vw;   /*height relative to screen width*/
+    position: relative;
+    overflow: hidden;
+}
+
+#services .card:hover .innerCard {
+    opacity: 1;
+}
+
+#services img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    max-width:100%;
+    max-height:100%;
+    transition: transform 400ms;
+    -webkit-backface-visibility: hidden;/* add to fix webkit bug jitter */
+    -webkit-transform: perspective(1000px); /* add to fix webkit bug jitter */
+}
+
+#services .card:hover img {
+    transform: scale(1.2, 1.2)
+}
+
+#services .innerCard {
+    padding: 18px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 300ms;
+    background-color: rgba(0, 0, 0, .6);
+}
+
+#services .innerCard .view {
+    height: 15%;
+    border: solid 3px white;
+    margin-top: 2.5vw;
+    text-align: center;
+    cursor: pointer;
+}
+
+#services .innerCard :hover {
+    text-decoration: none
+}
+
+#services .innerCard h3 {
+    color: white;
+}
+#services .innerCard p {
+    color: white;
+
+}
+
+#vision {
+    padding-top: 0px;
+    height: 700px;
+    text-align: center;
+    padding-bottom: 300px;
+    position: relative;
+}
+#vision p {
+    font-weight: 300;
+    font-size: xx-large;
+}
+
+#vision img{
+    /* max-width: 100%; */
+    /* max-height: 100%; */
+    top:0px;
+    position: fixed;
+    width: 100%;
+    margin:0px;
+    left:0px;
+    z-index:-5
+}
+
+#vision .transparent-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    margin: 0px;
+
+}
+
+#vision .bigTextContainer {
+    padding-top: 220px;
+    text-align:center;
+    width:100%;
+    color: black;
+    font-size: 60px
+}
+
+#contacts {
+    height: 800px;
+    background-color: #efefef;
+}
+
+
+#contacts .final {
+    height: 500px;
+    background-color: rgba(0, 0, 0, .1);
+    margin:15px;
+    padding: 5px;
+}
+#contacts .panels {
+    padding-left: 90px;
+    padding-right: 90px;
+}
+#contacts .panel{
+    height: 300px;
+    padding-left: 40px;
+    padding-right: 40px;
+    width:100%
+}
+#contacts .formy{
+    padding-top:70px;
+}
+/* #contacts .button {
+    margin-top: 20px;
+    width: 40%;
+    background-color: #2d3436;
+    /* transform: translateX(75%); 
+    width: 100%;
+} */
