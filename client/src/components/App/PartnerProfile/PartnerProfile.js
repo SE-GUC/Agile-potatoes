@@ -38,7 +38,7 @@ class PartnerProfile extends Component{
         this.setState({toggle:1})
     }
 
-    handleChangeCreate=()=>
+    handleChangeCreateEve=()=>
     {
         this.setState({toggle:2})
     }
@@ -77,7 +77,7 @@ class PartnerProfile extends Component{
     render() {
         let func;
 
-        if(this.state.toggle == 0)
+        if(this.state.toggle === 0)
         {
             func = 
             <div>
@@ -101,14 +101,20 @@ class PartnerProfile extends Component{
            </div>
         }
         else{
-            if(this.state.toggle == 1)
+            if(this.state.toggle === 1)
             {
                 func = <Edit/>
             }
             else{
-                if(this.state.toggle == 2)
+                if(this.state.toggle === 2)
                 {
                     func = <CreateEvent/>
+                }
+                else{
+                  if(this.state.toggle === 3)
+                  {
+                    func = <CreateVacany/>
+                  }
                 }
             }
 
@@ -121,7 +127,7 @@ class PartnerProfile extends Component{
              <div className='side-bar col-sm-2 ' >
              <div className="list-group">
              <h1>PARTNER PROFILE</h1>
-                    { this.state.showFeedback == false ? (<button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
+                    { this.state.showFeedback === false ? (<button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
                     ):(
                         <div>
                           <button
@@ -153,8 +159,8 @@ class PartnerProfile extends Component{
                      <button onClick = {this.handleChangeEdit} className="list-group-item list-group-item-action">EDIT PROFILE</button>
                      <button onClick = {this.handleChangeProf} className="list-group-item list-group-item-action">SHOW POFILE</button>
 
-                     <NavLink to="/createEvent" onClick = {this.handleChangeCreate} className="link-button"><p>CREATE EVENT</p></NavLink>
-                     <NavLink to="/createEvent" onClick = {this.handleChangeCreateVac} className="link-button"><p>CREATE VACANCY</p></NavLink>
+                     <NavLink to="/createEvent" onClick = {this.handleChangeCreateEve} className="link-button"><p>CREATE EVENT</p></NavLink>
+                     <NavLink to="/createVacancy" onClick = {this.handleChangeCreateVac} className="link-button"><p>CREATE VACANCY</p></NavLink>
 
                  </div>
                  </div>

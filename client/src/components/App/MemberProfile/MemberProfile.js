@@ -25,25 +25,7 @@ class MemberProfile extends Component {
         lname: "",
         address: "",
         notifications: [],
-        reviews: [{
-          text: 'asasasas',
-          date: new Date()-1
-        }, {
-          text: 'asasasas',
-          date: new Date()
-        }, {
-          text: 'asasasas',
-          date: new Date()+1
-        }, {
-          text: 'asasasas',
-          date: new Date()+2
-        }, {
-          text: 'asasasas',
-          date: new Date()+3
-        }, {
-          text: 'asasasas',
-          date: new Date()+4
-        }],
+        reviews: [],
       },
       toggle: 0,
       showFeedback: false
@@ -99,7 +81,7 @@ class MemberProfile extends Component {
 
   render() {
     return (
-      this.state.toggle == 0 ? 
+      this.state.toggle === 0 ? 
       (<div>
       <div className="row push-down">
         <div className=" offset-sm-2 col-sm-6">
@@ -111,8 +93,8 @@ class MemberProfile extends Component {
             <div className="attrContainer"><p>Address: <span>{this.state.userProfile.address}</span></p></div>
             <div className="attrContainer"><p>Interests: <span>{this.state.userProfile.interests}</span></p></div>
             <div className="attrContainer"> <p> Membership State: <span className ={ 
-              this.state.userProfile.membershipState == 'Active' ? ('activeMem') : this.state.userProfile.membershipState
-            == 'Pending' ? ('pendingMem') : ('expiredMem')
+              this.state.userProfile.membershipState === 'Active' ? ('activeMem') : this.state.userProfile.membershipState
+            === 'Pending' ? ('pendingMem') : ('expiredMem')
             }> {
               this.state.userProfile.membershipState
             }</span></p> </div>
@@ -160,38 +142,3 @@ class MemberProfile extends Component {
   }
 }
 export default MemberProfile;
-  {
-/*
-                    <h1>MEMBER PROFILE</h1>
-                    {this.state.showFeedback == false ? (
-                      <button
-                        onClick={this.handleChangeProf}
-                        className="list-group-item list-group-item-action"
-                      >
-                        SHOW POFILE
-                      </button>
-                    ) : (
-                      <div>
-                        <button
-                          className="list-group-item list-group-item-action"
-                          onClick={() => this.simpleDialog.show()}
-                        >
-                          Show Feedback
-                        </button>
-                        
-                      </div>
-                    )}
-                    <button
-                      onClick={this.handleChangeEdit}
-                      className="list-group-item list-group-item-action"
-                    >
-                      EDIT PROFILE
-                    </button>
-                  </div>
-                </div>
-
-                {func}
-              </div>
-            </div>
-          </div> */
-  }

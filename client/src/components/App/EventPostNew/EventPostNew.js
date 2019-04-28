@@ -8,13 +8,15 @@ class EventPostNew extends Component {
     /*  
       props should have the user data
     */
+    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
     this.state = {
-      postID: '5cbbbea760006f509880af3b',
-      //put user data here until we get them from props
-      userData: {
-        _id: '5cbbb65c9800133ed8898a09',
-        userType: 'Partner'
-      },
+      // postID: '5cbbbea760006f509880af3b',
+      // //put user data here until we get them from props
+      // userData: {
+      //   _id: '5cbbb65c9800133ed8898a09',
+      //   userType: 'Partner'
+      // },
+      postID: "",
       loaded: false,
       userHasBooked: false,
       Edit: false,
@@ -46,7 +48,7 @@ class EventPostNew extends Component {
   }
 
   async componentDidMount() {
-    await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
+    await axios.get(`http://localhost:3001/api/event/Post/${this.props.match.params.id}`)
       .then(res => {
         this.setState({
           eventData: res.data
@@ -75,9 +77,11 @@ class EventPostNew extends Component {
     // check if user is found in attendees array
     let booked = false;
     let attendees = this.state.eventData.attendees;
-    for (let i = 0; i < attendees.length; i++) {
-      if (attendees[i]._id === this.state.userData._id)
-        booked = true;
+    if(attendees){
+      for (let i = 0; i < attendees.length; i++) {
+        if (attendees[i]._id === this.userData.userId)
+          booked = true;
+      }
     }
     if (booked)
       this.setState({
@@ -89,14 +93,14 @@ class EventPostNew extends Component {
         loaded: true
       });
     console.log(this.state.eventData.partner._id)
-    console.log(this.state.userData._id)
+    console.log(this.userData.userId)
     console.log(this.state.eventData);
   }
 
   async onClickComment(e) {
     await axios.post(`http://localhost:3001/api/event/${this.state.postID}/comment`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType,
+      "userID": this.userData.userId,
+      "userType": this.userData.userType,
       "comment": this.state.feedback,
     });
     //hopefully getting the updated event with the new comments
@@ -141,8 +145,8 @@ class EventPostNew extends Component {
 
   async onClickSubmit() {
     await axios.put(`http://localhost:3001/api/event/${this.state.postID}`, {
-      'userType': this.state.userData.userType,
-      'userID': this.state.userData._id,
+      'userType': this.userData.userType,
+      'userID': this.userData.userId,
       'eventID': this.state.eventData._id,
       'date': this.state.eventEditedData.date,
       'location': this.state.eventEditedData.location,
@@ -165,8 +169,8 @@ class EventPostNew extends Component {
 
   onClickBook = (e) => {
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+      "userID": this.userData.userId,
+      "userType": this.userData.userType
     }).then(res =>
       this.setState({
         eventData: {
@@ -186,8 +190,8 @@ class EventPostNew extends Component {
   onClickCancel = (e) => {
     e.preventDefault();
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+      "userID": this.userData.userId,
+      "userType": this.userData.userType
     }).then(res =>
       this.setState({
         eventData: {
@@ -200,7 +204,7 @@ class EventPostNew extends Component {
 
   submitFeedbackEvent = (e) => {
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/feedback`, {
-      "userType": this.state.userData.userType,
+      "userType": this.userData.userType,
       "feedback": this.state.feedback
     })
       .then(this.setState({
@@ -221,8 +225,8 @@ class EventPostNew extends Component {
         this.state.postID
         }/closeMyEvent`,
         {
-          "userType": this.state.userData.userType,
-          "userId": this.state.userData._id
+          "userType": this.userData.userType,
+          "userId": this.userData.userId
         }
       )
       .then(res => {
@@ -251,8 +255,8 @@ class EventPostNew extends Component {
         this.state.postID
         }/reOpenMyEvent`,
         {
-          "userType": this.state.userData.userType,
-          "userId": this.state.userData._id
+          "userType": this.userData.userType,
+          "userId": this.userData.userId
         }
       )
       .then(res => {
@@ -278,15 +282,14 @@ class EventPostNew extends Component {
       method: 'DELETE',
       url: `http://localhost:3001/api/event/${this.state.postID}/deleteEvent`,
       data: {
-        "userType": this.state.userData.userType,
-        "userID": this.state.userData._id
+        "userType": this.userData.userType,
+        "userID": this.userData.userId
       }
     })
       .catch(err => {
         this.refs.alert.innerText = err.response.data;
         this.refs.alert.style.display = "block";
       });
-    //need to rereoute to home page somehow now
   }
 
   render() {
@@ -332,7 +335,8 @@ class EventPostNew extends Component {
                 <br />
                 <h4>Speakers</h4>
                 <div className="row">
-                  {this.state.eventData.speakers.map(speaker => {
+                  {this.state.eventData.speakers &&
+                  this.state.eventData.speakers.map(speaker => {
                     return (
                       <div key={speaker} className="col-sm-4">
                         <i> -{speaker}</i>
@@ -343,7 +347,8 @@ class EventPostNew extends Component {
                 <br />
                 <h4>Topics</h4>
                 <div className="row">
-                  {this.state.eventData.topics.map(topic => {
+                  {this.state.eventData.topics && 
+                  this.state.eventData.topics.map(topic => {
                     return (
                       <div key={topic} className="col-sm-4">
                         <p> {topic}</p>
@@ -355,11 +360,11 @@ class EventPostNew extends Component {
               {
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
-                (this.state.userData.userType === "Admin" || this.state.userData.userType === "Partner")
+                (this.userData.userType === "Admin" || this.userData.userType === "Partner")
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
-                  <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
+                  <CommentsSection userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
                   {/* {this.getCommentsSorted().map(comment => {
                     return (
                       <div key={comment.date} className="comment">
@@ -385,7 +390,7 @@ class EventPostNew extends Component {
               }
 
               {
-                (this.state.eventData.attendees.some(attendee => attendee._id === this.state.userData._id))
+                (this.state.eventData.attendees.some(attendee => attendee._id === this.userData.userId))
                 &&
                 (this.state.eventData.eventStatus === 'Finished')
                 &&
@@ -405,13 +410,13 @@ class EventPostNew extends Component {
                 this.state.userHasBooked ? (
                   <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickCancel} >CANCEL</button>
                 ) : (
-                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickBook} >BOOK NOW</button>
+                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickBook} >BOOK NOW</button>
                   )
               }
               <p className="text-muted text-center">remaining seats: {this.state.eventData.remainingPlaces} </p>
 
               {
-                (this.state.userData.userType === "Admin")
+                (this.userData.userType === "Admin")
                 &&
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
@@ -421,11 +426,11 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
-                (this.state.userData._id === this.state.eventData.partner._id)
+                (this.userData.userId === this.state.eventData.partner._id)
                 &&
                 <div>
                   <br /><br /><br />
@@ -433,11 +438,11 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
-                (this.state.userData._id === this.state.eventData.partner._id)
+                (this.userData.userId === this.state.eventData.partner._id)
                 &&
                 <div>
                   <br /><br /><br />
@@ -445,7 +450,7 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner" || this.state.userData.userType === "Admin")
+                (this.userData.userType === "Partner" || this.userData.userType === "Admin")
                 &&
                 (this.state.eventData.eventStatus === "Approved")
                 &&
@@ -455,7 +460,7 @@ class EventPostNew extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner" || this.state.userData.userType === "Admin")
+                (this.userData.userType === "Partner" || this.userData.userType === "Admin")
                 &&
                 (this.state.eventData.eventStatus === "Finished")
                 &&
