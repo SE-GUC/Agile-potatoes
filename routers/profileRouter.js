@@ -26,41 +26,39 @@ function createToken(userType, email, userID) {
 //user story 12 returning user detatils to display his profile
 
 router.get('/:id',verifyToken, function (req, res, next) {
-    //jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
-    // if(err) console.log(err)
     var userType = req.userType; //should come from session
     var userId = req.userId; //should come from session
     var profId = req.params.id;
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
             Admin.findById({ _id: profId }, function (err, adminDoc) {
-                if (err) next(err);
+                if (err) return next(err);
                 if (!adminDoc) {
                     console.log('admin not found')
-                    res.status(404).send("admin not found");
-                    return next();
+                    return res.status(404).send("admin not found");
+                    
                 }
                 return res.send(adminDoc);
             });
         }
         else if (userType == 'Partner') {
             Partner.findById({ _id: profId }, function (err, partnerDoc) {
-                if (err) next(err);
+                if (err) return next(err);
                 if (!partnerDoc) {
                     console.log('partner not found')
-                    res.status(404).send("partner not found");
-                    return next();
+                    return res.status(404).send("partner not found");
+                    
                 }
                 return res.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
             Member.findById({ _id: profId }, function (err, memberDoc) {
-                if (err) next(err);
+                if (err) return next(err);
                 if (!memberDoc) {
                     console.log('member not found')
-                    res.status(404).send("member not found");
-                    return next();
+                    return res.status(404).send("member not found");
+                    
                 }
                 return res.send(memberDoc);
             })
@@ -68,26 +66,26 @@ router.get('/:id',verifyToken, function (req, res, next) {
     }
     else {                        //user viewing other's profile
         Member.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, memberDoc) {
-            if (err) next(err);
+            if (err) return next(err);
+            console.log('is it sent after error?', res.headersSent)
             if (memberDoc) {
                 return res.send(memberDoc);
             }
             else {
                 Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
-                    if (err) next(err);
+                    if (err) return next(err);
                     if (partnerDoc) {
                         return res.send(partnerDoc);
                     }
                     else {
                         Admin.findById(profId, 'fname lname events', function (err, adminDoc) {
-                            if (err) next(err);
+                            if (err) return next(err);
                             if (adminDoc) {
                                 return res.send(adminDoc);
                             }
                             else {
                                 console.log('profile not found');
-                                res.status(404).send('profile not found');
-                                return next();
+                                return res.status(404).send('profile not found');
                             }
                         })
                     }

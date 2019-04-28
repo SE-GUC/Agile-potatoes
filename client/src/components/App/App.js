@@ -54,15 +54,15 @@ class App extends Component {
             <Route exact path="/vacancies/:id" component={VacancyPost}/>
             {
               (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin') ?
-                (<Route exact path="/profile" component={AdminProfile}/>):(
+                (<Route exact path="/profile/:profId" component={AdminProfile}/>):(
                   (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner') ?
-                    (<Route exact path="/profile" component={PartnerProfile}/>):(
+                    (<Route exact path="/profile/:profId" component={PartnerProfile}/>):(
                       this.state.loggedIn && <Route exact path="/profile" component={MemberProfile}/>)
                 )
             }
-            <Route exact path="/profile" component={MemberProfile}/> 
 
-            
+            <Route exact path="/profile/:profId" component={MemberProfile}/>)
+
             <Route exact path="/signupmember" component={MemberForm}/>
             <Route exact path="/signuppartner" component={PartnerForm}/>
             <Route exact path="/signup" component={SignUp}/>

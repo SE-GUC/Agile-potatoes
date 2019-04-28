@@ -25,8 +25,7 @@ router.post('/:id/comment', (req, res, next) => {
                 if (err) console.log(err)
                 if (!vacancy) {
                     console.log('vacancy not found')
-                    res.status(404).send("vacancy not found");
-                    return next();
+                    return res.status(404).send("vacancy not found");
                 }
                 vacancy.commentsByAdmin.push({
                     text: comment,
@@ -50,8 +49,7 @@ router.post('/:id/comment', (req, res, next) => {
                 if (err) console.log(err)
                 if (!vacancy) {
                     console.log('vacancy not found')
-                    res.status(404).send("vacancy not found");
-                    return next();
+                    return res.status(404).send("vacancy not found");
                 }
                 vacancy.commentsByPartner.push({
                     text: comment,
@@ -232,15 +230,15 @@ router.get('/RecommendedVacancies', function (req, res, next) {
     let RecommendedVacancies = []
     Member.findById(userId, 'availability address skills')
         .exec((err, member) => {
-            if (err) next(err);
+            if (err) return next(err);
             if (!member) {
-                res.status(404).send("member not found");
-                return next();
+                return res.status(404).send("member not found");
+                
             }
             if (!member) return res.status(404).send('Member not found');
             Vacancy.find({ 'status': 'Open' }, 'url name location city dailyHours partner description')
                 .exec((err, vacs) => {
-                    if (err) next(err);
+                    if (err) return next(err);
                     for (vac of vacs) {
                         if (((vac.city) && (member.address.includes(vac.city)) || ((vac.location) && (member.address.includes(vac.location))))) {
                             if (vac.dailyHours && member.availability) {

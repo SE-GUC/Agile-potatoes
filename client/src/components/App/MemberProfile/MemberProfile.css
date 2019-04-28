@@ -54,16 +54,14 @@
 .profPanel{
     margin-top: 20px;   
     padding: 20px;
-    height: 800px;
+    height: 350px;
     background-color: #dfe4ea;
-    border-radius: 25px;
 }
 .profOptions{
     margin-top: 20px;   
     padding: 20px;
-    height: 800px;
+    height: 400px;
     background-color: #dfe4ea;
-    border-radius: 25px;
     margin-left: 20px;
 }
 
@@ -79,4 +77,29 @@
     font-size: 28px;    
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
+}
+
+.attrContainer span {
+    color:#0a3d62;
+    /* font-size: 28px;
+    font-family: 'Montserrat', sans-serif;*/
+    font-weight: 500; 
+}
+.pendingMem{
+    font-size: 28px;
+    font-family: 'Montserrat',sans-serif;
+    font-weight: 500;
+    color:#ffa502 !important;
+}
+.activeMem  {
+    font-size: 28px;
+    font-family: 'Montserrat',sans-serif;
+    font-weight: 500;
+    color:#4cd137 !important;
+}
+.expiredMem{
+    font-size: 28px;
+    font-family: 'Montserrat',sans-serif;
+    font-weight: 500;
+    color:#eb2f06 !important;
 }
