@@ -160,8 +160,7 @@ router.get('/RecommendedEvents', function (req, res) {
 		.populate('events')
 		.exec((err, member) => {
 			if (!member) {
-				res.status(404).send("member not found");
-				return next();
+				return res.status(404).send("member not found");
 			}
 			if (err) console.log(err); // getting recommended events
 			member.events.map((event) => {
@@ -241,8 +240,7 @@ router.put('/:id/reOpenMyEvent', (req, res, next) => {
 		if (err) return res.send("something wrong");
 		if (!event) {
 			console.log('event not found')
-			res.status(404).send("event not found");
-			return next();
+			return res.status(404).send("event not found");
 		}
 		if (event.partner && event.partner == userId) {
 			if (event.eventStatus === 'Finished' && (Date.parse(event.eventDate) - Date.now()) > 0) {
@@ -282,8 +280,7 @@ router.put('/:id/closeMyEvent', (req, res, next) => {
 		if (err) return res.send("something wrong");
 		if (!event) {
 			console.log('event not found')
-			res.status(404).send("event not found");
-			return next();
+			return res.status(404).send("event not found");
 		}
 		if (userType === "Partner" && event.partner && event.partner == userId) {
 			if (event.eventStatus === 'Approved') {
