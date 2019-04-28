@@ -8,6 +8,8 @@ const Admin = require('../models/adminModel');
 const schemas = require('../models/Schemas/schemas');
 const bodyParser = require('body-parser');
 const NotifyByEmail = require('../services/NotifyByEmail');
+const verifyToken = require('../middleware/tokenVerifier').verifyToken;
+
 
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
@@ -107,8 +109,8 @@ router.get('/:id/comment', function (req, res) {
 })
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEventsAdmin', function (req, res) {
-	var usertype = req.get('userType');
+router.get('/PendingEventsAdmin', verifyToken,function(req, res) {
+	var usertype = req.userType;
 	if (usertype == 'Admin') {
 		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate eventStatus').exec(function (err, event) {
 			if (err) { return res.send(err); }
@@ -122,7 +124,7 @@ router.get('/PendingEventsAdmin', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-	Event.find({ eventStatus: 'Approved' }, 'url name eventDate eventStatus').exec(function (err, events) {
+	Event.find({ eventStatus: 'Approved' }, 'url name eventDate eventStatus description').exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -131,17 +133,17 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All Event Requests.(Sorted by status)
-router.get('/:id/PartnerEvents', function (req, res) {
-	var userType = req.get('userType');
-	var userid = req.params.id
+router.get('/PartnerEvents',verifyToken, function (req, res) {
+	var userType = req.userType;
+	var userid = req.userId;
 	if (userType == 'Partner') {
 		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate description').exec(function (err, Submittedevent) {
 			if (err) return res.send(err)
-			Event.find({ eventStatus: 'Approved' }, 'url name eventDate description').exec(function (err, Approvedevent) {
+			Event.find({ partner: userid, eventStatus: 'Approved' }, 'url name eventDate description').exec(function (err, Approvedevent) {
 				if (err) return res.send(err)
-				Event.find({ eventStatus: 'Closed' }, 'url name eventDate description').exec(function (err, Closedevent) {
+				Event.find({ partner: userid, eventStatus: 'Closed' }, 'url name eventDate description').exec(function (err, Closedevent) {
 					if (err) return res.send(err)
-					Event.find({ eventStatus: 'Finished' }, 'url name eventDate description').exec(function (err, Finishedevent) {
+					Event.find({ partner: userid, eventStatus: 'Finished' }, 'url name eventDate description').exec(function (err, Finishedevent) {
 						if (err) return res.send(err)
 						return res.send([...Submittedevent, ...Approvedevent, ...Closedevent, ...Finishedevent])
 					});
@@ -152,8 +154,8 @@ router.get('/:id/PartnerEvents', function (req, res) {
 });
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
-router.get('/RecommendedEvents', function (req, res) {
-	var userId = req.get('userId');
+router.get('/RecommendedEvents',verifyToken, function (req, res) {
+	var userId = req.userId;
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
 	Member.findById(userId, 'url name eventDate address interests events')

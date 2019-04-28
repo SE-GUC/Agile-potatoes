@@ -73,7 +73,7 @@ class App extends Component {
             <Route exact path="/login" component={ () => <Login changeLoggedInFlag={this.changeLoggedInFlag} /> } />
           </div>
         </Router>
-        {/* <Footer/> */}
+        <Footer/>
         {/*<EventPostNew/>
         <GetApplicants/>
         <SubmitFeedbackForm />
