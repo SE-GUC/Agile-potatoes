@@ -187,15 +187,15 @@ router.get('/RecommendedEvents',verifyToken, function (req, res) {
 		})
 })
 
-router.delete('/:evid/deleteEvent', function (req, res) {
-	var userType = req.body.userType;
+router.delete('/:evid/deleteEvent', verifyToken, function (req, res) {
+	var userType = req.userType;
 	var evId = req.params.evid;
-	var userID = req.body.userID;
+	var userID = req.userId;
 	console.log("I am deleting event")
 	if (userType == 'Partner') {
 		Event.findById(evId)
 			.exec(function (err, event) {
-				if (err) res.status(400).send
+				if (err) res.status(400).send('shit happens');
 				if (event.eventStatus == 'Submitted' && event.partner == userID) {
 					Event.findByIdAndRemove(evId, function (err, event1) {
 						if (err) res.status(400).send('Got a database error while deleting')
@@ -226,7 +226,7 @@ router.delete('/:evid/deleteEvent', function (req, res) {
 // Story 21.2 display an event post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
 	var eveId = req.params.id;
-	Event.findById(eveId, '-_id').populate('partner', 'name').populate('attendees', 'fname lname').exec(
+	Event.findById(eveId).populate('partner', 'name').populate('attendees', 'fname lname').exec(
 		function (err, response) {
 			if (err) return res.send("event not found");
 			return res.send(response);
@@ -234,9 +234,9 @@ router.get('/Post/:id', function (req, res) {
 });
 
 // As a partner i can re-allow more members to book tickets to my event 
-router.put('/:id/reOpenMyEvent', (req, res, next) => {
-	let userType = req.body.userType; //should come from session
-	let userId = req.body.userId; //should come from session
+router.put('/:id/reOpenMyEvent', verifyToken,(req, res, next) => {
+	let userType = req.userType; //should come from session
+	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
 	Event.findById(eventId).exec((err, event) => {
 		if (err) return res.send("something wrong");
@@ -244,7 +244,7 @@ router.put('/:id/reOpenMyEvent', (req, res, next) => {
 			console.log('event not found')
 			return res.status(404).send("event not found");
 		}
-		if (event.partner && event.partner == userId) {
+		if (userType === "Admin" || (userType === "Partner" && event.partner && event.partner == userId)) {
 			if (event.eventStatus === 'Finished' && (Date.parse(event.eventDate) - Date.now()) > 0) {
 				event.eventStatus = 'Approved';
 				event.save((err) => {
@@ -274,17 +274,18 @@ router.put('/:id/reOpenMyEvent', (req, res, next) => {
 })
 
 // As a partner i can disallow more members to book tickets to my event 
-router.put('/:id/closeMyEvent', (req, res, next) => {
-	let userType = req.body.userType; //should come from session
-	let userId = req.body.userId; //should come from session
+router.put('/:id/closeMyEvent', verifyToken ,(req, res, next) => {
+	let userType = req.userType; //should come from session
+	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
+	console.log(userType, userId, eventId, req);
 	Event.findById(eventId).exec((err, event) => {
 		if (err) return res.send("something wrong");
 		if (!event) {
 			console.log('event not found')
 			return res.status(404).send("event not found");
 		}
-		if (userType === "Partner" && event.partner && event.partner == userId) {
+		if (userType === "Admin" || ( userType === "Partner" && event.partner && event.partner == userId)) {
 			if (event.eventStatus === 'Approved') {
 				event.eventStatus = 'Finished';
 				event.save((err) => {
@@ -318,9 +319,9 @@ router.put('/:id/closeMyEvent', (req, res, next) => {
 
 //user story 21: As a partner I can update my pending events
 //Date, Location, Description, Price, Type, Topics, Speakers, Number of Attendees, Remaining Places.
-router.put('/:id', async (req, res) => {
-	var userType = req.body.userType; //should come from session
-	var userID = req.body.userID; //should come from session
+router.put('/:id',verifyToken, async (req, res) => {
+	var userType = req.userType; //should come from session
+	var userID = req.userId; //should come from session
 	var eventID = req.params.id;
 	var date; var location; var desc; var price; var type; var topics; var speakers; var attendees; var remPlaces;
 	if (userType == 'Partner') {     //partner updating HIS event
@@ -354,7 +355,7 @@ router.put('/:id', async (req, res) => {
 		await Event.findById(eventID).exec(function (err, event) {
 			if (event.partner._id == userID && event.eventStatus == 'Submitted') {
 				if (date) {
-					event.date = date;
+					event.eventDate = date;
 				}
 				if (location) {
 					event.location = location;
@@ -391,9 +392,9 @@ router.put('/:id', async (req, res) => {
 		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
 });
 
-router.post('/:id/comment', function (req, res) {
-	var userType = req.body.userType;
-	var userId = req.body.userID;
+router.post('/:id/comment', verifyToken, function (req, res) {
+	var userType = req.userType;
+	var userId = req.userId;
 	var comment = req.body.comment;
 	var evId = req.params.id;
 	if (userType == 'Admin') {
@@ -437,24 +438,27 @@ router.post('/:id/comment', function (req, res) {
 });
 
 //As a member I can mark myself as going to an event
-router.put('/:id/attending', function (req, res) {
+router.put('/:id/attending', verifyToken, function (req, res) {
 	var eventID = req.params.id;
-	var userID = req.body.userID;
-	var userType = req.body.userType;
+	var userID = req.userId;
+	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
 			event.attendees.push(userID);
 			event.remainingPlaces = event.remainingPlaces - 1;
 			event.save(function (err, done) {
-				if (err) res.status(400).send(err);
+				if (err) {
+					res.status(400).send(err);
+					console.log(err);
+				}
 				else res.send("Marked you as attending");
 			});
 		});
 	}
 });
 //As an admin I can approve events
-router.put('/:id/approve', function (req, res) {
-	var userType = req.body.userType;
+router.put('/:id/approve', verifyToken, function (req, res) {
+	var userType = req.userType;
 	var eveId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(eveId).exec(function (err, event) {
@@ -472,10 +476,10 @@ router.put('/:id/approve', function (req, res) {
 })
 //As a member I can mark myself as not going to an event that I 
 //previously marked myself as going to
-router.put('/:id/notAttending', function (req, res) {
+router.put('/:id/notAttending', verifyToken, function (req, res) {
 	var eventID = req.params.id;
-	var userID = req.body.userID;
-	var userType = req.body.userType;
+	var userID = req.userId;
+	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
 			event.attendees.pull(userID);

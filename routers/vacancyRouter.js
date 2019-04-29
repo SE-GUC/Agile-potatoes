@@ -8,6 +8,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
 const NotifyByEmail = require('../services/NotifyByEmail');
+const verifyToken = require('../middleware/tokenVerifier').verifyToken;
+
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
@@ -273,8 +275,8 @@ router.get('/RecommendedVacancies', function (req, res, next) {
 })
 
 //As an admin i can change vacancy status if it is submitted and as a partner i can change vacancy status if it is opened
-router.put('/:id/status', function (req, res) {
-    var userType = req.body.userType;
+router.put('/:id/status', verifyToken, function (req, res) {
+    var userType = req.userType;
     var vacId = req.params.id;
     var status = req.body.status;
     var partner = req.body.partner;

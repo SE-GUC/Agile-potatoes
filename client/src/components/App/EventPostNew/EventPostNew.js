@@ -5,18 +5,10 @@ import axios from "axios";
 class EventPostNew extends Component {
   constructor(props) {
     super(props);
-    /*  
-      props should have the user data
-    */
     this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
+    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
-      // postID: '5cbbbea760006f509880af3b',
-      // //put user data here until we get them from props
-      // userData: {
-      //   _id: '5cbbb65c9800133ed8898a09',
-      //   userType: 'Partner'
-      // },
-      postID: "",
+      postID: this.props.match.params.id,
       loaded: false,
       userHasBooked: false,
       Edit: false,
@@ -43,7 +35,10 @@ class EventPostNew extends Component {
       })
     else
       this.setState({
-        eventEditedData: { [e.target.name]: e.target.value }
+        eventEditedData: {
+          ...this.state.eventEditedData,
+          [e.target.name]: e.target.value
+        }
       });
   }
 
@@ -92,9 +87,6 @@ class EventPostNew extends Component {
       this.setState({
         loaded: true
       });
-    console.log(this.state.eventData.partner._id)
-    console.log(this.userData.userId)
-    console.log(this.state.eventData);
   }
 
   async onClickComment(e) {
@@ -102,6 +94,10 @@ class EventPostNew extends Component {
       "userID": this.userData.userId,
       "userType": this.userData.userType,
       "comment": this.state.feedback,
+    }, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     });
     //hopefully getting the updated event with the new comments
     await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
@@ -124,11 +120,12 @@ class EventPostNew extends Component {
   }
 
   async onClickApprove() {
-    await axios.put(`http://localhost:3001/api/event/${this.state.postID}/approve`, {
-      "userType": "Admin"
+    await axios.put(`http://localhost:3001/api/event/${this.state.postID}/approve`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     })
       .then(res =>
-        // window.location.reload();
         this.setState({
           eventData: {
             ...this.state.eventData,
@@ -157,8 +154,12 @@ class EventPostNew extends Component {
       'speakers': this.state.eventData.speakers,
       'attendees': this.state.eventData.attendees,
       'remPlaces': this.state.eventEditedData.remPlaces
+    },{
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     }).then(res => {
-      console.log(res)
+      console.log(res) 
       this.setState({
         Edit: false
       });
@@ -168,10 +169,12 @@ class EventPostNew extends Component {
 
 
   onClickBook = (e) => {
-    axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {
-      "userID": this.userData.userId,
-      "userType": this.userData.userType
-    }).then(res =>
+    console.log('hi')
+    axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {}, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -180,19 +183,21 @@ class EventPostNew extends Component {
         userHasBooked: true
       }))
       .catch(err => {
-        console.log(err.response.data);
+        if(err.response){
         this.refs.alert.innerText = err.response.data;
         console.log(this.refs.alert);
         this.refs.alert.style.display = "block";
+        }
       });
   }
 
   onClickCancel = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {
-      "userID": this.userData.userId,
-      "userType": this.userData.userType
-    }).then(res =>
+    axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {},{
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -220,15 +225,7 @@ class EventPostNew extends Component {
 
   closeEvent() {
     axios
-      .put(
-        `http://localhost:3001/api/event/${
-        this.state.postID
-        }/closeMyEvent`,
-        {
-          "userType": this.userData.userType,
-          "userId": this.userData.userId
-        }
-      )
+      .put(`http://localhost:3001/api/event/${this.state.postID}/closeMyEvent`, {},{headers: { Authorization: 'Bearer '+ this.authData }  })
       .then(res => {
         if (res.data === "closed") {
           this.setState({
@@ -239,6 +236,7 @@ class EventPostNew extends Component {
             }
           });
         }
+        this.refs.alert.style.display = "none";
       })
       .catch(err => {
         console.log(err.response.data);
@@ -250,15 +248,7 @@ class EventPostNew extends Component {
 
   reOpenEvent() {
     axios
-      .put(
-        `http://localhost:3001/api/event/${
-        this.state.postID
-        }/reOpenMyEvent`,
-        {
-          "userType": this.userData.userType,
-          "userId": this.userData.userId
-        }
-      )
+      .put(`http://localhost:3001/api/event/${this.state.postID}/reOpenMyEvent`,{},{ headers: { Authorization: 'Bearer '+ this.authData }})
       .then(res => {
         if (res.data === "opened") {
           this.setState({
@@ -269,6 +259,7 @@ class EventPostNew extends Component {
             }
           });
         }
+        this.refs.alert.style.display = "none";
       })
       .catch(err => {
         this.refs.alert.innerText = err.response.data;
@@ -281,10 +272,9 @@ class EventPostNew extends Component {
     axios({
       method: 'DELETE',
       url: `http://localhost:3001/api/event/${this.state.postID}/deleteEvent`,
-      data: {
-        "userType": this.userData.userType,
-        "userID": this.userData.userId
-      }
+      headers: { Authorization: 'Bearer '+ this.authData }
+    }).then(()=>{
+      this.props.history.push('/events');
     })
       .catch(err => {
         this.refs.alert.innerText = err.response.data;
@@ -364,7 +354,7 @@ class EventPostNew extends Component {
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
-                  <CommentsSection userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
+                  <CommentsSection partnerName={this.state.eventData.partner.name} userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
                   {/* {this.getCommentsSorted().map(comment => {
                     return (
                       <div key={comment.date} className="comment">
@@ -410,7 +400,7 @@ class EventPostNew extends Component {
                 this.state.userHasBooked ? (
                   <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickCancel} >CANCEL</button>
                 ) : (
-                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickBook} >BOOK NOW</button>
+                    <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.userData.userType !== "Member" || this.state.eventData.remainingPlaces <= 0 || this.state.eventData.eventStatus !== 'Approved'} onClick={this.onClickBook} >BOOK</button>
                   )
               }
               <p className="text-muted text-center">remaining seats: {this.state.eventData.remainingPlaces} </p>
@@ -445,7 +435,7 @@ class EventPostNew extends Component {
                 (this.userData.userId === this.state.eventData.partner._id)
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br />
                   <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Event</button>
                 </div>
               }
@@ -455,17 +445,17 @@ class EventPostNew extends Component {
                 (this.state.eventData.eventStatus === "Approved")
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br />
                   <button onClick={this.closeEvent.bind(this)} className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
                 </div>
               }
-              {
+              { 
                 (this.userData.userType === "Partner" || this.userData.userType === "Admin")
                 &&
                 (this.state.eventData.eventStatus === "Finished")
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br />
                   <button onClick={this.reOpenEvent.bind(this)} className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
                 </div>
               }
@@ -481,7 +471,7 @@ function CommentsSection(props) {
   return (
     props.allComments.map((comment) => {
       return <div className='comment'>
-        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin') ? 'Partner' : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
+        <p className="font-weight-bold">{comment.author === props.userID ? ('You') : ((props.userType === 'Admin') ? props.partnerName : 'Lirten Hub')}<span className="text-muted float-right font-weight-lighter">{comment.date}</span></p>
         <p>{comment.text}</p>
       </div>
     })

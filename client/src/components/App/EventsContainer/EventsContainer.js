@@ -10,6 +10,9 @@ class EventsContainer extends Component {
     ],
     toggle:0,
   }
+  componentDidMount = () =>{
+    this.getAllEvents();
+  }
   getAllEvents = async ()=>{
     try {
       let allEvents = await axios.get(`http://localhost:3001/api/event/ApprovedEvents`);

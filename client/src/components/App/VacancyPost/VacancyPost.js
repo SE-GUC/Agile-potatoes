@@ -9,6 +9,8 @@ class VacancyPost extends Component {
     /*  
       props should have the user data
     */
+    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
+    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
       postID: '5cb8b4653da6b4a548c005fb',
       //put user data here until we get them from props
@@ -255,10 +257,10 @@ class VacancyPost extends Component {
   }
 
   onClickClose = (e) => {
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
-      "status": "Closed"
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {"status":"Closed"}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     });
 
     this.setState({
@@ -284,11 +286,7 @@ class VacancyPost extends Component {
   }
 
   onClickReOpen = (e) => {
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
-      "status": "Open"
-    });
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`,  {"status":"Open"},{headers: { Authorization: 'Bearer '+ this.authData }  });
 
     this.setState({
       vacancyData: {
