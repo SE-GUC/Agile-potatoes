@@ -333,7 +333,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 	var remainingPlaces = req.body.remainingPlaces;
 	var city = req.body.city;
 	if (userType == 'Partner') {     //partner updating HIS event
-		await Event.findById(eventID).exec(function (err, event) {
+		await Event.findById(eventID).exec(async function (err, event) {
 			if (event.partner._id == userID && event.eventStatus == 'Submitted') {
 				event.eventDate = date;
 				event.location = location;
