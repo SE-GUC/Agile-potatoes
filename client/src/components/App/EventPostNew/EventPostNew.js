@@ -14,16 +14,17 @@ class EventPostNew extends Component {
       Edit: false,
       eventData: {},
       feedback: '',
+      
       eventEditedData: {
         date: "",
         location: "",
-        desc: "",
+        description: "",
         price: 0,
-        type: "",
+        eventType: "",
         topics: "",
         speakers: "",
-        attendees: "",
-        remPlaces: ""
+        remainingPlaces: "",
+        city: ""
       }
     };
   }
@@ -43,7 +44,7 @@ class EventPostNew extends Component {
   }
 
   async componentDidMount() {
-    await axios.get(`http://localhost:3001/api/event/Post/${this.props.match.params.id}`)
+    await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
       .then(res => {
         this.setState({
           eventData: res.data
@@ -72,7 +73,7 @@ class EventPostNew extends Component {
     // check if user is found in attendees array
     let booked = false;
     let attendees = this.state.eventData.attendees;
-    if(attendees){
+    if (attendees) {
       for (let i = 0; i < attendees.length; i++) {
         if (attendees[i]._id === this.userData.userId)
           booked = true;
@@ -95,10 +96,10 @@ class EventPostNew extends Component {
       "userType": this.userData.userType,
       "comment": this.state.feedback,
     }, {
-      headers: {
-        Authorization: 'Bearer ' + this.authData
-      }
-    });
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      });
     //hopefully getting the updated event with the new comments
     await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
       .then(updatedEvent => {
@@ -144,26 +145,25 @@ class EventPostNew extends Component {
     await axios.put(`http://localhost:3001/api/event/${this.state.postID}`, {
       'userType': this.userData.userType,
       'userID': this.userData.userId,
-      'eventID': this.state.eventData._id,
       'date': this.state.eventEditedData.date,
       'location': this.state.eventEditedData.location,
-      'desc': this.state.eventEditedData.desc,
+      'description': this.state.eventEditedData.description,
       'price': this.state.eventEditedData.price,
-      'type': this.state.eventEditedData.type,
+      'eventType': this.state.eventEditedData.eventType,
       'topics': this.state.eventData.topics,
       'speakers': this.state.eventData.speakers,
-      'attendees': this.state.eventData.attendees,
-      'remPlaces': this.state.eventEditedData.remPlaces
-    },{
-      headers: {
-        Authorization: 'Bearer ' + this.authData
-      }
-    }).then(res => {
-      console.log(res) 
-      this.setState({
-        Edit: false
-      });
-    })
+      'remainingPlaces': this.state.eventEditedData.remainingPlaces,
+      'city': this.state.eventEditedData.city
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        console.log(res)
+        this.setState({
+          Edit: false
+        });
+      })
     window.location.reload();
   }
 
@@ -171,10 +171,10 @@ class EventPostNew extends Component {
   onClickBook = (e) => {
     console.log('hi')
     axios.put(`http://localhost:3001/api/event/${this.state.postID}/attending`, {}, {
-        headers: {
-          Authorization: 'Bearer ' + this.authData
-        }
-      }).then(res =>
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
+    }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -183,21 +183,21 @@ class EventPostNew extends Component {
         userHasBooked: true
       }))
       .catch(err => {
-        if(err.response){
-        this.refs.alert.innerText = err.response.data;
-        console.log(this.refs.alert);
-        this.refs.alert.style.display = "block";
+        if (err.response) {
+          this.refs.alert.innerText = err.response.data;
+          console.log(this.refs.alert);
+          this.refs.alert.style.display = "block";
         }
       });
   }
 
   onClickCancel = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {},{
-        headers: {
-          Authorization: 'Bearer ' + this.authData
-        }
-      }).then(res =>
+    axios.put(`http://localhost:3001/api/event/${this.state.postID}/notAttending`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
+    }).then(res =>
       this.setState({
         eventData: {
           ...this.state.eventData,
@@ -225,7 +225,7 @@ class EventPostNew extends Component {
 
   closeEvent() {
     axios
-      .put(`http://localhost:3001/api/event/${this.state.postID}/closeMyEvent`, {},{headers: { Authorization: 'Bearer '+ this.authData }  })
+      .put(`http://localhost:3001/api/event/${this.state.postID}/closeMyEvent`, {}, { headers: { Authorization: 'Bearer ' + this.authData } })
       .then(res => {
         if (res.data === "closed") {
           this.setState({
@@ -248,7 +248,7 @@ class EventPostNew extends Component {
 
   reOpenEvent() {
     axios
-      .put(`http://localhost:3001/api/event/${this.state.postID}/reOpenMyEvent`,{},{ headers: { Authorization: 'Bearer '+ this.authData }})
+      .put(`http://localhost:3001/api/event/${this.state.postID}/reOpenMyEvent`, {}, { headers: { Authorization: 'Bearer ' + this.authData } })
       .then(res => {
         if (res.data === "opened") {
           this.setState({
@@ -272,8 +272,8 @@ class EventPostNew extends Component {
     axios({
       method: 'DELETE',
       url: `http://localhost:3001/api/event/${this.state.postID}/deleteEvent`,
-      headers: { Authorization: 'Bearer '+ this.authData }
-    }).then(()=>{
+      headers: { Authorization: 'Bearer ' + this.authData }
+    }).then(() => {
       this.props.history.push('/events');
     })
       .catch(err => {
@@ -292,14 +292,16 @@ class EventPostNew extends Component {
             <input type="text" className="form-control" name="date" onChange={this.handleChange} defaultValue={this.state.eventData.eventDate + ""} />
             <span className="text-muted" > Location </span>
             <input type="text" className="form-control" name="location" onChange={this.handleChange} defaultValue={this.state.eventData.location + ""} />
+            <span className="text-muted" > City </span>
+            <input type="text" className="form-control" name="city" onChange={this.handleChange} defaultValue={this.state.eventData.city + ""} />
             <span className="text-muted" > Description </span>
-            <input type="text-area" className="form-control" name="desc" onChange={this.handleChange} defaultValue={this.state.eventData.description + ""} />
+            <input type="text-area" className="form-control" name="description" onChange={this.handleChange} defaultValue={this.state.eventData.description + ""} />
             <span className="text-muted" > Price </span>
             <input type="text" className="form-control" name="price" onChange={this.handleChange} defaultValue={this.state.eventData.price + ""} />
             <span className="text-muted" > Type </span>
-            <input type="text" className="form-control" name="type" onChange={this.handleChange} defaultValue={this.state.eventData.eventType + ""} />
+            <input type="text" className="form-control" name="eventType" onChange={this.handleChange} defaultValue={this.state.eventData.eventType + ""} />
             <span className="text-muted" > Remaining Places </span>
-            <input type="text" className="form-control" name="remPlaces" onChange={this.handleChange} defaultValue={this.state.eventData.remainingPlaces + ""} />
+            <input type="text" className="form-control" name="remainingPlaces" onChange={this.handleChange} defaultValue={this.state.eventData.remainingPlaces + ""} />
             <br></br>
             <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.onClickSubmit()}> Done! </button>
           </div>
@@ -326,25 +328,25 @@ class EventPostNew extends Component {
                 <h4>Speakers</h4>
                 <div className="row">
                   {this.state.eventData.speakers &&
-                  this.state.eventData.speakers.map(speaker => {
-                    return (
-                      <div key={speaker} className="col-sm-4">
-                        <i> -{speaker}</i>
-                      </div>
-                    );
-                  })}
+                    this.state.eventData.speakers.map(speaker => {
+                      return (
+                        <div key={speaker} className="col-sm-4">
+                          <i> -{speaker}</i>
+                        </div>
+                      );
+                    })}
                 </div>
                 <br />
                 <h4>Topics</h4>
                 <div className="row">
-                  {this.state.eventData.topics && 
-                  this.state.eventData.topics.map(topic => {
-                    return (
-                      <div key={topic} className="col-sm-4">
-                        <p> {topic}</p>
-                      </div>
-                    );
-                  })}
+                  {this.state.eventData.topics &&
+                    this.state.eventData.topics.map(topic => {
+                      return (
+                        <div key={topic} className="col-sm-4">
+                          <p> {topic}</p>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
               {
@@ -449,7 +451,7 @@ class EventPostNew extends Component {
                   <button onClick={this.closeEvent.bind(this)} className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
                 </div>
               }
-              { 
+              {
                 (this.userData.userType === "Partner" || this.userData.userType === "Admin")
                 &&
                 (this.state.eventData.eventStatus === "Finished")
