@@ -437,7 +437,7 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
+                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.userData.userId === this.state.vacancyData.partner._id))
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
@@ -454,7 +454,7 @@ class VacancyPost extends Component {
               }
 
               {
-                (this.state.vacancyData.hired.some(emp => emp._id === this.state.userData._id))
+                (this.state.vacancyData.hired.some(emp => emp._id === this.userData.userId))
                 &&
                 (this.state.vacancyData.status === 'Closed')
                 &&
@@ -472,7 +472,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Applicants</h4>
@@ -487,7 +487,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Hired People that you can submit feedback on:</h4>
@@ -516,7 +516,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id) &&
+                (this.state.vacancyData.partner._id === this.userData.userId) &&
                 <div>
                   <br /><br /> <br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })} >Edit</button>
@@ -527,7 +527,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Open")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
                   <br /><br /><br />
@@ -539,7 +539,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Finished")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
                   <br /><br /><br />

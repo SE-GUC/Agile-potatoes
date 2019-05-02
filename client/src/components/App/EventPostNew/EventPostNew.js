@@ -14,7 +14,7 @@ class EventPostNew extends Component {
       Edit: false,
       eventData: {},
       feedback: '',
-      
+
       eventEditedData: {
         date: "",
         location: "",
@@ -444,6 +444,8 @@ class EventPostNew extends Component {
               {
                 (this.userData.userType === "Partner" || this.userData.userType === "Admin")
                 &&
+                (this.userData.userId === this.state.eventData.partner._id)
+                &&
                 (this.state.eventData.eventStatus === "Approved")
                 &&
                 <div>
@@ -453,6 +455,8 @@ class EventPostNew extends Component {
               }
               {
                 (this.userData.userType === "Partner" || this.userData.userType === "Admin")
+                &&
+                (this.userData.userId === this.state.eventData.partner._id)
                 &&
                 (this.state.eventData.eventStatus === "Finished")
                 &&
