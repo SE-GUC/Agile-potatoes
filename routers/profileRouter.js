@@ -134,8 +134,8 @@ router.get('/:id/GetPassword', function (req, res) {
 
 //user story 8: As a Member I can post feedback to a Partner I previously worked with
 router.post('/:id/feedback', verifyToken, function (req, res) {
-    var userType = req.userType; //should come from session (has to be Member)
-    var userID = req.userID;    //should come from session (the writer of the feedback comment)
+    var userType = req.userType; //has to be Member
+    var userID = req.userId;    //the writer of the feedback comment
     var personID = req.params.id;
     var comment = req.body.comment;
     if (userType === 'Member') {
@@ -147,7 +147,7 @@ router.post('/:id/feedback', verifyToken, function (req, res) {
             });
 
             NotifyByEmail(partner.email, 'New feedback',
-                "Member that previously worked with has posted a feedback"
+                "Member that previously worked for you has posted a feedback to your profile"
                 + `\n feedback is: ${comment}`)
 
             partner.save();
@@ -162,7 +162,9 @@ router.post('/:id/feedback', verifyToken, function (req, res) {
                 partner: userID
             })
 
-            //notify by email here please
+            NotifyByEmail(member.email, 'New feedback',
+                "Partner that you worked for has posted a feedback to your profile"
+                + `\n feedback is: ${comment}`)
 
             member.save();
         })
@@ -175,7 +177,7 @@ router.post('/:id/feedback', verifyToken, function (req, res) {
 //user story 20: As a Partner I can update my profile (Board Members, Pending vacancies, Password, Pending events).
 router.put('/:id', verifyToken, function (req, res) {
     var userType = req.userType; //should come from session
-    var userID = req.userID; //should come from session (person logged in)
+    var userID = req.userId; //should come from session (person logged in)
     var partnerID = req.params.id; //the ID of the partner I want to update
     var pwd; var members; var oldPassword;
     if (req.body.boardMembers) {

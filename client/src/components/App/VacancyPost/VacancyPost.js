@@ -12,12 +12,7 @@ class VacancyPost extends Component {
     this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
     this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
-      postID: '5cb8b4653da6b4a548c005fb',
-      //put user data here until we get them from props
-      userData: {
-        _id: '5cb8b44f3da6b4a548c005fa',
-        userType: 'Partner',
-      },
+      postID: this.props.match.params.id,
       loaded: false,
       userHasApplied: false,
       vacancyData: {},
@@ -29,7 +24,7 @@ class VacancyPost extends Component {
       salary: 0,
       dailyHours: 0,
       city: "",
-      name: "",
+      name: ""
     }
   }
 
@@ -69,7 +64,7 @@ class VacancyPost extends Component {
     let applied = false;
     let applicants = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/applicants`);
     for (let i = 0; i < applicants.data.length; i++) {
-      if (applicants.data[i]._id === this.state.userData._id)
+      if (applicants.data[i]._id === this.userData.userId)
         applied = true;
     }
     if (applied) {
@@ -89,16 +84,19 @@ class VacancyPost extends Component {
 
   async onClickApprove() {
     await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": "Admin",
       "status": "Open"
-    }).then(res => {
-      this.setState({
-        vacancyDate: {
-          ...this.state.vacancyData,
-          status: 'Open'
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
         }
+      }).then(res => {
+        this.setState({
+          vacancyDate: {
+            ...this.state.vacancyData,
+            status: 'Open'
+          }
+        })
       })
-    })
   }
 
   async onClickSubmit() {
@@ -110,8 +108,12 @@ class VacancyPost extends Component {
       "dailyHours": this.state.dailyHours,
       "name": this.state.name,
       "city": this.state.city
-    });
-    console.log(resp.data);
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      });
+    console.log('The data after submission of edit: ' + resp.data);
     this.setState({ Edit: false });
     window.location.reload();
   }
@@ -122,9 +124,10 @@ class VacancyPost extends Component {
       flag = false;
 
     //e.preventDefault();
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     }).then(
       this.setState({
         userHasApplied: (true & flag)
@@ -139,9 +142,10 @@ class VacancyPost extends Component {
 
   onClickCancel = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/un-apply`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/un-apply`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     }).then(
       this.setState({
         userHasApplied: false
@@ -156,14 +160,15 @@ class VacancyPost extends Component {
 
   async onClickComment(e) {
     await axios.post(`http://localhost:3001/api/vacancy/${this.state.postID}/comment`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType,
       "comment": this.state.feedback,
-    });
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      });
     //hopefully getting the updated vacancy with the new comments
     await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`)
       .then(updatedVacancy => {
-        console.log(updatedVacancy);
         this.setState({
           vacancyData: {
             ...this.state.vacancyData,
@@ -181,8 +186,8 @@ class VacancyPost extends Component {
   }
 
   handleChange = (e) => {
-    console.log('Name ' + e.target.name)
-    console.log('Value ' + e.target.value)
+    //console.log('Name ' + e.target.name)
+    //console.log('Value ' + e.target.value)
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -190,10 +195,12 @@ class VacancyPost extends Component {
   submitFeedbackMember = (e) => {
     e.preventDefault();
     axios.post(`http://localhost:3001/api/profile/${this.state.vacancyData.partner._id}/feedback`, {
-      "userType": this.state.userData.userType,
-      "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      })
       .then(this.setState({ feedback: '' }))
       .catch(err => {
         console.log(err.response.data);
@@ -206,10 +213,12 @@ class VacancyPost extends Component {
   submitFeedbackPartner = (employee) => {
     //employee.preventDefault();
     axios.post(`http://localhost:3001/api/profile/${employee._id}/feedback`, {
-      "userType": this.state.userData.userType,
-      "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      })
       .then(this.setState({ feedback: '' }))
       .catch(err => {
         console.log(err.response.data);
@@ -221,18 +230,20 @@ class VacancyPost extends Component {
 
   onClickHire = (applicant) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/hireMember`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "memberID": applicant._id
-    }).then(res => {
-      let filteredApplicants = this.state.vacancyData.applicants.filter(a => a._id !== applicant._id)
-      this.setState({
-        vacancyData: {
-          ...this.state.vacancyData,
-          applicants: filteredApplicants
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
         }
-      });
-    })
+      }).then(res => {
+        let filteredApplicants = this.state.vacancyData.applicants.filter(a => a._id !== applicant._id)
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            applicants: filteredApplicants
+          }
+        });
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -243,32 +254,37 @@ class VacancyPost extends Component {
 
   onClickApprove = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "status": "Approved"
-    });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Approved'
-      }
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Approved'
+          }
+        })
+      })
   }
 
   onClickClose = (e) => {
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {"status":"Closed"}, {
-      headers: {
-        Authorization: 'Bearer ' + this.authData
-      }
-    });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Closed'
-      }
-    })
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "status": "Closed"
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Closed'
+          }
+        })
+        this.refs.alert.style.display = "none";
+      });
   }
 
   onClickDelete = (e) => {
@@ -277,23 +293,34 @@ class VacancyPost extends Component {
       method: 'DELETE',
       url: `http://localhost:3001/api/vacancy/${this.state.postID}/deleteVacancy`,
       data: {
-        "userType": this.state.userData.userType,
-        "userID": this.state.userData._id
+        "userType": this.userData.userType,
+        "userID": this.userData.userId
       }
-    })
-
-    //need to rereoute to home page somehow now
+    }).then(() => {
+      //redirect
+      this.props.history.push('/vacancies');
+    }).catch(err => {
+      this.refs.alert.innerText = err.response.data;
+      this.refs.alert.style.display = "block";
+    });
   }
 
   onClickReOpen = (e) => {
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`,  {"status":"Open"},{headers: { Authorization: 'Bearer '+ this.authData }  });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Open'
-      }
-    })
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
+      "status": "Open"
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Open'
+          }
+        })
+        this.refs.alert.style.display = "none";
+      })
   }
 
   render() {
@@ -410,7 +437,7 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
+                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.userData.userId === this.state.vacancyData.partner._id))
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
@@ -427,7 +454,7 @@ class VacancyPost extends Component {
               }
 
               {
-                (this.state.vacancyData.hired.some(emp => emp._id === this.state.userData._id))
+                (this.state.vacancyData.hired.some(emp => emp._id === this.userData.userId))
                 &&
                 (this.state.vacancyData.status === 'Closed')
                 &&
@@ -445,7 +472,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Applicants</h4>
@@ -460,7 +487,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Hired People that you can submit feedback on:</h4>
@@ -489,7 +516,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id) &&
+                (this.state.vacancyData.partner._id === this.userData.userId) &&
                 <div>
                   <br /><br /> <br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })} >Edit</button>
@@ -500,7 +527,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Open")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
                   <br /><br /><br />
@@ -512,7 +539,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Finished")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
                   <br /><br /><br />
