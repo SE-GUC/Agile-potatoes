@@ -1,97 +1,105 @@
 import React, { Component } from 'react'
-import './EventsContainer.css'
-import EventsDisplayer from './EventsDisplayer/EventsDisplayer'
+import './VacanciesContainer.css'
+import VacancyDisplayer from './VacancyDisplayer/VacancyDisplayer'
 import axios from 'axios'
-import CreateEvent from '../CreateEvent/CreateEvent'
+import CreateVacancy from '../CreateVacancy/CreateVacancy'
 class EventsContainer extends Component {
   state = {
-    events: [
-      
-    ],
-    toggle:0,
+    vacancies: [],
+    toggle: 0,
   }
-  componentDidMount = () =>{
-    this.getAllEvents();
-  }
-  getAllEvents = async ()=>{
+
+  componentWillMount = async () => {
     try {
-      let allEvents = await axios.get(`http://localhost:3001/api/event/ApprovedEvents`);
-      this.setState({toggle:this.state.toggle ,events:[...allEvents.data]});
-     } catch (error) {
-      console.log('GOT ERROR')
-    }
-  }
-  getRecommendedEvents = async ()=>{
-    try {
-      let tokenData = JSON.parse(localStorage.getItem('token')).data;
-      let recommendEventsRes = await axios.get(`http://localhost:3001/api/event/RecommendedEvents`, { headers: { Authorization: 'Bearer '+ tokenData.authData }  });
-      this.setState({toggle:this.state.toggle ,events:[...recommendEventsRes.data]});
-     } catch (error) {
-      console.log('GOT ERROR')
-    }
-  }
-  getPartnerEvents= async()=>{
-    try {
-      let tokenData = JSON.parse(localStorage.getItem('token')).data;
-      let events = await axios.get(`http://localhost:3001/api/event/PartnerEvents`, { headers: { Authorization: 'Bearer '+ tokenData.authData } });
-      this.setState({toggle:this.state.toggle ,events:[...events.data]});
-     } catch (error) {
-      console.log('GOT ERROR '+error)
+      let allVacancies = await axios.get(`http://localhost:3001/api/vacancy/getAllVacancies`);
+      this.setState({
+        vacancies: allVacancies.data
+      });
+    } catch (error) {
+      console.log('GOT ERROR fetching vacancies')
     }
   }
 
-  getPendingEventsAdmin= async()=> {
-    try{
-    let tokenData = JSON.parse(localStorage.getItem('token')).data;
-    let response = await axios.get('http://localhost:3001/api/event/PendingEventsAdmin', { headers: { Authorization: 'Bearer ' + tokenData.authData}
-    })
-    this.setState({toggle:this.state.toggle ,events:[...response.data]});
+  getRecommendedVacancies = async () => {
+    try {
+      let tokenData = JSON.parse(localStorage.getItem('token')).data;
+      let recommendVacanciesRes = await axios.get(`http://localhost:3001/api/vacancies/RecommendedVacancies`, { headers: { Authorization: 'Bearer ' + tokenData.authData } });
+      this.setState({
+        vacancies: recommendVacanciesRes.data
+      });
+    } catch (error) {
+      console.log('GOT ERROR getting recommended vacancies')
+    }
+  }
+
+  getPartnerVacancies = async () => {
+    try {
+      let tokenData = JSON.parse(localStorage.getItem('token')).data;
+      let vacancies = await axios.get(`http://localhost:3001/api/vacancy/PartnerVacancies`, { headers: { Authorization: 'Bearer ' + tokenData.authData } });
+      this.setState({
+        vacancies: vacancies.data
+      });
     } catch (error) {
       console.log('GOT ERROR ' + error)
     }
   }
 
-  handletoggle=()=>
-  {
-    this.setState({events:[],toggle:1})
+  getPendingVacanciesAdmin = async () => {
+    try {
+      let tokenData = JSON.parse(localStorage.getItem('token')).data;
+      let response = await axios.get('http://localhost:3001/api/vacancy/AdminPendingVacancies', {
+        headers: { Authorization: 'Bearer ' + tokenData.authData }
+      })
+      this.setState({
+        vacancies: response.data
+      });
+    } catch (error) {
+      console.log('GOT ERROR ' + error)
+    }
   }
+
+  handletoggle = () => {
+    this.setState({ 
+      events: [], 
+      toggle: 1 
+    })
+  }
+
   render() {
-    let func;
-    if(this.state.toggle ==1)
-    {
-      func =  <CreateEvent/>
-      
+    if (this.state.toggle > 0) {
+      return <CreateVacancy />
     }
     return (
       <div className='container-fluid'>
         <div className='row'>
-            <div className='side-bar col-sm-2 ' >
-                <div className="list-group">
-                  <button type="button" onClick={this.getAllEvents} id="allEvents" className="list-group-item list-group-item-action">All Events</button>
-                  {JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member' 
-                    &&
-                  <button type="button" onClick={this.getRecommendedEvents} id="recommendedEvents" className="list-group-item list-group-item-action">Recommended Events</button>
-                  }
-                  {JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' 
-                    &&
-                  <button type="button" onClick={this.getPartnerEvents} id="partnerEvents" className="list-group-item list-group-item-action">Partner Events</button>
-                  }
-                  {
-                    JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin' 
-                    &&
-                  <button type="button" onClick={this.getPendingEventsAdmin} id="partnerEvents" className="list-group-item list-group-item-action">Admin Pending Events</button>
-                  }
-                  {
-                    (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' || JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin')
-                    &&
-                  <button type="button" onClick={this.handletoggle} id="partnerEvents" className="list-group-item list-group-item-action">Create Event</button>
-                  }
-                </div>
+          <div className='side-bar col-sm-2 ' >
+            <div className="list-group">
+              <button type="button" onClick={this.getAllVacancies} id="allVacancies" className="list-group-item list-group-item-action">All Vacancies</button>
+              {
+                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
+                &&
+                <button type="button" onClick={this.getRecommendedVacancies} id="recommendedVacancies" className="list-group-item list-group-item-action">Recommended Vacancies</button>
+              }
+              {
+                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner'
+                &&
+                <button type="button" onClick={this.getPartnerVacancies} id="partnerVacancies" className="list-group-item list-group-item-action">All your Vacancies</button>
+              }
+              {
+                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin'
+                &&
+                <button type="button" onClick={this.getPendingVacanciesAdmin} id="partnerVacancies" className="list-group-item list-group-item-action">Vacancies that need approval</button>
+              }
+              {
+                (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner')
+                &&
+                <button type="button" onClick={this.handletoggle} id="partnerVacancies" className="list-group-item list-group-item-action">Create Vacancy</button>
+              }
             </div>
-            <div className='events-window col-sm-10'>
-              <EventsDisplayer events={this.state.events}/>
-              {func}
-            </div>
+          </div>
+          <div className='events-window col-sm-10'>
+            <VacancyDisplayer vacancies={this.state.vacancies} />
+          </div>
         </div>
       </div>
     )

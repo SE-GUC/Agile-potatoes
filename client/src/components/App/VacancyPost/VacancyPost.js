@@ -10,6 +10,7 @@ class VacancyPost extends Component {
       props should have the user data
     */
     this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
+    console.log(this.userData);
     this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
       postID: this.props.match.params.id,
@@ -437,11 +438,11 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.userData.userId === this.state.vacancyData.partner._id))
+                (this.userData.userType === "Admin" || (this.userData.userType === "Partner" && this.userData.userId === this.state.vacancyData.partner._id))
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
-                  <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
+                  <CommentsSection userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
 
                   <br />
                   <div className="input-group mb-3">
@@ -470,7 +471,7 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === 'Open')
                 &&
-                (this.state.userData.userType === 'Partner')
+                (this.userData.userType === 'Partner')
                 &&
                 (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
@@ -485,7 +486,7 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === 'Closed')
                 &&
-                (this.state.userData.userType === 'Partner')
+                (this.userData.userType === 'Partner')
                 &&
                 (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
@@ -508,11 +509,11 @@ class VacancyPost extends Component {
                   <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.vacancyData.status === "Closed"} onClick={this.onClickCancel}>CANCEL</button>
                 ) :
                 (
-                  <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.vacancyData.status === "Closed"} onClick={this.onClickApply}>APPLY NOW</button>
+                  <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.userData.userType !== "Member" || this.state.vacancyData.status === "Closed"} onClick={this.onClickApply}>APPLY NOW</button>
                 )
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
@@ -523,7 +524,7 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Open")
                 &&
@@ -535,7 +536,7 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Finished")
                 &&
@@ -547,7 +548,7 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Admin")
+                (this.userData.userType === "Admin")
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
@@ -556,9 +557,9 @@ class VacancyPost extends Component {
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&

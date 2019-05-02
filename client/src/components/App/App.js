@@ -24,11 +24,11 @@ import Footer from './Footer/Footer'
 import PartnerProfile from './PartnerProfile/PartnerProfile'
 import MemberProfile from './MemberProfile/MemberProfile'
 import AdminProfile from './AdminProfile/AdminProfile'
-import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
+// import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
+import VacanciesContainer from './VacanciesContainer/VacanciesContainer'
 import PartnerForm from './CreatePartnerForm/CreatePartnerForm'
 import MemberForm from './CreateMemberForm/CreateMemberForm'
 import SignUp from './SignUp/SignUp'
-import CreateVacancy from './CreateVacancy/CreateVacancy';
 class App extends Component {
 
   constructor(props) {
@@ -51,7 +51,7 @@ class App extends Component {
             <Route exact path="/" component={HomePage} />
             <Route exact path="/events" component={EventsContainer} />
             <Route exact path="/events/:id" component={EventPost} />
-            <Route exact path="/vacancies" component={GetAllVacancies} />
+            <Route exact path="/vacancies" component={VacanciesContainer} />
             <Route exact path="/vacancies/:id" component={VacancyPost} />
             {
               (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin') ?

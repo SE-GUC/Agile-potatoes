@@ -18,8 +18,8 @@ class CreateVacancy extends Component {
   }
 
   handleChange = (e) => {
-    console.log('Name ' + e.target.name)
-    console.log('Value ' + e.target.value)
+    //console.log('Name ' + e.target.name)
+    //console.log('Value ' + e.target.value)
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -65,7 +65,7 @@ class CreateVacancy extends Component {
               <input type="text" name="city" onChange={this.handleChange} /><br />
               Vacancy Duration:
               <input type="text" name="duration" onChange={this.handleChange} /><br />
-              Salary amount:
+              Salary in EGP:
               <input type="number" name="salary" onChange={this.handleChange} /><br />
               <input type="submit" value="Submit" />
             </form>
