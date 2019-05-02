@@ -33,9 +33,14 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      loggedIn: false,
-    }
+    if (JSON.parse(localStorage.getItem('token')))
+      this.state = {
+        loggedIn: true
+      }
+    else
+      this.state = {
+        loggedIn: false,
+      }
   }
   changeLoggedInFlag = (flag) => {
     this.setState({

@@ -57,7 +57,7 @@ class EventsContainer extends Component {
   }
   render() {
     let func;
-    if(this.state.toggle ==1)
+    if(this.state.toggle === 1)
     {
       func =  <CreateEvent/>
       
