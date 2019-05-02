@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./EventPostNew.css";
+import "./EventPost.css";
 import axios from "axios";
 
 class EventPost extends Component {
