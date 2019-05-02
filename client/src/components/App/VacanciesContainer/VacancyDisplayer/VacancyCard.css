@@ -1,0 +1,29 @@
+.eventCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 100px;
+    height:220px;
+    position: relative;
+}
+
+.eventCard a{
+    float:right;
+    position: absolute;
+    right:15px;
+    bottom: 15px;
+}
+.eventCard span{
+    float: left;
+    position: absolute;
+    left:20px;
+    bottom: 20px;
+}
+.sample-text {
+    overflow: hidden;
+    box-sizing: content-box;
+    text-overflow: ellipsis;
+    max-height: 150px;
+    max-lines: 3;
+}
