@@ -159,6 +159,7 @@ class CreateMemberForm extends Component {
                 'certificates': this.state.certificates,
                 'interests': this.state.interests,
             })
+            window.alert("Your form has been submitted successfully!")
             console.log(res.data)
         }
         catch (err) {
