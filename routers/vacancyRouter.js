@@ -73,7 +73,7 @@ router.post('/:id/comment', verifyToken, (req, res, next) => {
 });
 
 // As a partner I can submit a vacancy announcement request
-router.post('/:id/CreateVacancy', verifyToken, async (req, res) => {
+router.post('/CreateVacancy', verifyToken, async (req, res) => {
     var userType = req.userType;
     var userId = req.userId; 
     var description = req.body.description;
@@ -210,10 +210,10 @@ router.get('/Post/:id', function (req, res) {
             });
 });
 
-//////Story 17 As an admin I cana view pending vacancies announcments requests
+//////Story 17 As an admin I can view pending vacancies announcments requests
 // FOR SOME REASON YOU'RE HAVING ID AS PARAMETER !
-router.get('/:id/pendingVacancies', function (req, res) {
-    var userType = req.get('userType');
+router.get('/AdminPendingVacancies', verifyToken, function (req, res) {
+    var userType = req.userType;
     if (userType == 'Admin') {
         Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, vacancies) {
             if (err) return res.send(err)
@@ -226,8 +226,8 @@ router.get('/:id/pendingVacancies', function (req, res) {
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
-router.get('/RecommendedVacancies', function (req, res, next) {
-    let userId = req.get('userId');
+router.get('/RecommendedVacancies', verifyToken, function (req, res, next) {
+    let userId = req.userId;
     let vacSortObjArray = [];
     let LastRecommendedVacancies = [];
     let RecommendedVacancies = []
@@ -317,69 +317,77 @@ router.put('/:id/status', verifyToken, function (req, res) {
 });
 
 //get all vacancies
-router.get('/:id/GetAllVacancies', function (req, res) {
-    var userid = req.params.id;
-    Member.findById(userid).exec(function (err, memberDoc) {
-        if (memberDoc) {
-            Vacancy.find({ status: 'Open' }).exec(function (err, vacancy) {
-                if (err)
-                    return res.send("Error")
-                else
-                    return res.send(vacancy);
-            });
-        }
+router.get('/getAllVacancies', function(req, res){
+    Vacancy.find({
+        status: 'Open'
+    }).exec(function(err, vacancies){
+        if(err) res.status(400).send(err);
+        else res.send(vacancies);
     })
+})
+// router.get('/:id/GetAllVacancies', function (req, res) {
+//     var userid = req.params.id;
+//     Member.findById(userid).exec(function (err, memberDoc) {
+//         if (memberDoc) {
+//             Vacancy.find({ status: 'Open' }).exec(function (err, vacancy) {
+//                 if (err)
+//                     return res.send("Error")
+//                 else
+//                     return res.send(vacancy);
+//             });
+//         }
+//     })
 
-    Partner.findById(userid).exec(function (err, partnerDoc) {
-        if (partnerDoc) {
-            Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
-                if (err)
-                    return res.send("Error")
+//     Partner.findById(userid).exec(function (err, partnerDoc) {
+//         if (partnerDoc) {
+//             Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
+//                 if (err)
+//                     return res.send("Error")
 
-                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
-                    if (err)
-                        return res.send("Error")
+//                 Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
+//                     if (err)
+//                         return res.send("Error")
 
-                    Vacancy.find({ status: 'Closed' }).exec(function (err, Closedvacancy) {
-                        if (err)
-                            return res.send("Error")
+//                     Vacancy.find({ status: 'Closed' }).exec(function (err, Closedvacancy) {
+//                         if (err)
+//                             return res.send("Error")
 
-                        return res.send([...Submittedvacancy, ...Openvacancy, ...Closedvacancy])
+//                         return res.send([...Submittedvacancy, ...Openvacancy, ...Closedvacancy])
 
-                    });
-
-
-                });
-            });
-
-
-
-        }
-    })
-
-    Admin.findById(userid).exec(function (err, adminDoc) {
-        if (adminDoc) {
-            Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
-                if (err)
-                    return res.send("Error")
-
-                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
-                    if (err)
-                        return res.send("Error")
-
-                    return res.send([...Submittedvacancies, ...Openvacancies])
-                });
-            });
-        }
-    })
+//                     });
 
 
-});
+//                 });
+//             });
+
+
+
+//         }
+//     })
+
+//     Admin.findById(userid).exec(function (err, adminDoc) {
+//         if (adminDoc) {
+//             Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
+//                 if (err)
+//                     return res.send("Error")
+
+//                 Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
+//                     if (err)
+//                         return res.send("Error")
+
+//                     return res.send([...Submittedvacancies, ...Openvacancies])
+//                 });
+//             });
+//         }
+//     })
+
+
+// });
 
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
-router.get('/:id/PartnerPendingVacancies', function (req, res) {
-    var userType = req.get('userType')
-    var userid = req.params.id
+router.get('/PartnerPendingVacancies', verifyToken, function (req, res) {
+    var userType = req.userType
+    var userid = req.userId
     if (userType == 'Partner') {
         Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, vacancy) {
             return res.send(vacancy);
@@ -387,6 +395,18 @@ router.get('/:id/PartnerPendingVacancies', function (req, res) {
     }
     else {
         return res.status(404).send('not found');
+    }
+});
+
+//a partner getting all vacancies he made. no matter their status!
+router.get('/PartnerVacancies', verifyToken, function (req, res) {
+    var userType = req.userType
+    var userID = req.userId
+    if (userType == 'Partner') {
+        Vacancy.find({ partner: userID}).exec(function (err, vacancy) {
+            if(err) res.status(400).send(err);
+            else res.send(vacancy);
+        });
     }
 });
 
