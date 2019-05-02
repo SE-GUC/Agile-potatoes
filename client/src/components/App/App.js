@@ -28,6 +28,7 @@ import GetAllVacancies from './GetAllVacancies/GetAllVacancies'
 import PartnerForm from './CreatePartnerForm/CreatePartnerForm'
 import MemberForm from './CreateMemberForm/CreateMemberForm'
 import SignUp from './SignUp/SignUp'
+import CreateVacancy from './CreateVacancy/CreateVacancy';
 class App extends Component {
 
   constructor(props) {
