@@ -109,7 +109,7 @@ router.get('/:id/comment', function (req, res) {
 })
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEventsAdmin', verifyToken,function(req, res) {
+router.get('/PendingEventsAdmin', verifyToken, function (req, res) {
 	var usertype = req.userType;
 	if (usertype == 'Admin') {
 		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate eventStatus').exec(function (err, event) {
@@ -133,7 +133,7 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All Event Requests.(Sorted by status)
-router.get('/PartnerEvents',verifyToken, function (req, res) {
+router.get('/PartnerEvents', verifyToken, function (req, res) {
 	var userType = req.userType;
 	var userid = req.userId;
 	if (userType == 'Partner') {
@@ -154,7 +154,7 @@ router.get('/PartnerEvents',verifyToken, function (req, res) {
 });
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
-router.get('/RecommendedEvents',verifyToken, function (req, res) {
+router.get('/RecommendedEvents', verifyToken, function (req, res) {
 	var userId = req.userId;
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
@@ -234,7 +234,7 @@ router.get('/Post/:id', function (req, res) {
 });
 
 // As a partner i can re-allow more members to book tickets to my event 
-router.put('/:id/reOpenMyEvent', verifyToken,(req, res, next) => {
+router.put('/:id/reOpenMyEvent', verifyToken, (req, res, next) => {
 	let userType = req.userType; //should come from session
 	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
@@ -274,7 +274,7 @@ router.put('/:id/reOpenMyEvent', verifyToken,(req, res, next) => {
 })
 
 // As a partner i can disallow more members to book tickets to my event 
-router.put('/:id/closeMyEvent', verifyToken ,(req, res, next) => {
+router.put('/:id/closeMyEvent', verifyToken, (req, res, next) => {
 	let userType = req.userType; //should come from session
 	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
@@ -285,7 +285,7 @@ router.put('/:id/closeMyEvent', verifyToken ,(req, res, next) => {
 			console.log('event not found')
 			return res.status(404).send("event not found");
 		}
-		if (userType === "Admin" || ( userType === "Partner" && event.partner && event.partner == userId)) {
+		if (userType === "Admin" || (userType === "Partner" && event.partner && event.partner == userId)) {
 			if (event.eventStatus === 'Approved') {
 				event.eventStatus = 'Finished';
 				event.save((err) => {
@@ -319,77 +319,39 @@ router.put('/:id/closeMyEvent', verifyToken ,(req, res, next) => {
 
 //user story 21: As a partner I can update my pending events
 //Date, Location, Description, Price, Type, Topics, Speakers, Number of Attendees, Remaining Places.
-router.put('/:id',verifyToken, async (req, res) => {
+router.put('/:id', verifyToken, async (req, res) => {
 	var userType = req.userType; //should come from session
 	var userID = req.userId; //should come from session
 	var eventID = req.params.id;
-	var date; var location; var desc; var price; var type; var topics; var speakers; var attendees; var remPlaces;
+	var date = req.body.date;
+	var location = req.body.location;
+	var description = req.body.description;
+	var price = req.body.price
+	var eventType = req.body.eventType;
+	var topics = req.body.topics;
+	var speakers = req.body.speakers;
+	var remainingPlaces = req.body.remainingPlaces;
+	var city = req.body.city;
 	if (userType == 'Partner') {     //partner updating HIS event
-		if (req.body.date) {
-			date = req.body.date;
-		}
-		if (req.body.location) {
-			location = req.body.location;
-		}
-		if (req.body.description) {
-			desc = req.body.description;
-		}
-		if (req.body.price) {
-			price = req.body.price
-		}
-		if (req.body.type) {
-			type = req.body.eventType;
-		}
-		if (req.body.topics) {
-			topics = req.body.topics
-		}
-		if (req.body.speakers) {
-			speakers = req.body.speakers;
-		}
-		if (req.body.attendees) {
-			attendees = req.body.attendees;
-		}
-		if (req.body.remainingPlaces) {
-			remPlaces = req.body.remainingPlaces;
-		}
 		await Event.findById(eventID).exec(function (err, event) {
 			if (event.partner._id == userID && event.eventStatus == 'Submitted') {
-				if (date) {
-					event.eventDate = date;
-				}
-				if (location) {
-					event.location = location;
-				}
-				if (desc) {
-					event.description = desc;
-				}
-				if (price) {
-					event.price = price;
-				}
-				if (type) {
-					event.type = type;
-				}
-				if (topics) {
-					event.topics = topics;
-				}
-				if (speakers) {
-					event.speakers = speakers;
-				}
-				if (attendees) {
-					event.attendees = attendees;
-				}
-				if (remPlaces) {
-					event.remainingPlaces = remPlaces;
-				}
+				event.eventDate = date;
+				event.location = location;
+				event.description = description;
+				event.price = price;
+				event.eventType = eventType;
+				event.topics = topics;
+				event.speakers = speakers;
+				event.remainingPlaces = remainingPlaces;
+				event.city = city;
+				await event.save();
 				res.send(event);
-				console.log("Updated event successfully");
-				event.save();
 			}
-			//else res.send("Event was already approved so you can't update it");
+			else res.status(400).send("Event is either not yours or was already Approved so you can't edit it");
 		});
 	}
 	else
-		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
+		return res.status(400).send({ error: 'Cannot edit this event as you are not a partner' });
 });
 
 router.post('/:id/comment', verifyToken, function (req, res) {
