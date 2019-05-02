@@ -16,7 +16,7 @@ import Notifications from '../Notifications/Notifications';
 // import DeletePendingEvents from './DeletePendingEvents'
 // import CreatingEventComment from './CreatingEventComment'
 import VacancyPost from './VacancyPost/VacancyPost'
-import EventPostNew from './EventPostNew/EventPostNew'
+import EventPost from './EventPost/EventPost'
 import HomePage from './HomePage/HomePage'
 import Navbar from './Navbar/Navbar'
 import Login from './Sign In/Login';
@@ -49,7 +49,7 @@ class App extends Component {
           <div>
             <Route exact path="/" component={HomePage} />
             <Route exact path="/events" component={EventsContainer} />
-            <Route exact path="/events/:id" component={EventPostNew} />
+            <Route exact path="/events/:id" component={EventPost} />
             <Route exact path="/vacancies" component={GetAllVacancies} />
             <Route exact path="/vacancies/:id" component={VacancyPost} />
             {

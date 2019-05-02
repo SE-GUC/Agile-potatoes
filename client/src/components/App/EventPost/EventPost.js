@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./EventPostNew.css";
 import axios from "axios";
 
-class EventPostNew extends Component {
+class EventPost extends Component {
   constructor(props) {
     super(props);
     this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
@@ -484,4 +484,4 @@ function CommentsSection(props) {
   )
 }
 
-export default EventPostNew;
+export default EventPost;
