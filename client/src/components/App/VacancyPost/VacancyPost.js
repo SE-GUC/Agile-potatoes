@@ -580,9 +580,8 @@ function ApplicantItem(props) {
   return (
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
-      {/* <Link to={props.ProfileURL}></Link> */}
       <div className="input-group-append">
-        <h6>{props.fname} {props.lname}</h6>
+        <Link to={props.url}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
