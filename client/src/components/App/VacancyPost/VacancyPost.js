@@ -413,7 +413,7 @@ class VacancyPost extends Component {
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
                   <span className="text-muted">Posted by </span>
-                  {this.state.vacancyData.partner.name}
+                  <Link to={this.state.vacancyData.partner.ProfileURL}>{this.state.vacancyData.partner.name}</Link>
                 </p>
                 <p className="text-muted">
                   <i className="fas fa-map-marker-alt" />{" "}
@@ -581,7 +581,7 @@ function ApplicantItem(props) {
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
       <div className="input-group-append">
-        <Link to={props.url}><h6>{props.fname} {props.lname}</h6></Link>
+        <Link to={'http://localhost:3001/' + props.url}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
