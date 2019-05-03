@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import "./EventPost.css";
 import axios from "axios";
+import SkyLight from "react-skylight";
+
 
 class EventPost extends Component {
   constructor(props) {
@@ -318,7 +320,7 @@ class EventPost extends Component {
                   {this.state.eventData.eventDate}
                 </p>
                 <h2>{this.state.eventData.name}</h2>
-                <p><span className="text-muted">organized by </span>{this.state.eventData.partner ? (this.state.eventData.partner.name) : ("LirtnenHub")}</p>
+                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ? (this.state.eventData.partner.name) : ("LirtnenHub")}</p>
                 <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.eventData.location}, {this.state.eventData.city}</p>
               </div>
               <div className="event-post-info">
@@ -349,6 +351,9 @@ class EventPost extends Component {
                     })}
                 </div>
               </div>
+
+
+
               {
                 (this.state.eventData.eventStatus === "Submitted")
                 &&
@@ -393,6 +398,21 @@ class EventPost extends Component {
               }
               <p className="text-muted text-center">remaining seats: {this.state.eventData.remainingPlaces} </p>
 
+              <SkyLight hideOnOverlayClicked ref={ref => (this.simpleDialog = ref)} title="Feedbacks">
+                <div className='toto'>
+                  {this.state.eventData.feedbacks.map(feedback => {
+                    return (
+                      <div key={feedback} className="eventCardy">
+                        <div className="card-body">
+                          <span className="card-text"><small className="text-muted">Review: </small></span>
+                          <h5 className="card-title">{feedback}</h5>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SkyLight>
+
               {
                 (this.userData.userType === "Admin")
                 &&
@@ -403,6 +423,7 @@ class EventPost extends Component {
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.onClickApprove()}>Approve</button>
                 </div>
               }
+
               {
                 (this.userData.userType === "Partner")
                 &&
@@ -415,6 +436,17 @@ class EventPost extends Component {
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })}>Edit</button>
                 </div>
               }
+
+              {
+                (this.userData.userType === "Partner")
+                &&
+                (this.state.eventData.eventStatus === "Finished")
+                &&
+                (this.userData.userId === this.state.eventData.partner._id)
+                &&
+                <div className="btn btn-success ctrl-button col-sm-12" onClick={() => this.simpleDialog.show()} >Show Feedbacks</div>
+              }
+
               {
                 (this.userData.userType === "Partner")
                 &&
@@ -451,6 +483,8 @@ class EventPost extends Component {
                   <button onClick={this.reOpenEvent.bind(this)} className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
                 </div>
               }
+
+
               <div ref="alert" className="alert alert-danger alert-dev" role="alert" > This is a primary alert—check it out </div>
             </div>
           </div>
