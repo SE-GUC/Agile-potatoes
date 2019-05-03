@@ -406,14 +406,19 @@ router.put('/:id/attending', verifyToken, function (req, res) {
 	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
+			if(err) return res.status(400).send(err)
+			if(!event) return res.status(404).send('Event not found')
 			event.attendees.push(userID);
 			event.remainingPlaces = event.remainingPlaces - 1;
 			event.save(function (err, done) {
-				if (err) {
-					res.status(400).send(err);
-					console.log(err);
-				}
-				else res.send("Marked you as attending");
+				if (err) return res.status(400).send(err)
+				Member.findById(userID).exec(async function (err, member){
+					if(err) return res.status(400).send(err)
+					else if(!member) return res.status(404).send('Member not found')
+					member.events.push(eventID);
+					await member.save();
+				})
+				res.send("Marked you as attending");
 			});
 		});
 	}
@@ -444,11 +449,21 @@ router.put('/:id/notAttending', verifyToken, function (req, res) {
 	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
+			if(err) return res.status(400).send(err)
+			if(!event) return res.status(404).send('Event not found')
 			event.attendees.pull(userID);
 			event.remainingPlaces = event.remainingPlaces + 1;
-			event.save();
+			event.save(function (err, done) {
+				if (err) return res.status(400).send(err)
+				Member.findById(userID).exec(async function (err, member){
+					if(err) return res.status(400).send(err)
+					else if(!member) return res.status(404).send('Member not found')
+					member.events.pull(eventID);
+					await member.save();
+				})
+				res.send("Marked you as not-attending");
+			});
 		});
-		res.send("Marked you as not-attending");
 	}
 });
 
@@ -470,6 +485,18 @@ router.put('/:id/feedback', function (req, res) {
 	}
 	else
 		res.status(400).send('Invalid user type');
+})
+
+router.get('/myAttendedEvents', verifyToken, function(req, res){
+	var userID = req.userId;
+	var userType = req.userType;
+	if(userType == 'Member'){
+		Member.findById(userID).populate('events').exec(function(err, member){
+			if(err) res.status(400).send(err)
+			else if(!member) res.status(404).send('Member not found')
+			else res.send(member.events);
+		})
+	}
 })
 
 router.use(bodyParser.json());
