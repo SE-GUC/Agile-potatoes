@@ -124,7 +124,8 @@ class MemberProfile extends Component {
               title="Feedbacks"
             >
               <div className='toto'>
-                {this.state.userProfile.reviews.map(review => {
+                {this.state.userProfile.reviews &&
+                  this.state.userProfile.reviews.map(review => {
                   return (
                     <div key={review.date} className="eventCardy">
                       <div className="card-body">

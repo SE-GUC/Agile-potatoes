@@ -187,8 +187,6 @@ class VacancyPost extends Component {
   }
 
   handleChange = (e) => {
-    //console.log('Name ' + e.target.name)
-    //console.log('Value ' + e.target.value)
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -202,7 +200,10 @@ class VacancyPost extends Component {
           Authorization: 'Bearer ' + this.authData
         }
       })
-      .then(this.setState({ feedback: '' }))
+      .then(()=>{
+        this.setState({ feedback: '' });
+        window.alert('added feedback succesfully');
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -220,7 +221,10 @@ class VacancyPost extends Component {
           Authorization: 'Bearer ' + this.authData
         }
       })
-      .then(this.setState({ feedback: '' }))
+      .then(()=>{
+        this.setState({ feedback: '' });
+        window.alert('added feedback succesfully');
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -325,6 +329,7 @@ class VacancyPost extends Component {
   }
 
   render() {
+    
     if (!this.state.loaded) return null;
     if (this.state.Edit)
       return (
@@ -400,7 +405,7 @@ class VacancyPost extends Component {
           </div>
         </div>
       );
-    else
+    else{
       return (
         <div>
           <div className="vacancy-post offset-sm-2 col-sm-8 row ">
@@ -413,7 +418,7 @@ class VacancyPost extends Component {
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
                   <span className="text-muted">Posted by </span>
-                  <Link to={this.state.vacancyData.partner.ProfileURL}>{this.state.vacancyData.partner.name}</Link>
+                  <Link to={`/profile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
                 </p>
                 <p className="text-muted">
                   <i className="fas fa-map-marker-alt" />{" "}
@@ -429,9 +434,6 @@ class VacancyPost extends Component {
                 <br />
                 <h4>Duration</h4>
                 <p>{this.state.vacancyData.duration}</p>
-                <br />
-                <h4>URL</h4>
-                <p>{this.state.vacancyData.url}</p>
                 <br />
               </div>
 
@@ -457,14 +459,16 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.hired.some(emp => emp._id === this.userData.userId))
                 &&
-                (this.state.vacancyData.status === 'Closed')
+                (this.state.vacancyData.status === 'Closed' || this.state.vacancyData.status === 'Finished')
                 &&
+                <div>
+                <span className="text-muted"> Submit your feedback on this Partner </span>
                 <div className="input-group mb-3">
-                  <span className="text-muted"> Submit your feedback on this Partner </span>
                   <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
                   </div>
+                </div>
                 </div>
               }
 
@@ -519,7 +523,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.partner._id === this.userData.userId) &&
                 <div>
-                  <br /><br /> <br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })} >Edit</button>
                 </div>
               }
@@ -531,19 +535,19 @@ class VacancyPost extends Component {
                 (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose} >Close Vacancy</button>
                 </div>
               }
               {
                 (this.userData.userType === "Partner")
                 &&
-                (this.state.vacancyData.status === "Finished")
+                (this.state.vacancyData.status === "Closed")
                 &&
                 (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
                 </div>
               }
@@ -552,7 +556,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                <div><br /><br /><br />
+                <div><br /><br /><br /><br />
                   <button class="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickApprove}>Approve Vacancy</button>
                 </div>
               }
@@ -563,7 +567,7 @@ class VacancyPost extends Component {
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                <div><br /><br /><br />
+                <div><br /><br /><br /><br />
                   <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
                 </div>
               }
@@ -571,7 +575,7 @@ class VacancyPost extends Component {
             </div>
           </div>
         </div>
-      );
+      )};
   }
 }
 
@@ -581,7 +585,7 @@ function ApplicantItem(props) {
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
       <div className="input-group-append">
-        <Link to={'http://localhost:3001/' + props.url}><h6>{props.fname} {props.lname}</h6></Link>
+        <Link to={`/profile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
@@ -590,12 +594,17 @@ function ApplicantItem(props) {
 
 function HiredSubmitFeedbackForm(props) {
   return (
-    <div className="input-group mb-3">
-      <Link to={props.url}><h6>{props.fname} {props.lname}</h6></Link>
-
-      <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
-      <div className="input-group-append">
-        <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+    <div className="container" >
+      <div className="row">
+        <div className="hired-boy-name"><h6><Link to={`/profile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
+      </div>
+      <div className="row" >
+        <div className="input-group mb-3 hired-boy-form">
+        <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
+        <div className="input-group-append">
+          <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+        </div>
+      </div>
       </div>
     </div>
   )

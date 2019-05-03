@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./EventPost.css";
 import axios from "axios";
 import SkyLight from "react-skylight";
+import { Link } from 'react-router-dom';
+
 
 
 class EventPost extends Component {
@@ -53,8 +55,9 @@ class EventPost extends Component {
         })
       })
       .catch(err => {
-        console.log(err.response.data);
+        if(err.response){
         this.refs.alert.innerText = err.response.data;
+        }
         console.log(this.refs.alert);
         this.refs.alert.style.display = "block";
       });
@@ -320,7 +323,7 @@ class EventPost extends Component {
                   {this.state.eventData.eventDate}
                 </p>
                 <h2>{this.state.eventData.name}</h2>
-                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ? (this.state.eventData.partner.name) : ("LirtnenHub")}</p>
+                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ?<Link to={`/profile/${this.state.eventData.partner._id}`}> {(this.state.eventData.partner.name)}</Link> : ("LirtnenHub")}</p>
                 <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.eventData.location}, {this.state.eventData.city}</p>
               </div>
               <div className="event-post-info">
@@ -362,20 +365,6 @@ class EventPost extends Component {
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
                   <CommentsSection partnerName={this.state.eventData.partner.name} userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
-                  {/* {this.getCommentsSorted().map(comment => {
-                    return (
-                      <div key={comment.date} className="comment">
-                        <p className="font-weight-bold">
-                          {comment.author.name}
-                          <span className="text-muted float-right font-weight-lighter">
-                            {comment.date}
-                          </span>
-                        </p>
-                        <p>{comment.text}</p>
-                      </div>
-                    );
-                  })} */}
-
                   <br />
                   <div className="input-group mb-3">
                     <input type="text" name="feedback" className="form-control" onChange={this.handleChange} />
@@ -391,12 +380,14 @@ class EventPost extends Component {
                 &&
                 (this.state.eventData.eventStatus === 'Finished')
                 &&
+                <div>
+                <span className="text-muted"> Submit your feedback on this Event</span>
                 <div className="input-group mb-3">
-                  <span className="text-muted"> Submit your feedback on this Event</span>
                   <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={this.submitFeedbackEvent}>Submit Feedback</button>
                   </div>
+                </div>
                 </div>
               }
             </div>
@@ -481,7 +472,7 @@ class EventPost extends Component {
                 (this.state.eventData.eventStatus === "Approved")
                 &&
                 <div>
-                  <br />
+                  <br /><br /><br />
                   <button onClick={this.closeEvent.bind(this)} className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
                 </div>
               }
@@ -493,7 +484,7 @@ class EventPost extends Component {
                 (this.state.eventData.eventStatus === "Finished")
                 &&
                 <div>
-                  <br />
+                  <br /><br /><br />
                   <button onClick={this.reOpenEvent.bind(this)} className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
                 </div>
               }
