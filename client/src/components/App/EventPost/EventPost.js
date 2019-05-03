@@ -357,20 +357,6 @@ class EventPost extends Component {
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
                   <CommentsSection partnerName={this.state.eventData.partner.name} userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
-                  {/* {this.getCommentsSorted().map(comment => {
-                    return (
-                      <div key={comment.date} className="comment">
-                        <p className="font-weight-bold">
-                          {comment.author.name}
-                          <span className="text-muted float-right font-weight-lighter">
-                            {comment.date}
-                          </span>
-                        </p>
-                        <p>{comment.text}</p>
-                      </div>
-                    );
-                  })} */}
-
                   <br />
                   <div className="input-group mb-3">
                     <input type="text" name="feedback" className="form-control" onChange={this.handleChange} />
@@ -449,7 +435,7 @@ class EventPost extends Component {
                 (this.state.eventData.eventStatus === "Approved")
                 &&
                 <div>
-                  <br />
+                  <br /><br /><br />
                   <button onClick={this.closeEvent.bind(this)} className="btn btn-warning ctrl-button col-sm-12 ">Close Event</button>
                 </div>
               }
@@ -461,7 +447,7 @@ class EventPost extends Component {
                 (this.state.eventData.eventStatus === "Finished")
                 &&
                 <div>
-                  <br />
+                  <br /><br /><br />
                   <button onClick={this.reOpenEvent.bind(this)} className="btn btn-success ctrl-button col-sm-12 ">Re-Open Event</button>
                 </div>
               }
