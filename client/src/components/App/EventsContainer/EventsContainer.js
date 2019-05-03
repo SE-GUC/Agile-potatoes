@@ -51,6 +51,20 @@ class EventsContainer extends Component {
     }
   }
 
+  getMyAttendedEvents= async()=> {
+    try{
+    let tokenData = JSON.parse(localStorage.getItem('token')).data;
+    let response = await axios.get('http://localhost:3001/api/event/myAttendedEvents', { headers: { Authorization: 'Bearer ' + tokenData.authData}
+    })
+    console.log(response.data);
+    this.setState({
+      events: response.data
+    });
+    } catch (error) {
+      console.log('GOT ERROR while getting my attended events' + error)
+    }
+  }
+
   handletoggle=()=>
   {
     this.setState({events:[],toggle:1})
@@ -79,7 +93,12 @@ class EventsContainer extends Component {
                   {
                     JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin' 
                     &&
-                  <button type="button" onClick={this.getPendingEventsAdmin} id="partnerEvents" className="list-group-item list-group-item-action">Admin Pending Events</button>
+                  <button type="button" onClick={this.getPendingEventsAdmin} id="adminEvents" className="list-group-item list-group-item-action">Admin Pending Events</button>
+                  }
+                  {
+                    JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member' 
+                    &&
+                  <button type="button" onClick={this.getMyAttendedEvents} id="memberEvents" className="list-group-item list-group-item-action">Your Events</button>
                   }
                   {
                     (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' || JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin')
