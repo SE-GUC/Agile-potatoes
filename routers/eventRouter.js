@@ -449,11 +449,21 @@ router.put('/:id/notAttending', verifyToken, function (req, res) {
 	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
+			if(err) return res.status(400).send(err)
+			if(!event) return res.status(404).send('Event not found')
 			event.attendees.pull(userID);
 			event.remainingPlaces = event.remainingPlaces + 1;
-			event.save();
+			event.save(function (err, done) {
+				if (err) return res.status(400).send(err)
+				Member.findById(userID).exec(async function (err, member){
+					if(err) return res.status(400).send(err)
+					else if(!member) return res.status(404).send('Member not found')
+					member.events.pull(eventID);
+					await member.save();
+				})
+				res.send("Marked you as not-attending");
+			});
 		});
-		res.send("Marked you as not-attending");
 	}
 });
 
