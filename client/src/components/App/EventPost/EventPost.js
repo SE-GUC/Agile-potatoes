@@ -377,12 +377,14 @@ class EventPost extends Component {
                 &&
                 (this.state.eventData.eventStatus === 'Finished')
                 &&
+                <div>
+                <span className="text-muted"> Submit your feedback on this Event</span>
                 <div className="input-group mb-3">
-                  <span className="text-muted"> Submit your feedback on this Event</span>
                   <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={this.submitFeedbackEvent}>Submit Feedback</button>
                   </div>
+                </div>
                 </div>
               }
             </div>
