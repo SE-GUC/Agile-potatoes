@@ -585,7 +585,7 @@ function ApplicantItem(props) {
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
       <div className="input-group-append">
-        <Link to={'http://localhost:3001/' + props.url}><h6>{props.fname} {props.lname}</h6></Link>
+        <Link to={`/profile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
@@ -596,7 +596,7 @@ function HiredSubmitFeedbackForm(props) {
   return (
     <div className="container" >
       <div className="row">
-        <div className="hired-boy-name"><h6><Link to={props.url}>{props.fname} {props.lname}</Link></h6></div>
+        <div className="hired-boy-name"><h6><Link to={`/profile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
       </div>
       <div className="row" >
         <div className="input-group mb-3 hired-boy-form">

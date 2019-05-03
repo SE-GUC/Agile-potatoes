@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./EventPost.css";
 import axios from "axios";
 import SkyLight from "react-skylight";
+import { Link } from 'react-router-dom';
+
 
 
 class EventPost extends Component {
@@ -53,8 +55,9 @@ class EventPost extends Component {
         })
       })
       .catch(err => {
-        console.log(err.response.data);
+        if(err.response){
         this.refs.alert.innerText = err.response.data;
+        }
         console.log(this.refs.alert);
         this.refs.alert.style.display = "block";
       });
@@ -320,7 +323,7 @@ class EventPost extends Component {
                   {this.state.eventData.eventDate}
                 </p>
                 <h2>{this.state.eventData.name}</h2>
-                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ? (this.state.eventData.partner.name) : ("LirtnenHub")}</p>
+                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ?<Link to={`/profile/${this.state.eventData.partner._id}`}> {(this.state.eventData.partner.name)}</Link> : ("LirtnenHub")}</p>
                 <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.eventData.location}, {this.state.eventData.city}</p>
               </div>
               <div className="event-post-info">
