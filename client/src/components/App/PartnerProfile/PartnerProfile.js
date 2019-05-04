@@ -83,8 +83,7 @@ class PartnerProfile extends Component {
                     return <span><Link to={`/vacancies/${vacancy._id}`}>{vacancy.name + ', '}</Link></span>
                   })}</p></div>
                 }
-
-                {/* <div className="attrContainer"><p>Vacancies: <span>{this.state.userProfile.vacancies}</span></p></div> */}
+                
               </div>
             </div>
 
