@@ -3,6 +3,8 @@ import axios from "axios";
 import Edit from "./Edit/Edit";
 import SkyLight from "react-skylight";
 import "./PartnerProfile.css";
+import { Link } from 'react-router-dom';
+
 class PartnerProfile extends Component {
   constructor(props) {
     super(props);
@@ -71,14 +73,14 @@ class PartnerProfile extends Component {
                   (this.state.userProfile.events)
                   &&
                   <div className="attrContainer"><p>Events: {this.state.userProfile.events.map((event) => {
-                    return <span>{event.name + ', '}</span>
+                    return <span><Link to={`/events/${event._id}`}>{event.name + ', '}</Link></span>
                   })}</p></div>
                 }
                 {
                   (this.state.userProfile.vacancies)
                   &&
                   <div className="attrContainer"><p>Vacancies: {this.state.userProfile.vacancies.map((vacancy) => {
-                    return <span>{vacancy.name + ', '}</span>
+                    return <span><Link to={`/vacancies/${vacancy._id}`}>{vacancy.name + ', '}</Link></span>
                   })}</p></div>
                 }
 

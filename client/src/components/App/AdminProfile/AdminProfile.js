@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Edit from "./Edit/Edit";
-import SkyLight from "react-skylight";
 import "./AdminProfile.css";
+import { Link } from 'react-router-dom';
+
 class AdminProfile extends Component {
   constructor(props) {
     super(props);
@@ -59,7 +60,7 @@ class AdminProfile extends Component {
                   (this.state.userProfile.events)
                   &&
                   <div className="attrContainer"><p>Your created events: {this.state.userProfile.events.map((event) => {
-                    return <span>{event.name + ', '}</span>
+                    return <span><Link to={`/events/${event._id}`}>{event.name + ', '}</Link></span>
                   })}</p></div>
                 }
 
