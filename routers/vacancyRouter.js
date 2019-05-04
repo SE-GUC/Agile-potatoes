@@ -8,14 +8,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
 const NotifyByEmail = require('../services/NotifyByEmail');
+const verifyToken = require('../middleware/tokenVerifier').verifyToken;
+
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
 /////////// 7 Add comment to vacancy (admin-partner negotiation) 
-router.post('/:id/comment', (req, res, next) => {
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userID;    //should come from session
+router.post('/:id/comment', verifyToken, (req, res, next) => {
+    var userType = req.userType;
+    var userId = req.userId;
     var comment = req.body.comment;
     var vacId = req.params.id;
     if (userType == 'Admin') {
@@ -25,8 +27,7 @@ router.post('/:id/comment', (req, res, next) => {
                 if (err) console.log(err)
                 if (!vacancy) {
                     console.log('vacancy not found')
-                    res.status(404).send("vacancy not found");
-                    return next();
+                    return res.status(404).send("vacancy not found");
                 }
                 vacancy.commentsByAdmin.push({
                     text: comment,
@@ -50,8 +51,7 @@ router.post('/:id/comment', (req, res, next) => {
                 if (err) console.log(err)
                 if (!vacancy) {
                     console.log('vacancy not found')
-                    res.status(404).send("vacancy not found");
-                    return next();
+                    return res.status(404).send("vacancy not found");
                 }
                 vacancy.commentsByPartner.push({
                     text: comment,
@@ -73,9 +73,9 @@ router.post('/:id/comment', (req, res, next) => {
 });
 
 // As a partner I can submit a vacancy announcement request
-router.post('/:id/CreateVacancy', async (req, res) => {
-    var userType = req.body.userType;
-    var userId = req.params.id;   //should come from session
+router.post('/CreateVacancy', verifyToken, async (req, res) => {
+    var userType = req.userType;
+    var userId = req.userId; 
     var description = req.body.description;
     var duration = req.body.duration;
     var location = req.body.location;
@@ -109,7 +109,7 @@ router.post('/:id/CreateVacancy', async (req, res) => {
         return res.send("created vacancy successfully");
     }
     else {
-        return res.send("you can't create a vacancy");
+        return res.status(400).send("Can't create a vacancy");
     }
 });
 
@@ -127,9 +127,9 @@ router.get('/:id/comments', function (req, res) {
 })
 
 // Allow member to apply for a vacancy
-router.put('/:id/apply', function (req, res) {
-    var uid = req.body.userID; //should come from session
-    var userType = req.body.userType;
+router.put('/:id/apply', verifyToken, function (req, res) {
+    var uid = req.userId;
+    var userType = req.userType;
     var vacId = req.params.id;
     if (userType === 'Member') {
         Vacancy.findById(vacId)
@@ -143,6 +143,12 @@ router.put('/:id/apply', function (req, res) {
                     } else {
                         vac.applicants.push(uid);
                         vac.save();
+                        Member.findById(uid).exec(async function(err, member){
+                            if(err) return res.status(400).send(err)
+                            else if(!member) return res.status(404).send('Member not found');
+                            else member.vacancies.push(vacId)
+                            await member.save();
+                        })
                         return res.send('Application successful')
                     }
                 }
@@ -168,6 +174,7 @@ router.put('/:id/apply', function (req, res) {
 //         })
 // })
 
+//get all applicants to a vacancy
 router.get('/:id/applicants', function (req, res) {
     var vacID = req.params.id;
     Vacancy.findById(vacID, 'applicants')
@@ -209,10 +216,10 @@ router.get('/Post/:id', function (req, res) {
             });
 });
 
-//////Story 17 As an admin I cana view pending vacancies announcments requests
+//////Story 17 As an admin I can view pending vacancies announcments requests
 // FOR SOME REASON YOU'RE HAVING ID AS PARAMETER !
-router.get('/:id/pendingVacancies', function (req, res) {
-    var userType = req.get('userType');
+router.get('/AdminPendingVacancies', verifyToken, function (req, res) {
+    var userType = req.userType;
     if (userType == 'Admin') {
         Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, vacancies) {
             if (err) return res.send(err)
@@ -225,22 +232,19 @@ router.get('/:id/pendingVacancies', function (req, res) {
 });
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
-router.get('/RecommendedVacancies', function (req, res, next) {
-    let userId = req.get('userId');
+router.get('/RecommendedVacancies', verifyToken, function (req, res, next) {
+    console.log('aaaaaaaaaaaaaaaaaa')
+    let userId = req.userId;
     let vacSortObjArray = [];
     let LastRecommendedVacancies = [];
     let RecommendedVacancies = []
     Member.findById(userId, 'availability address skills')
         .exec((err, member) => {
-            if (err) next(err);
-            if (!member) {
-                res.status(404).send("member not found");
-                return next();
-            }
+            if (err) return next(err);
             if (!member) return res.status(404).send('Member not found');
             Vacancy.find({ 'status': 'Open' }, 'url name location city dailyHours partner description')
                 .exec((err, vacs) => {
-                    if (err) next(err);
+                    if (err) return next(err);
                     for (vac of vacs) {
                         if (((vac.city) && (member.address.includes(vac.city)) || ((vac.location) && (member.address.includes(vac.location))))) {
                             if (vac.dailyHours && member.availability) {
@@ -275,20 +279,20 @@ router.get('/RecommendedVacancies', function (req, res, next) {
 })
 
 //As an admin i can change vacancy status if it is submitted and as a partner i can change vacancy status if it is opened
-router.put('/:id/status', function (req, res) {
-    var userType = req.body.userType;
+router.put('/:id/status', verifyToken, function (req, res) {
+    var userType = req.userType;
     var vacId = req.params.id;
     var status = req.body.status;
-    var partner = req.body.partner;
+    var partner = req.userId;
     if (userType == 'Admin') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
             if (vacancy.status == 'Submitted') {
                 Vacancy.findByIdAndUpdate(vacId, { status: status },
-                        function(err, response) {
-                            console.log(response);
-                            return res.send("Status Updated");
-                        }
-                    );
+                    function (err, response) {
+                        console.log(response);
+                        return res.send("Status Updated");
+                    }
+                );
                 if (status === 'Open') {
                     NotifyByEmail(vacancy.partner.email, 'GOOD NEWS regarding a vacancy you posted!',
                         "Admin has approved your vacancy request and it members can apply for it now,"
@@ -302,7 +306,7 @@ router.put('/:id/status', function (req, res) {
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open' && vacancy.partner == partner)
+            if (vacancy.partner == partner)
                 Vacancy.findByIdAndUpdate(vacId, { status: status },
                     function (err, response) {
                         console.log(response);
@@ -316,69 +320,77 @@ router.put('/:id/status', function (req, res) {
 });
 
 //get all vacancies
-router.get('/:id/GetAllVacancies', function (req, res) {
-    var userid = req.params.id;
-    Member.findById(userid).exec(function (err, memberDoc) {
-        if (memberDoc) {
-            Vacancy.find({ status: 'Open' }).exec(function (err, vacancy) {
-                if (err)
-                    return res.send("Error")
-                else
-                    return res.send(vacancy);
-            });
-        }
+router.get('/getAllVacancies', function(req, res){
+    Vacancy.find({
+        status: 'Open'
+    }).exec(function(err, vacancies){
+        if(err) res.status(400).send(err);
+        else res.send(vacancies);
     })
+})
+// router.get('/:id/GetAllVacancies', function (req, res) {
+//     var userid = req.params.id;
+//     Member.findById(userid).exec(function (err, memberDoc) {
+//         if (memberDoc) {
+//             Vacancy.find({ status: 'Open' }).exec(function (err, vacancy) {
+//                 if (err)
+//                     return res.send("Error")
+//                 else
+//                     return res.send(vacancy);
+//             });
+//         }
+//     })
 
-    Partner.findById(userid).exec(function (err, partnerDoc) {
-        if (partnerDoc) {
-            Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
-                if (err)
-                    return res.send("Error")
+//     Partner.findById(userid).exec(function (err, partnerDoc) {
+//         if (partnerDoc) {
+//             Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, Submittedvacancy) {
+//                 if (err)
+//                     return res.send("Error")
 
-                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
-                    if (err)
-                        return res.send("Error")
+//                 Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancy) {
+//                     if (err)
+//                         return res.send("Error")
 
-                    Vacancy.find({ status: 'Closed' }).exec(function (err, Closedvacancy) {
-                        if (err)
-                            return res.send("Error")
+//                     Vacancy.find({ status: 'Closed' }).exec(function (err, Closedvacancy) {
+//                         if (err)
+//                             return res.send("Error")
 
-                        return res.send([...Submittedvacancy, ...Openvacancy, ...Closedvacancy])
+//                         return res.send([...Submittedvacancy, ...Openvacancy, ...Closedvacancy])
 
-                    });
-
-
-                });
-            });
-
-
-
-        }
-    })
-
-    Admin.findById(userid).exec(function (err, adminDoc) {
-        if (adminDoc) {
-            Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
-                if (err)
-                    return res.send("Error")
-
-                Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
-                    if (err)
-                        return res.send("Error")
-
-                    return res.send([...Submittedvacancies, ...Openvacancies])
-                });
-            });
-        }
-    })
+//                     });
 
 
-});
+//                 });
+//             });
+
+
+
+//         }
+//     })
+
+//     Admin.findById(userid).exec(function (err, adminDoc) {
+//         if (adminDoc) {
+//             Vacancy.find({ status: 'Submitted' }, 'url name eventDate description postDate').exec(function (err, Submittedvacancies) {
+//                 if (err)
+//                     return res.send("Error")
+
+//                 Vacancy.find({ status: 'Open' }).exec(function (err, Openvacancies) {
+//                     if (err)
+//                         return res.send("Error")
+
+//                     return res.send([...Submittedvacancies, ...Openvacancies])
+//                 });
+//             });
+//         }
+//     })
+
+
+// });
 
 /// story 19 : As a Partner, I can view All My Pending(yet not approved) Vacancy Announcement Request
-router.get('/:id/PartnerPendingVacancies', function (req, res) {
-    var userType = req.get('userType')
-    var userid = req.params.id
+router.get('/PartnerPendingVacancies', verifyToken, function (req, res) {
+    var userType = req.userType
+    var userid = req.userId
     if (userType == 'Partner') {
         Vacancy.find({ partner: userid, status: 'Submitted' }).exec(function (err, vacancy) {
             return res.send(vacancy);
@@ -389,24 +401,21 @@ router.get('/:id/PartnerPendingVacancies', function (req, res) {
     }
 });
 
-////////////// Story 22.1 : A partner can view his vacancy
-router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
-    var userType = req.get('userType');  //should come from session
-    var userId = req.get('id');      //should come from session
-    var vacId = req.params.id;
+//a partner getting all vacancies he made. no matter their status!
+router.get('/PartnerVacancies', verifyToken, function (req, res) {
+    var userType = req.userType
+    var userID = req.userId
+    if (userType == 'Partner') {
+        Vacancy.find({ partner: userID}).exec(function (err, vacancy) {
+            if(err) res.status(400).send(err);
+            else res.send(vacancy);
+        });
+    }
+});
 
-    Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
-        if (userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted') {
-            return res.send(vacancy);
-        }
-        else {
-            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited");
-        }
-    })
-})
 
 ////////////// Story 22.2 : A partner can update his vacancy
-router.put('/:id/', function (req, res) {  //submitting edited vacancy
+router.put('/:id/', verifyToken, function (req, res) {  //submitting edited vacancy
     var vacId = req.params.id;
     var duration = req.body.duration;
     var location = req.body.location;
@@ -416,35 +425,41 @@ router.put('/:id/', function (req, res) {  //submitting edited vacancy
     var dailyHours = req.body.dailyHours;
     var name = req.body.name;
 
-    Vacancy.findById(vacId).exec(function (err, vacancy) {
-        if (!vacancy)
-            return res.status(404).send('Vacancy not found')
-        else
-            if (vacancy.status == 'Submitted') {
-                vacancy.name = name;
-                vacancy.city = city;
-                vacancy.duration = duration;
-                vacancy.location = location;
-                vacancy.description = description;
-                vacancy.salary = salary;
-                vacancy.dailyHours = dailyHours;
-                vacancy.save(function (err, done) {
-                    if (err)
-                        res.status(400).send("Very weird error, sorry, can't handle it.")
-                    else res.send(vacancy);
-                });
-            }
+    var userType = req.userType;
+    var userID = req.userID;
+
+    if (userType == 'Partner') {
+        Vacancy.findById(vacId).exec(function (err, vacancy) {
+            if (!vacancy)
+                return res.status(404).send('Vacancy not found')
             else
-                return res.status(400).send('Vacancy cannot be edited after being approved');
-    })
+                if (vacancy.status == 'Submitted' && vacancy.partner == userID) {
+                    vacancy.name = name;
+                    vacancy.city = city;
+                    vacancy.duration = duration;
+                    vacancy.location = location;
+                    vacancy.description = description;
+                    vacancy.salary = salary;
+                    vacancy.dailyHours = dailyHours;
+                    vacancy.save(function (err, done) {
+                        if (err)
+                            res.status(400).send("Very weird error, sorry, can't handle it.")
+                        else res.send(vacancy);
+                    });
+                }
+                else
+                    return res.status(400).send("Vacancy either not yours or was already Approves so it can't be edited");
+        })
+    }
+
 });
 
 //As a member I can withdraw my application from a vacancy
 //that I previously applied to
-router.put('/:id/un-apply', function (req, res) {
+router.put('/:id/un-apply', verifyToken, function (req, res) {
     var vacancyID = req.params.id;
-    var userID = req.body.userID;
-    var userType = req.body.userType;
+    var userID = req.userId;
+    var userType = req.userType;
     if (userType === 'Member') {
         Vacancy.findById(vacancyID).exec(function (err, vacancy) {
             vacancy.applicants.pull(userID);
@@ -455,11 +470,11 @@ router.put('/:id/un-apply', function (req, res) {
 });
 
 
-router.put('/:id/hireMember', function (req, res) {
+router.put('/:id/hireMember', verifyToken, function (req, res) {
     var vacancyID = req.params.id;
     var memberID = req.body.memberID;
-    var userType = req.body.userType;
-    var userID = req.body.userID;
+    var userType = req.userType;
+    var userID = req.userId;
     if (userType === 'Partner') {
         Vacancy.findById(vacancyID).exec(function (err, vacancy) {
             if (vacancy.partner == userID) {
@@ -483,8 +498,37 @@ router.get('/:id/hired', function (req, res) {
         .populate('hired', 'fname lname ProfileURL')
         .exec(function (err, vacancy) {
             if (!vacancy) res.status(400).send('Error vacancy not found');
-            res.send(vacancy.hired);
+            if (vacancy.hired) res.send(vacancy.hired);
         })
+})
+
+router.get('/myPastVacancies', verifyToken, function(req, res){
+	var userID = req.userId;
+    var userType = req.userType;
+	if(userType == 'Member'){
+		Member.findById(userID).populate('vacancies').exec(function(err, member){
+			if(err) res.status(400).send(err)
+			else if(!member) res.status(404).send('Member not found')
+			else res.send(member.vacancies);
+		})
+	}
+})
+
+
+////////////// Story 22.1 : A partner can view his vacancy
+router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
+    var userType = req.get('userType');  //should come from session
+    var userId = req.get('id');      //should come from session
+    var vacId = req.params.id;
+
+    Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
+        if (userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted') {
+            return res.send(vacancy);
+        }
+        else {
+            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited");
+        }
+    })
 })
 
 module.exports = router;

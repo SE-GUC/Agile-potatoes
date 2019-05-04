@@ -8,6 +8,8 @@ const Admin = require('../models/adminModel');
 const schemas = require('../models/Schemas/schemas');
 const bodyParser = require('body-parser');
 const NotifyByEmail = require('../services/NotifyByEmail');
+const verifyToken = require('../middleware/tokenVerifier').verifyToken;
+
 
 
 router.use(bodyParser.json()); //parsing out json out of the http request body
@@ -107,8 +109,8 @@ router.get('/:id/comment', function (req, res) {
 })
 
 // Story 18 : viewing pending event requests as admin
-router.get('/PendingEventsAdmin', function (req, res) {
-	var usertype = req.get('userType');
+router.get('/PendingEventsAdmin', verifyToken, function (req, res) {
+	var usertype = req.userType;
 	if (usertype == 'Admin') {
 		Event.find({ eventStatus: 'Submitted' }, 'url name eventDate eventStatus').exec(function (err, event) {
 			if (err) { return res.send(err); }
@@ -122,7 +124,7 @@ router.get('/PendingEventsAdmin', function (req, res) {
 
 // Story 14 : viewing approved events as admin/partner/member
 router.get('/ApprovedEvents', function (req, res) {
-	Event.find({ eventStatus: 'Approved' }, 'url name eventDate eventStatus').exec(function (err, events) {
+	Event.find({ eventStatus: 'Approved' }, 'url name eventDate eventStatus description').exec(function (err, events) {
 		if (err) {
 			return console.log(err);
 		}
@@ -131,17 +133,17 @@ router.get('/ApprovedEvents', function (req, res) {
 })
 
 /// story 20 : As a Partner, I can view All Event Requests.(Sorted by status)
-router.get('/:id/PartnerEvents', function (req, res) {
-	var userType = req.get('userType');
-	var userid = req.params.id
+router.get('/PartnerEvents', verifyToken, function (req, res) {
+	var userType = req.userType;
+	var userid = req.userId;
 	if (userType == 'Partner') {
 		Event.find({ partner: userid, eventStatus: 'Submitted' }, 'url name eventDate description').exec(function (err, Submittedevent) {
 			if (err) return res.send(err)
-			Event.find({ eventStatus: 'Approved' }, 'url name eventDate description').exec(function (err, Approvedevent) {
+			Event.find({ partner: userid, eventStatus: 'Approved' }, 'url name eventDate description').exec(function (err, Approvedevent) {
 				if (err) return res.send(err)
-				Event.find({ eventStatus: 'Closed' }, 'url name eventDate description').exec(function (err, Closedevent) {
+				Event.find({ partner: userid, eventStatus: 'Closed' }, 'url name eventDate description').exec(function (err, Closedevent) {
 					if (err) return res.send(err)
-					Event.find({ eventStatus: 'Finished' }, 'url name eventDate description').exec(function (err, Finishedevent) {
+					Event.find({ partner: userid, eventStatus: 'Finished' }, 'url name eventDate description').exec(function (err, Finishedevent) {
 						if (err) return res.send(err)
 						return res.send([...Submittedevent, ...Approvedevent, ...Closedevent, ...Finishedevent])
 					});
@@ -152,16 +154,15 @@ router.get('/:id/PartnerEvents', function (req, res) {
 });
 
 // Story 22.1 : viewing recommended events as a member (sprint 2)
-router.get('/RecommendedEvents', function (req, res) {
-	var userId = req.get('userId');
+router.get('/RecommendedEvents', verifyToken, function (req, res) {
+	var userId = req.userId;
 	var memberPastEventsTypes = [];
 	var recommendedEvents = [];
 	Member.findById(userId, 'url name eventDate address interests events')
 		.populate('events')
 		.exec((err, member) => {
 			if (!member) {
-				res.status(404).send("member not found");
-				return next();
+				return res.status(404).send("member not found");
 			}
 			if (err) console.log(err); // getting recommended events
 			member.events.map((event) => {
@@ -186,15 +187,15 @@ router.get('/RecommendedEvents', function (req, res) {
 		})
 })
 
-router.delete('/:evid/deleteEvent', function (req, res) {
-	var userType = req.body.userType;
+router.delete('/:evid/deleteEvent', verifyToken, function (req, res) {
+	var userType = req.userType;
 	var evId = req.params.evid;
-	var userID = req.body.userID;
+	var userID = req.userId;
 	console.log("I am deleting event")
 	if (userType == 'Partner') {
 		Event.findById(evId)
 			.exec(function (err, event) {
-				if (err) res.status(400).send
+				if (err) res.status(400).send('shit happens');
 				if (event.eventStatus == 'Submitted' && event.partner == userID) {
 					Event.findByIdAndRemove(evId, function (err, event1) {
 						if (err) res.status(400).send('Got a database error while deleting')
@@ -225,7 +226,7 @@ router.delete('/:evid/deleteEvent', function (req, res) {
 // Story 21.2 display an event post for partner/admin/member
 router.get('/Post/:id', function (req, res) {
 	var eveId = req.params.id;
-	Event.findById(eveId, '-_id').populate('partner', 'name').populate('attendees', 'fname lname').exec(
+	Event.findById(eveId).populate('partner', 'name').populate('attendees', 'fname lname').exec(
 		function (err, response) {
 			if (err) return res.send("event not found");
 			return res.send(response);
@@ -233,18 +234,17 @@ router.get('/Post/:id', function (req, res) {
 });
 
 // As a partner i can re-allow more members to book tickets to my event 
-router.put('/:id/reOpenMyEvent', (req, res, next) => {
-	let userType = req.body.userType; //should come from session
-	let userId = req.body.userId; //should come from session
+router.put('/:id/reOpenMyEvent', verifyToken, (req, res, next) => {
+	let userType = req.userType; //should come from session
+	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
 	Event.findById(eventId).exec((err, event) => {
 		if (err) return res.send("something wrong");
 		if (!event) {
 			console.log('event not found')
-			res.status(404).send("event not found");
-			return next();
+			return res.status(404).send("event not found");
 		}
-		if (event.partner && event.partner == userId) {
+		if (userType === "Admin" || (userType === "Partner" && event.partner && event.partner == userId)) {
 			if (event.eventStatus === 'Finished' && (Date.parse(event.eventDate) - Date.now()) > 0) {
 				event.eventStatus = 'Approved';
 				event.save((err) => {
@@ -274,18 +274,18 @@ router.put('/:id/reOpenMyEvent', (req, res, next) => {
 })
 
 // As a partner i can disallow more members to book tickets to my event 
-router.put('/:id/closeMyEvent', (req, res, next) => {
-	let userType = req.body.userType; //should come from session
-	let userId = req.body.userId; //should come from session
+router.put('/:id/closeMyEvent', verifyToken, (req, res, next) => {
+	let userType = req.userType; //should come from session
+	let userId = req.userId; //should come from session
 	let eventId = req.params.id;
+	console.log(userType, userId, eventId, req);
 	Event.findById(eventId).exec((err, event) => {
 		if (err) return res.send("something wrong");
 		if (!event) {
 			console.log('event not found')
-			res.status(404).send("event not found");
-			return next();
+			return res.status(404).send("event not found");
 		}
-		if (userType === "Partner" && event.partner && event.partner == userId) {
+		if (userType === "Admin" || (userType === "Partner" && event.partner && event.partner == userId)) {
 			if (event.eventStatus === 'Approved') {
 				event.eventStatus = 'Finished';
 				event.save((err) => {
@@ -319,82 +319,44 @@ router.put('/:id/closeMyEvent', (req, res, next) => {
 
 //user story 21: As a partner I can update my pending events
 //Date, Location, Description, Price, Type, Topics, Speakers, Number of Attendees, Remaining Places.
-router.put('/:id', async (req, res) => {
-	var userType = req.body.userType; //should come from session
-	var userID = req.body.userID; //should come from session
+router.put('/:id', verifyToken, async (req, res) => {
+	var userType = req.userType; //should come from session
+	var userID = req.userId; //should come from session
 	var eventID = req.params.id;
-	var date; var location; var desc; var price; var type; var topics; var speakers; var attendees; var remPlaces;
+	var date = req.body.date;
+	var location = req.body.location;
+	var description = req.body.description;
+	var price = req.body.price
+	var eventType = req.body.eventType;
+	var topics = req.body.topics;
+	var speakers = req.body.speakers;
+	var remainingPlaces = req.body.remainingPlaces;
+	var city = req.body.city;
 	if (userType == 'Partner') {     //partner updating HIS event
-		if (req.body.date) {
-			date = req.body.date;
-		}
-		if (req.body.location) {
-			location = req.body.location;
-		}
-		if (req.body.description) {
-			desc = req.body.description;
-		}
-		if (req.body.price) {
-			price = req.body.price
-		}
-		if (req.body.type) {
-			type = req.body.eventType;
-		}
-		if (req.body.topics) {
-			topics = req.body.topics
-		}
-		if (req.body.speakers) {
-			speakers = req.body.speakers;
-		}
-		if (req.body.attendees) {
-			attendees = req.body.attendees;
-		}
-		if (req.body.remainingPlaces) {
-			remPlaces = req.body.remainingPlaces;
-		}
-		await Event.findById(eventID).exec(function (err, event) {
+		await Event.findById(eventID).exec(async function (err, event) {
 			if (event.partner._id == userID && event.eventStatus == 'Submitted') {
-				if (date) {
-					event.date = date;
-				}
-				if (location) {
-					event.location = location;
-				}
-				if (desc) {
-					event.description = desc;
-				}
-				if (price) {
-					event.price = price;
-				}
-				if (type) {
-					event.type = type;
-				}
-				if (topics) {
-					event.topics = topics;
-				}
-				if (speakers) {
-					event.speakers = speakers;
-				}
-				if (attendees) {
-					event.attendees = attendees;
-				}
-				if (remPlaces) {
-					event.remainingPlaces = remPlaces;
-				}
+				event.eventDate = date;
+				event.location = location;
+				event.description = description;
+				event.price = price;
+				event.eventType = eventType;
+				event.topics = topics;
+				event.speakers = speakers;
+				event.remainingPlaces = remainingPlaces;
+				event.city = city;
+				await event.save();
 				res.send(event);
-				console.log("Updated event successfully");
-				event.save();
 			}
-			//else res.send("Event was already approved so you can't update it");
+			else res.status(400).send("Event is either not yours or was already Approved so you can't edit it");
 		});
 	}
 	else
-		return res.status(400).send({ error: 'Cannot edit this event as it is NOT yours' });
+		return res.status(400).send({ error: 'Cannot edit this event as you are not a partner' });
 });
 
-router.post('/:id/comment', function (req, res) {
-	var userType = req.body.userType;
-	var userId = req.body.userID;
+router.post('/:id/comment', verifyToken, function (req, res) {
+	var userType = req.userType;
+	var userId = req.userId;
 	var comment = req.body.comment;
 	var evId = req.params.id;
 	if (userType == 'Admin') {
@@ -438,24 +400,32 @@ router.post('/:id/comment', function (req, res) {
 });
 
 //As a member I can mark myself as going to an event
-router.put('/:id/attending', function (req, res) {
+router.put('/:id/attending', verifyToken, function (req, res) {
 	var eventID = req.params.id;
-	var userID = req.body.userID;
-	var userType = req.body.userType;
+	var userID = req.userId;
+	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
+			if(err) return res.status(400).send(err)
+			if(!event) return res.status(404).send('Event not found')
 			event.attendees.push(userID);
 			event.remainingPlaces = event.remainingPlaces - 1;
 			event.save(function (err, done) {
-				if (err) res.status(400).send(err);
-				else res.send("Marked you as attending");
+				if (err) return res.status(400).send(err)
+				Member.findById(userID).exec(async function (err, member){
+					if(err) return res.status(400).send(err)
+					else if(!member) return res.status(404).send('Member not found')
+					member.events.push(eventID);
+					await member.save();
+				})
+				res.send("Marked you as attending");
 			});
 		});
 	}
 });
 //As an admin I can approve events
-router.put('/:id/approve', function (req, res) {
-	var userType = req.body.userType;
+router.put('/:id/approve', verifyToken, function (req, res) {
+	var userType = req.userType;
 	var eveId = req.params.id;
 	if (userType == 'Admin') {
 		Event.findById(eveId).exec(function (err, event) {
@@ -473,17 +443,27 @@ router.put('/:id/approve', function (req, res) {
 })
 //As a member I can mark myself as not going to an event that I 
 //previously marked myself as going to
-router.put('/:id/notAttending', function (req, res) {
+router.put('/:id/notAttending', verifyToken, function (req, res) {
 	var eventID = req.params.id;
-	var userID = req.body.userID;
-	var userType = req.body.userType;
+	var userID = req.userId;
+	var userType = req.userType;
 	if (userType === 'Member') {
 		Event.findById(eventID).exec(function (err, event) {
+			if(err) return res.status(400).send(err)
+			if(!event) return res.status(404).send('Event not found')
 			event.attendees.pull(userID);
 			event.remainingPlaces = event.remainingPlaces + 1;
-			event.save();
+			event.save(function (err, done) {
+				if (err) return res.status(400).send(err)
+				Member.findById(userID).exec(async function (err, member){
+					if(err) return res.status(400).send(err)
+					else if(!member) return res.status(404).send('Member not found')
+					member.events.pull(eventID);
+					await member.save();
+				})
+				res.send("Marked you as not-attending");
+			});
 		});
-		res.send("Marked you as not-attending");
 	}
 });
 
@@ -505,6 +485,18 @@ router.put('/:id/feedback', function (req, res) {
 	}
 	else
 		res.status(400).send('Invalid user type');
+})
+
+router.get('/myAttendedEvents', verifyToken, function(req, res){
+	var userID = req.userId;
+	var userType = req.userType;
+	if(userType == 'Member'){
+		Member.findById(userID).populate('events').exec(function(err, member){
+			if(err) res.status(400).send(err)
+			else if(!member) res.status(404).send('Member not found')
+			else res.send(member.events);
+		})
+	}
 })
 
 router.use(bodyParser.json());

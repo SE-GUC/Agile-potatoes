@@ -9,13 +9,11 @@ class VacancyPost extends Component {
     /*  
       props should have the user data
     */
+    this.userData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.userData:null;
+    console.log(this.userData);
+    this.authData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.authData:null;
     this.state = {
-      postID: '5cb8b4653da6b4a548c005fb',
-      //put user data here until we get them from props
-      userData: {
-        _id: '5cb8b44f3da6b4a548c005fa',
-        userType: 'Partner',
-      },
+      postID: this.props.match.params.id,
       loaded: false,
       userHasApplied: false,
       vacancyData: {},
@@ -27,11 +25,14 @@ class VacancyPost extends Component {
       salary: 0,
       dailyHours: 0,
       city: "",
-      name: "",
+      name: ""
     }
   }
 
   async componentDidMount() {
+    if (!this.userData) {
+      return this.props.history.push('/login')
+    }
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
     let hired = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/hired`);
     this.setState({
@@ -67,7 +68,7 @@ class VacancyPost extends Component {
     let applied = false;
     let applicants = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/applicants`);
     for (let i = 0; i < applicants.data.length; i++) {
-      if (applicants.data[i]._id === this.state.userData._id)
+      if (applicants.data[i]._id === this.userData.userId)
         applied = true;
     }
     if (applied) {
@@ -87,16 +88,19 @@ class VacancyPost extends Component {
 
   async onClickApprove() {
     await axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": "Admin",
       "status": "Open"
-    }).then(res => {
-      this.setState({
-        vacancyDate: {
-          ...this.state.vacancyData,
-          status: 'Open'
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
         }
+      }).then(res => {
+        this.setState({
+          vacancyDate: {
+            ...this.state.vacancyData,
+            status: 'Open'
+          }
+        })
       })
-    })
   }
 
   async onClickSubmit() {
@@ -108,8 +112,12 @@ class VacancyPost extends Component {
       "dailyHours": this.state.dailyHours,
       "name": this.state.name,
       "city": this.state.city
-    });
-    console.log(resp.data);
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      });
+    console.log('The data after submission of edit: ' + resp.data);
     this.setState({ Edit: false });
     window.location.reload();
   }
@@ -120,9 +128,10 @@ class VacancyPost extends Component {
       flag = false;
 
     //e.preventDefault();
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/apply`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     }).then(
       this.setState({
         userHasApplied: (true & flag)
@@ -137,9 +146,10 @@ class VacancyPost extends Component {
 
   onClickCancel = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/un-apply`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType
+    axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/un-apply`, {}, {
+      headers: {
+        Authorization: 'Bearer ' + this.authData
+      }
     }).then(
       this.setState({
         userHasApplied: false
@@ -154,14 +164,15 @@ class VacancyPost extends Component {
 
   async onClickComment(e) {
     await axios.post(`http://localhost:3001/api/vacancy/${this.state.postID}/comment`, {
-      "userID": this.state.userData._id,
-      "userType": this.state.userData.userType,
       "comment": this.state.feedback,
-    });
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      });
     //hopefully getting the updated vacancy with the new comments
     await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`)
       .then(updatedVacancy => {
-        console.log(updatedVacancy);
         this.setState({
           vacancyData: {
             ...this.state.vacancyData,
@@ -179,8 +190,6 @@ class VacancyPost extends Component {
   }
 
   handleChange = (e) => {
-    console.log('Name ' + e.target.name)
-    console.log('Value ' + e.target.value)
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -188,11 +197,16 @@ class VacancyPost extends Component {
   submitFeedbackMember = (e) => {
     e.preventDefault();
     axios.post(`http://localhost:3001/api/profile/${this.state.vacancyData.partner._id}/feedback`, {
-      "userType": this.state.userData.userType,
-      "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
-      .then(this.setState({ feedback: '' }))
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      })
+      .then(()=>{
+        this.setState({ feedback: '' });
+        window.alert('added feedback succesfully');
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -204,11 +218,16 @@ class VacancyPost extends Component {
   submitFeedbackPartner = (employee) => {
     //employee.preventDefault();
     axios.post(`http://localhost:3001/api/profile/${employee._id}/feedback`, {
-      "userType": this.state.userData.userType,
-      "personID": this.state.userData._id,
       "comment": this.state.feedback
-    })
-      .then(this.setState({ feedback: '' }))
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      })
+      .then(()=>{
+        this.setState({ feedback: '' });
+        window.alert('added feedback succesfully');
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -219,18 +238,20 @@ class VacancyPost extends Component {
 
   onClickHire = (applicant) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/hireMember`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "memberID": applicant._id
-    }).then(res => {
-      let filteredApplicants = this.state.vacancyData.applicants.filter(a => a._id !== applicant._id)
-      this.setState({
-        vacancyData: {
-          ...this.state.vacancyData,
-          applicants: filteredApplicants
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
         }
-      });
-    })
+      }).then(res => {
+        let filteredApplicants = this.state.vacancyData.applicants.filter(a => a._id !== applicant._id)
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            applicants: filteredApplicants
+          }
+        });
+      })
       .catch(err => {
         console.log(err.response.data);
         this.refs.alert.innerText = err.response.data;
@@ -241,32 +262,37 @@ class VacancyPost extends Component {
 
   onClickApprove = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "status": "Approved"
-    });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Approved'
-      }
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Approved'
+          }
+        })
+      })
   }
 
   onClickClose = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "status": "Closed"
-    });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Closed'
-      }
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Closed'
+          }
+        })
+        this.refs.alert.style.display = "none";
+      });
   }
 
   onClickDelete = (e) => {
@@ -275,30 +301,38 @@ class VacancyPost extends Component {
       method: 'DELETE',
       url: `http://localhost:3001/api/vacancy/${this.state.postID}/deleteVacancy`,
       data: {
-        "userType": this.state.userData.userType,
-        "userID": this.state.userData._id
+        "userType": this.userData.userType,
+        "userID": this.userData.userId
       }
-    })
-
-    //need to rereoute to home page somehow now
+    }).then(() => {
+      //redirect
+      this.props.history.push('/vacancies');
+    }).catch(err => {
+      this.refs.alert.innerText = err.response.data;
+      this.refs.alert.style.display = "block";
+    });
   }
 
   onClickReOpen = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "userType": this.state.userData.userType,
-      "userID": this.state.userData._id,
       "status": "Open"
-    });
-
-    this.setState({
-      vacancyData: {
-        ...this.state.vacancyData,
-        status: 'Open'
-      }
-    })
+    }, {
+        headers: {
+          Authorization: 'Bearer ' + this.authData
+        }
+      }).then(res => {
+        this.setState({
+          vacancyData: {
+            ...this.state.vacancyData,
+            status: 'Open'
+          }
+        })
+        this.refs.alert.style.display = "none";
+      })
   }
 
   render() {
+    
     if (!this.state.loaded) return null;
     if (this.state.Edit)
       return (
@@ -374,7 +408,7 @@ class VacancyPost extends Component {
           </div>
         </div>
       );
-    else
+    else{
       return (
         <div>
           <div className="vacancy-post offset-sm-2 col-sm-8 row ">
@@ -382,12 +416,12 @@ class VacancyPost extends Component {
               <div className="vacancy-post-header">
                 <p className="text-muted">
                   <i className="fas fa-calendar-day" />{" "}
-                  {this.state.vacancyData.postDate}
+                  {new Date(this.state.vacancyData.postDate).toLocaleDateString()}
                 </p>
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
                   <span className="text-muted">Posted by </span>
-                  {this.state.vacancyData.partner.name}
+                  <Link to={`/otherPartnerProfile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
                 </p>
                 <p className="text-muted">
                   <i className="fas fa-map-marker-alt" />{" "}
@@ -404,19 +438,16 @@ class VacancyPost extends Component {
                 <h4>Duration</h4>
                 <p>{this.state.vacancyData.duration}</p>
                 <br />
-                <h4>URL</h4>
-                <p>{this.state.vacancyData.url}</p>
-                <br />
               </div>
 
               {
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.userData.userType === "Admin" || (this.state.userData.userType === "Partner" && this.state.userData._id === this.state.vacancyData.partner._id))
+                (this.userData.userType === "Admin" || (this.userData.userType === "Partner" && this.userData.userId === this.state.vacancyData.partner._id))
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Comments</h4>
-                  <CommentsSection userID={this.state.userData._id} userType={this.state.userData.userType} allComments={this.getCommentsSorted()} />
+                  <CommentsSection userID={this.userData.userId} userType={this.userData.userType} allComments={this.getCommentsSorted()} />
 
                   <br />
                   <div className="input-group mb-3">
@@ -429,25 +460,27 @@ class VacancyPost extends Component {
               }
 
               {
-                (this.state.vacancyData.hired.some(emp => emp._id === this.state.userData._id))
+                (this.state.vacancyData.hired.some(emp => emp._id === this.userData.userId))
                 &&
                 (this.state.vacancyData.status === 'Closed')
                 &&
+                <div>
+                <span className="text-muted"> Submit your feedback on this Partner </span>
                 <div className="input-group mb-3">
-                  <span className="text-muted"> Submit your feedback on this Partner </span>
                   <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
                   </div>
+                </div>
                 </div>
               }
 
               {
                 (this.state.vacancyData.status === 'Open')
                 &&
-                (this.state.userData.userType === 'Partner')
+                (this.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Applicants</h4>
@@ -460,9 +493,9 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.status === 'Closed')
                 &&
-                (this.state.userData.userType === 'Partner')
+                (this.userData.userType === 'Partner')
                 &&
-                (this.state.userData._id === this.state.vacancyData.partner._id)
+                (this.userData.userId === this.state.vacancyData.partner._id)
                 &&
                 <div className="comments-section col-sm-12">
                   <h4>Hired People that you can submit feedback on:</h4>
@@ -483,61 +516,61 @@ class VacancyPost extends Component {
                   <button className="btn btn-danger offset-sm-1 col-sm-10 book-button" disabled={this.state.vacancyData.status === "Closed"} onClick={this.onClickCancel}>CANCEL</button>
                 ) :
                 (
-                  <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.state.userData.userType !== "Member" || this.state.vacancyData.status === "Closed"} onClick={this.onClickApply}>APPLY NOW</button>
+                  <button className="btn btn-outline-success offset-sm-1 col-sm-10 book-button" disabled={this.userData.userType !== "Member" || this.state.vacancyData.status === "Closed"} onClick={this.onClickApply}>APPLY NOW</button>
                 )
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id) &&
+                (this.state.vacancyData.partner._id === this.userData.userId) &&
                 <div>
-                  <br /><br /> <br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={() => this.setState({ Edit: true })} >Edit</button>
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
                 (this.state.vacancyData.status === "Open")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-warning ctrl-button col-sm-12 " onClick={this.onClickClose} >Close Vacancy</button>
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
-                (this.state.vacancyData.status === "Finished")
+                (this.state.vacancyData.status === "Closed")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 <div>
-                  <br /><br /><br />
+                  <br /><br /><br /><br />
                   <button className="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickReOpen}>Re-Open Vacancy</button>
                 </div>
               }
               {
-                (this.state.userData.userType === "Admin")
+                (this.userData.userType === "Admin")
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                <div><br /><br /><br />
+                <div><br /><br /><br /><br />
                   <button class="btn btn-success ctrl-button col-sm-12 " onClick={this.onClickApprove}>Approve Vacancy</button>
                 </div>
               }
               {
-                (this.state.userData.userType === "Partner")
+                (this.userData.userType === "Partner")
                 &&
-                (this.state.vacancyData.partner._id === this.state.userData._id)
+                (this.state.vacancyData.partner._id === this.userData.userId)
                 &&
                 (this.state.vacancyData.status === "Submitted")
                 &&
-                <div><br /><br /><br />
+                <div><br /><br /><br /><br />
                   <button className="btn btn-danger ctrl-button col-sm-12 " onClick={this.onClickDelete}>Delete Vacancy</button>
                 </div>
               }
@@ -545,7 +578,7 @@ class VacancyPost extends Component {
             </div>
           </div>
         </div>
-      );
+      )};
   }
 }
 
@@ -554,9 +587,8 @@ function ApplicantItem(props) {
   return (
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
-      {/* <Link to={props.ProfileURL}></Link> */}
       <div className="input-group-append">
-        <h6>{props.fname} {props.lname}</h6>
+        <Link to={`/otherMemberProfile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
@@ -565,12 +597,17 @@ function ApplicantItem(props) {
 
 function HiredSubmitFeedbackForm(props) {
   return (
-    <div className="input-group mb-3">
-      <Link to={props.url}><h6>{props.fname} {props.lname}</h6></Link>
-
-      <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
-      <div className="input-group-append">
-        <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+    <div className="container" >
+      <div className="row">
+        <div className="hired-boy-name"><h6><Link to={`/otherMemberProfile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
+      </div>
+      <div className="row" >
+        <div className="input-group mb-3 hired-boy-form">
+        <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
+        <div className="input-group-append">
+          <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+        </div>
+      </div>
       </div>
     </div>
   )

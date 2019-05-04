@@ -1,0 +1,60 @@
+.side-bar {
+    /* position: fixed; */
+    left: 0px;
+    height: 1000px;
+    padding-top: 250px;
+    background-color:#31353D;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+}
+.eventCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1px;
+    height:50px;
+    position: relative;
+}
+
+.side-bar button {
+    width: 100%;
+    padding-left: 0px ;
+    margin-left: 0px ; 
+    
+}
+.profile-window {
+    height: 100 px;
+    float: right;
+    padding-top: 50px;
+}
+
+.parprofileCard {
+    width: 18rem;
+    background-color: aquamarine;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 200px;
+    margin-left: 50px;
+    height:210px;
+    position: relative;
+}
+
+
+.parprofileCard span{
+    float: left;
+    position: absolute;
+    left:20px;
+    bottom: 20px;
+}
+
+
+.link-button, .brand-button {
+    text-decoration: none;
+    justify-content: center;        
+    -webkit-transition: background-color .4s;
+    transition: background-color .4s;
+}
+
+

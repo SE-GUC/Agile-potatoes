@@ -142,7 +142,7 @@ class HomePage extends Component {
                   <input className="form-control" ref="cemail" type="email" id="email" name="Email" placeholder="Your Email"/><br/>
                   <label htmlFor="msg">Message</label>
                   <textarea rows="4" className="form-control" ref="cmessage" type="text" id="msg" name="Message" placeholder="Message"></textarea><br/>
-                  <input className="btn btn-lg btn-dark" type="submit" value="Send" onClick={this.sendMsg.bind(this)}/>
+                  <input className="btn btn-lg btn-dark bot" type="submit" value="Send" onClick={this.sendMsg.bind(this)}/>
                 </div>
               </form>
           </div>

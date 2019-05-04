@@ -27,10 +27,12 @@ class Notifications extends Component {
     }
 
     componentDidMount() {
+      let tokenData = JSON.parse(localStorage.getItem('token')).data;
+
       axios.get('http://localhost:3001/api/notification', {
             'headers': {
-                'userId': '',
-                'userType': ''
+                'userId': tokenData.userData.userId,
+                'userType': tokenData.userData.userType
             }
         })
       .then(res => this.setState({ notif: res.data }))

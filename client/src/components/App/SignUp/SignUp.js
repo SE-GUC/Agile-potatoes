@@ -33,11 +33,11 @@ class SignUp extends Component{
         if(this.state.toggle == 2)
         {
             func = 
-            <MemberForm/>
+            <MemberForm />
            
         }
         return(
-            <div className='card-group'>
+            <div className='card-group' > 
              <div className = 'container-fluid'>
              <div className = 'row'>
              <div className='side-bar col-sm-2 ' >
