@@ -32,6 +32,19 @@ p{
     background-color:#ecf0f1;
 }
 
+.hired-boy-name{
+    padding-top:5px;
+    background-color: #ced6e0;
+    padding: 7px 13px 0px 13px ;
+    border-top-right-radius: 10px;
+}
+.hired-boy-form {
+    background-color: #ced6e0;
+    margin: 0px;
+    padding: 10px;
+    width: 100%
+}
+
 .book-button{
     height: 50px;
     font-size: 25px;

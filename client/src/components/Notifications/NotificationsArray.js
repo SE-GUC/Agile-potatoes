@@ -27,13 +27,15 @@ class NotificationsArray extends Component {
   }
 
   render() {
-    return this.props.notifications.map((notification) => (
+    if(this.props.notifications){
+      return this.props.notifications.map((notification) => (
       <div key={notification._id}>
         <p style={this.getStyleBackground()}> <p style={this.getStyleDescription()}> {notification.description} </p>
         <p style={this.getStyleLink()}> <Link to ={notification.srcURL} > "go to link" </Link> </p>
         </p>
       </div>
     ));
+    }
   }
 }
 

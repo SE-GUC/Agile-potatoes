@@ -13,83 +13,78 @@ const schemas = require('../models/Schemas/schemas');
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
+const verifyToken = require('../middleware/tokenVerifier').verifyToken;
 router.use(bodyParser.json()); //parsing out json out of the http request body
 router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
-const secret = 'this_secret_is_the_most_powerful_secret_of_all_TIME_..._HUNDRED_PERCENT_CONFIRMED'
 function createToken(userType, email, userID) {
-    let expirationDate = Math.floor(Date.now() / 1000) + 10; //4 hours from now...
-    var token = jwt.sign({ userType: userType, email: email, userID: userID, exp: expirationDate }, secret);
+    let expirationDate = Math.floor(Date.now() / 1000) + 14400; //4 hours from now...
+    var token = jwt.sign({ userType: userType, email: email, userId: userID, exp: expirationDate }, config.getJWTsecret());
     return token;
 }
 
 //user story 12 returning user detatils to display his profile
-router.get('/:id', function (req, res, next) {
-    //jwt.verify(((req.headers.authorization.split(' '))[1]), secret, function(err, decoded) {
-
-    // if(err) console.log(err)
-    var userType = req.body.userType; //should come from session
-    var userId = req.body.userId; //should come from session
+router.get('/:id',verifyToken, function (req, res, next) {
+    var userType = req.userType; //should come from session
+    var userId = req.userId; //should come from session
     var profId = req.params.id;
-
-
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
-            Admin.findById({ _id: profId }, function (err, adminDoc) {
-                if (err) next(err);
+            Admin.findById({ _id: profId }).populate('events', 'name').exec(function (err, adminDoc) {
+                if (err) return next(err);
                 if (!adminDoc) {
                     console.log('admin not found')
-                    res.status(404).send("admin not found");
-                    return next();
+                    return res.status(404).send("admin not found");
+                    
                 }
                 return res.send(adminDoc);
             });
         }
         else if (userType == 'Partner') {
-            Partner.findById({ _id: profId }, function (err, partnerDoc) {
-                if (err) next(err);
+            Partner.findById({ _id: profId }).populate('events', 'name').populate('vacancies', 'name').exec(function (err, partnerDoc) {
+                if (err) return next(err);
                 if (!partnerDoc) {
                     console.log('partner not found')
-                    res.status(404).send("partner not found");
-                    return next();
+                    return res.status(404).send("partner not found");
+                    
                 }
                 return res.send(partnerDoc);
             });
         }
         else if (userType == 'Member') {
-            Member.findById({ _id: profId }, function (err, memberDoc) {
-                if (err) next(err);
+            Member.findById({ _id: profId }).populate('events', 'name').populate('vacancies', 'name').exec(function (err, memberDoc) {
+                if (err) return next(err);
                 if (!memberDoc) {
                     console.log('member not found')
-                    res.status(404).send("member not found");
-                    return next();
+                    return res.status(404).send("member not found");
+                    
                 }
                 return res.send(memberDoc);
             })
         }
     }
     else {                        //user viewing other's profile
-        Member.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, memberDoc) {
-            if (err) next(err);
+        Member.findById(profId, '-username -password -notifications -membershipExpiryDate').populate('events', 'name').populate('vacancies', 'name').exec(function (err, memberDoc) {
+            if (err) return next(err);
+            console.log('is it sent after error?', res.headersSent)
             if (memberDoc) {
                 return res.send(memberDoc);
             }
             else {
-                Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
-                    if (err) next(err);
+                Partner.findById(profId, '-username -password -notifications -membershipExpiryDate').populate('events', 'name').populate('vacancies', 'name').exec(function (err, partnerDoc) {
+                    if (err) return next(err);
                     if (partnerDoc) {
                         return res.send(partnerDoc);
                     }
                     else {
-                        Admin.findById(profId, 'fname lname events', function (err, adminDoc) {
-                            if (err) next(err);
+                        Admin.findById(profId, 'fname lname events').populate('events', 'name').exec( function (err, adminDoc) {
+                            if (err) return next(err);
                             if (adminDoc) {
                                 return res.send(adminDoc);
                             }
                             else {
                                 console.log('profile not found');
-                                res.status(404).send('profile not found');
-                                return next();
+                                return res.status(404).send('profile not found');
                             }
                         })
                     }
@@ -137,9 +132,9 @@ router.get('/:id/GetPassword', function (req, res) {
 })
 
 //user story 8: As a Member I can post feedback to a Partner I previously worked with
-router.post('/:id/feedback', function (req, res) {
-    var userType = req.body.userType; //should come from session (has to be Member)
-    var userID = req.body.userID;    //should come from session (the writer of the feedback comment)
+router.post('/:id/feedback', verifyToken, function (req, res) {
+    var userType = req.userType; //has to be Member
+    var userID = req.userId;    //the writer of the feedback comment
     var personID = req.params.id;
     var comment = req.body.comment;
     if (userType === 'Member') {
@@ -151,7 +146,7 @@ router.post('/:id/feedback', function (req, res) {
             });
 
             NotifyByEmail(partner.email, 'New feedback',
-                "Member that previously worked with has posted a feedback"
+                "Member that previously worked for you has posted a feedback to your profile"
                 + `\n feedback is: ${comment}`)
 
             partner.save();
@@ -166,7 +161,9 @@ router.post('/:id/feedback', function (req, res) {
                 partner: userID
             })
 
-            //notify by email here please
+            NotifyByEmail(member.email, 'New feedback',
+                "Partner that you worked for has posted a feedback to your profile"
+                + `\n feedback is: ${comment}`)
 
             member.save();
         })
@@ -177,9 +174,9 @@ router.post('/:id/feedback', function (req, res) {
 });
 
 //user story 20: As a Partner I can update my profile (Board Members, Pending vacancies, Password, Pending events).
-router.put('/:id', function (req, res) {
-    var userType = req.body.userType; //should come from session
-    var userID = req.body.userID; //should come from session (person logged in)
+router.put('/:id', verifyToken, function (req, res) {
+    var userType = req.userType; //should come from session
+    var userID = req.userId; //should come from session (person logged in)
     var partnerID = req.params.id; //the ID of the partner I want to update
     var pwd; var members; var oldPassword;
     if (req.body.boardMembers) {
@@ -256,7 +253,6 @@ router.post('/create', function (req, res) {
         var avlblty = req.body.availibility
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
-
         const result = Joi.validate(req.body, schemas.memberSchema);
         if (result.error) return res.status(400).send({ error: result.error.details[0].message });
         bcrypt.hash(pwd, 10, function (err, hashedPwd) {
@@ -289,8 +285,8 @@ router.post('/create', function (req, res) {
 })
 
 //As an admin i can i can update my name story#30
-router.put('/:id/name', function (req, res) {
-    var userType = req.body.userType;
+router.put('/:id/name', verifyToken, function (req, res) {
+    var userType = req.userType;
     var userId = req.params.id;
     var fname = req.body.fname;
     var lname = req.body.lname;
@@ -304,8 +300,8 @@ router.put('/:id/name', function (req, res) {
 });
 
 //As an admin i can update my password story#30
-router.put('/:id/password', function (req, res) {
-    var userType = req.body.userType;
+router.put('/:id/password', verifyToken, function (req, res) {
+    var userType = req.userType;
     var userId = req.params.id;
     var password = req.body.password;
     if (userType == 'Admin') {
@@ -357,9 +353,9 @@ router.put('/:id/password', function (req, res) {
 // });
 
 // Admin updates user membership, member updates his profile
-router.put('/:id/update', function (req, res) {
-    var userTypeU = req.body.userType; //should come from session
-    var userId = req.body.userId;    //should come from session
+router.put('/:id/update', verifyToken, function (req, res) {
+    var userTypeU = req.userType; //should come from session
+    var userId = req.userId;    //should come from session
     var memberId = req.params.id;
 
     var addressU = req.body.address;
@@ -388,7 +384,9 @@ router.put('/:id/update', function (req, res) {
                 if (availibilityU) doc.availibility = availibilityU;
                 res.send(doc);
 
-                doc.save();
+                doc.save(function (err) {
+                    return res.status(200).send('profile updated');
+                });
             });
 
 
@@ -401,7 +399,9 @@ router.put('/:id/update', function (req, res) {
 
                 doc.membershipExpiryDate = membershipExpiryDateU;
                 doc.membershipState = membershipStateU;
-                doc.save();
+                doc.save(function (err) {
+                    return res.status(200).send('membership updated');
+                });
             });
 
 
@@ -441,7 +441,7 @@ router.post('/login', (req, res) => {
     }).exec(function (err, member) {
         if (err) console.log(err)
         if (member) {
-            bcrypt.compare(member.password, password, function (err, flag) {
+            bcrypt.compare(password,member.password, function (err, flag) {
                 if (member.email == email && flag) {
                     res.json({
                         authData: createToken('Member', email, member._id),
@@ -452,7 +452,6 @@ router.post('/login', (req, res) => {
                             fname: member.fname,
                             lname: member.lname,
                             membershipExpiryDate: member.membershipExpiryDate,
-                            secret: secret
                         }
                     })
                 } else {
@@ -476,7 +475,6 @@ router.post('/login', (req, res) => {
                                     userId: partner._id,
                                     name: partner.name,
                                     membershipExpiryDate: partner.membershipExpiryDate,
-                                    secret: secret
                                 }
                             })
                         } else {
@@ -490,7 +488,7 @@ router.post('/login', (req, res) => {
                     }).exec(function (err, admin) {
                         if (err) console.log(err);
                         if (admin) {
-                            bcrypt.compare(admin.password, password, function (err, flag) {
+                            bcrypt.compare(password,admin.password, function (err, flag) {
                                 if (admin.email == email && flag) {
                                     res.json({
                                         authData: createToken('Admin', email, admin._id),
@@ -500,7 +498,6 @@ router.post('/login', (req, res) => {
                                             userId: admin._id,
                                             fname: admin.fname,
                                             lname: admin.lname,
-                                            secret: secret
                                         }
                                     })
                                 } else {
@@ -516,7 +513,7 @@ router.post('/login', (req, res) => {
         }
     })
 })
-router.get('/viewAllPartners', (req, res) => {
+router.get('/viewAllPartners',(req, res) => {
     var userType = req.body.userType;
     if (userType == 'Admin') {
         Partner.find().exec(function (err, partner) {
