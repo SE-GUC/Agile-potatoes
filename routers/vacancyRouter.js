@@ -143,6 +143,12 @@ router.put('/:id/apply', verifyToken, function (req, res) {
                     } else {
                         vac.applicants.push(uid);
                         vac.save();
+                        Member.findById(uid).exec(async function(err, member){
+                            if(err) return res.status(400).send(err)
+                            else if(!member) return res.status(404).send('Member not found');
+                            else member.vacancies.push(vacId)
+                            await member.save();
+                        })
                         return res.send('Application successful')
                     }
                 }
@@ -300,7 +306,7 @@ router.put('/:id/status', verifyToken, function (req, res) {
     }
     else if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
-            if (vacancy.status == 'Open' && vacancy.partner == partner)
+            if (vacancy.partner == partner)
                 Vacancy.findByIdAndUpdate(vacId, { status: status },
                     function (err, response) {
                         console.log(response);
@@ -407,21 +413,6 @@ router.get('/PartnerVacancies', verifyToken, function (req, res) {
     }
 });
 
-////////////// Story 22.1 : A partner can view his vacancy
-router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
-    var userType = req.get('userType');  //should come from session
-    var userId = req.get('id');      //should come from session
-    var vacId = req.params.id;
-
-    Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
-        if (userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted') {
-            return res.send(vacancy);
-        }
-        else {
-            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited");
-        }
-    })
-})
 
 ////////////// Story 22.2 : A partner can update his vacancy
 router.put('/:id/', verifyToken, function (req, res) {  //submitting edited vacancy
@@ -514,16 +505,30 @@ router.get('/:id/hired', function (req, res) {
 router.get('/myPastVacancies', verifyToken, function(req, res){
 	var userID = req.userId;
     var userType = req.userType;
-    console.log('i am here')
 	if(userType == 'Member'){
 		Member.findById(userID).populate('vacancies').exec(function(err, member){
-            console.log(member.vacancies);
-            console.log('hello')
 			if(err) res.status(400).send(err)
 			else if(!member) res.status(404).send('Member not found')
 			else res.send(member.vacancies);
 		})
 	}
+})
+
+
+////////////// Story 22.1 : A partner can view his vacancy
+router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
+    var userType = req.get('userType');  //should come from session
+    var userId = req.get('id');      //should come from session
+    var vacId = req.params.id;
+
+    Vacancy.findById(vacId, 'duration location description salary dailyHours partner status').exec(function (err, vacancy) {
+        if (userType === 'Partner' && userId == vacancy.partner && vacancy.status === 'Submitted') {
+            return res.send(vacancy);
+        }
+        else {
+            return res.send("It's either not your own vacancy to update or its not pending anymore to be edited");
+        }
+    })
 })
 
 module.exports = router;
