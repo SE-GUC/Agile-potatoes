@@ -68,7 +68,8 @@ class App extends Component {
                 )
             }
 
-            {/* <Route exact path="/profile/:profId" component={PartnerProfileNew} />) */}
+            <Route exact path="/otherPartnerProfile/:profId" component={PartnerProfile} />
+            <Route exact path="/otherMemberProfile/:profId" component={MemberProfile} />
 
             <Route exact path="/signupmember" component={MemberForm} />
             <Route exact path="/signuppartner" component={PartnerForm} />

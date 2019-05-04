@@ -83,17 +83,19 @@ class PartnerProfile extends Component {
                     return <span><Link to={`/vacancies/${vacancy._id}`}>{vacancy.name + ', '}</Link></span>
                   })}</p></div>
                 }
-                
+
               </div>
             </div>
 
-            <div className="col-sm-2 profOptions " >
-              <div className="btn btn-primary" onClick={this.handleChangeEdit} >Edit</div>
-              <br /><br />
-              <div className="btn btn-danger" onClick={() => this.simpleDialog.show()} >Show Feedbacks</div>
-            </div>
-
-
+            {
+              (this.userData.email === this.state.userProfile.email)
+              &&
+              <div className="col-sm-2 profOptions " >
+                <div className="btn btn-primary" onClick={this.handleChangeEdit} >Edit</div>
+                <br /><br />
+                <div className="btn btn-danger" onClick={() => this.simpleDialog.show()} >Show Feedbacks</div>
+              </div>
+            }
 
             <SkyLight
               hideOnOverlayClicked

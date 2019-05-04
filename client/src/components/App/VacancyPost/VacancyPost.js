@@ -418,7 +418,7 @@ class VacancyPost extends Component {
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
                   <span className="text-muted">Posted by </span>
-                  <Link to={`/profile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
+                  <Link to={`/otherPartnerProfile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
                 </p>
                 <p className="text-muted">
                   <i className="fas fa-map-marker-alt" />{" "}
@@ -585,7 +585,7 @@ function ApplicantItem(props) {
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
       <div className="input-group-append">
-        <Link to={`/profile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
+        <Link to={`/otherMemberProfile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
@@ -596,7 +596,7 @@ function HiredSubmitFeedbackForm(props) {
   return (
     <div className="container" >
       <div className="row">
-        <div className="hired-boy-name"><h6><Link to={`/profile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
+        <div className="hired-boy-name"><h6><Link to={`/otherMemberProfile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
       </div>
       <div className="row" >
         <div className="input-group mb-3 hired-boy-form">
