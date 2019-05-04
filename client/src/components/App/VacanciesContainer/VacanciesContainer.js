@@ -49,7 +49,6 @@ class EventsContainer extends Component {
     let tokenData = JSON.parse(localStorage.getItem('token')).data;
     let response = await axios.get('http://localhost:3001/api/vacancy/myPastVacancies', { headers: { Authorization: 'Bearer ' + tokenData.authData}
     })
-    console.log('hello' + response.data);
     this.setState({
       vacancies: response.data
     });
@@ -97,7 +96,7 @@ class EventsContainer extends Component {
               {
                 JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
                 &&
-                <button type="button" onClick={this.getMyPastVacancies} id="pastVacancies" className="list-group-item list-group-item-action">Your past Vacancies</button>
+                <button type="button" onClick={this.getMyPastVacancies} id="aWDFDGhvmbhjgfdstghjcv," className="list-group-item list-group-item-action">Your past Vacancies</button>
               }
               {
                 JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner'

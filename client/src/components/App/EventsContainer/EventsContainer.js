@@ -56,7 +56,6 @@ class EventsContainer extends Component {
     let tokenData = JSON.parse(localStorage.getItem('token')).data;
     let response = await axios.get('http://localhost:3001/api/event/myAttendedEvents', { headers: { Authorization: 'Bearer ' + tokenData.authData}
     })
-    console.log(response.data);
     this.setState({
       events: response.data
     });
