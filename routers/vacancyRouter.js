@@ -227,6 +227,7 @@ router.get('/AdminPendingVacancies', verifyToken, function (req, res) {
 
 // Story 22.2 : viewing recommended vacancies as a member (sprint 2)
 router.get('/RecommendedVacancies', verifyToken, function (req, res, next) {
+    console.log('aaaaaaaaaaaaaaaaaa')
     let userId = req.userId;
     let vacSortObjArray = [];
     let LastRecommendedVacancies = [];
@@ -234,10 +235,6 @@ router.get('/RecommendedVacancies', verifyToken, function (req, res, next) {
     Member.findById(userId, 'availability address skills')
         .exec((err, member) => {
             if (err) return next(err);
-            if (!member) {
-                return res.status(404).send("member not found");
-
-            }
             if (!member) return res.status(404).send('Member not found');
             Vacancy.find({ 'status': 'Open' }, 'url name location city dailyHours partner description')
                 .exec((err, vacs) => {

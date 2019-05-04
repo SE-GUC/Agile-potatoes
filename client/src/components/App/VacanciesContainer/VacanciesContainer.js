@@ -23,7 +23,11 @@ class EventsContainer extends Component {
   getRecommendedVacancies = async () => {
     try {
       let tokenData = JSON.parse(localStorage.getItem('token')).data;
-      let recommendVacanciesRes = await axios.get(`http://localhost:3001/api/vacancies/RecommendedVacancies`, { headers: { Authorization: 'Bearer ' + tokenData.authData } });
+      let recommendVacanciesRes = await axios.get(`http://localhost:3001/api/vacancy/RecommendedVacancies`, {
+        headers: {
+          Authorization: 'Bearer ' + tokenData.authData
+        }
+      });
       this.setState({
         vacancies: recommendVacanciesRes.data
       });
