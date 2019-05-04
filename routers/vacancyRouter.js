@@ -514,4 +514,19 @@ router.get('/:id/hired', function (req, res) {
         })
 })
 
+router.get('/myPastVacancies', verifyToken, function(req, res){
+	var userID = req.userId;
+    var userType = req.userType;
+    console.log('i am here')
+	if(userType == 'Member'){
+		Member.findById(userID).populate('vacancies').exec(function(err, member){
+            console.log(member.vacancies);
+            console.log('hello')
+			if(err) res.status(400).send(err)
+			else if(!member) res.status(404).send('Member not found')
+			else res.send(member.vacancies);
+		})
+	}
+})
+
 module.exports = router;

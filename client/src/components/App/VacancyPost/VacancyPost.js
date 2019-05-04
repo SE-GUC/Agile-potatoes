@@ -459,7 +459,7 @@ class VacancyPost extends Component {
               {
                 (this.state.vacancyData.hired.some(emp => emp._id === this.userData.userId))
                 &&
-                (this.state.vacancyData.status === 'Closed' || this.state.vacancyData.status === 'Finished')
+                (this.state.vacancyData.status === 'Closed')
                 &&
                 <div>
                 <span className="text-muted"> Submit your feedback on this Partner </span>

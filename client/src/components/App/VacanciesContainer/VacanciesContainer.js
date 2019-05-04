@@ -44,6 +44,19 @@ class EventsContainer extends Component {
     }
   }
 
+  getMyPastVacancies = async()=> {
+    try{
+    let tokenData = JSON.parse(localStorage.getItem('token')).data;
+    let response = await axios.get('http://localhost:3001/api/vacancy/myPastVacancies', { headers: { Authorization: 'Bearer ' + tokenData.authData}
+    })
+    this.setState({
+      vacancies: response.data
+    });
+    } catch (error) {
+      console.log('GOT ERROR while getting my past vacancies' + error)
+    }
+  }
+
   getPendingVacanciesAdmin = async () => {
     try {
       let tokenData = JSON.parse(localStorage.getItem('token')).data;
@@ -79,6 +92,11 @@ class EventsContainer extends Component {
                 JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
                 &&
                 <button type="button" onClick={this.getRecommendedVacancies} id="recommendedVacancies" className="list-group-item list-group-item-action">Recommended Vacancies</button>
+              }
+              {
+                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
+                &&
+                <button type="button" onClick={this.getMyPastVacancies} id="aWDFDGhvmbhjgfdstghjcv," className="list-group-item list-group-item-action">Your past Vacancies</button>
               }
               {
                 JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner'
