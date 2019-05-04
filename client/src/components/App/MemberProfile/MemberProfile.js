@@ -3,32 +3,20 @@ import axios from "axios";
 import Edit from "./Edit/Edit";
 import SkyLight from "react-skylight";
 import "./MemberProfile.css";
+import { Link } from 'react-router-dom';
+
 class MemberProfile extends Component {
   constructor(props) {
     super(props);
+    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
+    console.log(this.userData.username)
+    console.log(this.userData)
+    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
-      userProfile: {
-        availability: true,
-        skills: [],
-        masterClasses: [],
-        certificates: [],
-        membershipState: "",
-        interests: [],
-        events: [],
-        projects: [],
-        tasks: [],
-        vacancies: [],
-        username: "",
-        password: "",
-        email: "",
-        fname: "",
-        lname: "",
-        address: "",
-        notifications: [],
-        reviews: [],
-      },
+      userProfile: {},
       toggle: 0,
-      showFeedback: false
+      showFeedback: false,
+      loaded: false
     };
   }
   handleChangeEdit = () => {
@@ -37,7 +25,7 @@ class MemberProfile extends Component {
   handleChangeProf = () => {
     this.setState({ toggle: 0, userProfile: this.state.userProfile });
   };
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     try {
       let tokenData = JSON.parse(localStorage.getItem('token')).data;
       let profId;
@@ -52,27 +40,8 @@ class MemberProfile extends Component {
       );
       console.log(profile);
       this.setState({
-        userProfile: {
-          availability: profile.data.availability,
-          skills: profile.data.skills,
-          masterClasses: profile.data.masterClasses,
-          certificates: profile.data.certificates,
-          membershipState: profile.data.membershipState,
-          interests: profile.data.interests,
-          events: profile.data.events,
-          projects: profile.data.projects,
-          tasks: profile.data.tasks,
-          vacancies: profile.data.vacancies,
-          username: profile.data.username,
-          password: profile.data.password,
-          email: profile.data.email,
-          fname: profile.data.fname,
-          lname: profile.data.lname,
-          address: profile.data.address,
-          notifications: profile.data.notifications,
-          reviews: profile.data.reviews
-        },
-        toggle: this.state.toggle
+        userProfile: profile.data,
+        loaded: true
       });
     } catch (err) {
       console.log("GOT ERROR" + err);
@@ -80,6 +49,7 @@ class MemberProfile extends Component {
   };
 
   render() {
+    if (!this.state.loaded) return null;
     return (
       this.state.toggle === 0 ?
         (<div>
@@ -87,8 +57,8 @@ class MemberProfile extends Component {
             <div className=" offset-sm-2 col-sm-6">
               <div className="profPanel">
                 <h1> Basic info </h1>
-                <div className="attrContainer"><p>First name: <span>{this.state.userProfile.fname}</span> </p></div>
-                <div className="attrContainer"><p>Last name: <span>{this.state.userProfile.lname}</span></p></div>
+                <div className="attrContainer"><p>Name: <span>{this.state.userProfile.fname} {this.state.userProfile.lname}</span> </p></div>
+                <div className="attrContainer"><p>Username: <span>{this.state.userProfile.username}</span> </p></div>
                 <div className="attrContainer"><p>Email: <span>{this.state.userProfile.email}</span> </p></div>
                 <div className="attrContainer"><p>Address: <span>{this.state.userProfile.address}</span></p></div>
                 <div className="attrContainer"><p>Interests: <span>{this.state.userProfile.interests}</span></p></div>
@@ -102,21 +72,52 @@ class MemberProfile extends Component {
               <div className="profPanel" >
                 <h1> Career info </h1>
                 <div className="attrContainer"><p>Availability: <span>{this.state.userProfile.availability}</span></p></div>
-                <div className="attrContainer"><p>Skills: <span>{this.state.userProfile.skills}</span></p></div>
-                <div className="attrContainer"><p>Master classes: <span>{this.state.userProfile.masterClasses}</span></p></div>
-                <div className="attrContainer"><p>Certificates: <span>{this.state.userProfile.certificates}</span></p></div>
-                <div className="attrContainer"><p>Events: <span>{this.state.userProfile.events}</span></p></div>
-                <div className="attrContainer"><p>Vacancies: <span>{this.state.userProfile.vacancies}</span></p></div>
+                {
+                  (this.state.userProfile.skills)
+                  &&
+                  <div className="attrContainer"><p>Skills: {this.state.userProfile.skills.map((skill) => {
+                    return <span>{skill + ', '}</span>
+                  })}</p></div>
+                }
+                {
+                  (this.state.userProfile.masterClasses)
+                  &&
+                  <div className="attrContainer"><p>Master classes: {this.state.userProfile.masterClasses.map((masterClass) => {
+                    return <span>{masterClass + ', '}</span>
+                  })}</p></div>
+                }
+                {
+                  (this.state.userProfile.certificates)
+                  &&
+                  <div className="attrContainer"><p>Certificates: {this.state.userProfile.certificates.map((certificate) => {
+                    return <span>{certificate + ', '}</span>
+                  })}</p></div>
+                }
+                {
+                  (this.state.userProfile.events)
+                  &&
+                  <div className="attrContainer"><p>Events: {this.state.userProfile.events.map((event) => {
+                    return <span><Link to={`/events/${event._id}`}>{event.name + ', '}</Link></span>
+                  })}</p></div>
+                }
+                {
+                  (this.state.userProfile.vacancies)
+                  &&
+                  <div className="attrContainer"><p>Vacancies: {this.state.userProfile.vacancies.map((vacancy) => {
+                    return <span><Link to={`/vacancies/${vacancy._id}`}>{vacancy.name + ', '}</Link></span>
+                  })}</p></div>
+                }
               </div>
             </div>
-
-            <div className="col-sm-2 profOptions " >
-              <div className="btn btn-primary" onClick={this.handleChangeEdit} >Edit</div>
-              <br /><br />
-              <div className="btn btn-danger" onClick={() => this.simpleDialog.show()} >Show Feedbacks</div>
-            </div>
-
-
+            {
+              (this.userData.email === this.state.userProfile.email)
+              &&
+              <div className="col-sm-2 profOptions " >
+                <div className="btn btn-primary" onClick={this.handleChangeEdit} >Edit</div>
+                <br /><br />
+                <div className="btn btn-danger" onClick={() => this.simpleDialog.show()} >Show Feedbacks</div>
+              </div>
+            }
 
             <SkyLight
               hideOnOverlayClicked
@@ -126,15 +127,15 @@ class MemberProfile extends Component {
               <div className='toto'>
                 {this.state.userProfile.reviews &&
                   this.state.userProfile.reviews.map(review => {
-                  return (
-                    <div key={review.date} className="eventCardy">
-                      <div className="card-body">
-                        <h5 className="card-title">{review.text}</h5>
-                        <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
+                    return (
+                      <div key={review.date} className="eventCardy">
+                        <div className="card-body">
+                          <h5 className="card-title">{review.text}</h5>
+                          <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </SkyLight>
           </div>

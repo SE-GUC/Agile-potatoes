@@ -323,7 +323,7 @@ class EventPost extends Component {
                   {this.state.eventData.eventDate}
                 </p>
                 <h2>{this.state.eventData.name}</h2>
-                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ?<Link to={`/profile/${this.state.eventData.partner._id}`}> {(this.state.eventData.partner.name)}</Link> : ("LirtnenHub")}</p>
+                <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ?<Link to={`/otherPartnerProfile/${this.state.eventData.partner._id}`}> {(this.state.eventData.partner.name)}</Link> : ("LirtnenHub")}</p>
                 <p className="text-muted"><i className="fas fa-map-marker-alt"></i>  {this.state.eventData.location}, {this.state.eventData.city}</p>
               </div>
               <div className="event-post-info">

@@ -31,8 +31,8 @@ export class Navbar extends Component {
                 {   //REMOVE the !
                     this.props.loggedIn ?
                         (<div className="right-nav col-sm-4 row">
-                            <NavLink to="/notifications" className="link-button offset-sm-2 col-sm-3"><p className="text-center">Notifications</p></NavLink>
-                            <NavLink to="/profile" className="link-button col-sm-3"><p className="text-center">Profile</p></NavLink>
+                            <NavLink to="/notifications" className="link-button offset-sm-2 col-sm-4"><p className="text-center">Notifications</p></NavLink>
+                            <NavLink to={"/profile/" + JSON.parse(localStorage.getItem('token')).data.userData.userId} className="link-button col-sm-3"><p className="text-center">Profile</p></NavLink>
                             <NavLink to="/" onClick={this.logout} className="link-button col-sm-3"><p className="text-center">Log Out <i className="fas fa-sign-out-alt"></i></p></NavLink>
                         </div>
                         ) : (

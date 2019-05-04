@@ -1,8 +1,8 @@
-.edside-bar {
+.side-bar {
    
     left: 0px;
     height: 1000px;
-    padding-top: 20px;
+    padding-top: 250px;
     background-color:#31353D;
     padding-left: 0px;
     padding-right: 0px;
@@ -13,32 +13,34 @@
     width: 100%;
     padding-left: 0px ;
     margin-left: 0px ; 
+    
 }
 .profile-window {
     height: 100 px;
     float: right;
-    padding-top: 300px;
+    padding-top: 50px;
 }
 
-.edprofileCard {
+.profileCard {
     width: 18rem;
     background-color: aquamarine;
-    margin-left: 0px;
-    margin-bottom: 0px;
-    height:100;
+    margin-right:100px;
+    margin-bottom: 100px;
+    margin-top: 0px;
+    height:220;
     position: relative;
 }
 
-.profileCard a {
+.profileCard a{
     float:right;
     position: absolute;
     right:15px;
     bottom: 15px;
 }
-.edprofileCard span{
+.profileCard span{
     float: left;
     position: absolute;
-    left:200px;
-    bottom: 0px;
+    left:20px;
+    bottom: 20px;
 }
 
