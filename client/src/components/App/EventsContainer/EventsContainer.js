@@ -78,26 +78,28 @@ class EventsContainer extends Component {
             <div className='side-bar col-sm-2 ' >
                 <div className="list-group">
                   <button type="button" onClick={this.getAllEvents} id="allEvents" className="list-group-item list-group-item-action">All Events</button>
-                  {JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member' 
+                  {
+                    JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member' 
                     &&
                   <button type="button" onClick={this.getRecommendedEvents} id="recommendedEvents" className="list-group-item list-group-item-action">Recommended Events</button>
                   }
-                  {JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' 
+                  {
+                    JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' 
                     &&
                   <button type="button" onClick={this.getPartnerEvents} id="partnerEvents" className="list-group-item list-group-item-action">Partner Events</button>
                   }
                   {
-                    JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin' 
+                    JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin'
                     &&
                   <button type="button" onClick={this.getPendingEventsAdmin} id="adminEvents" className="list-group-item list-group-item-action">Admin Pending Events</button>
                   }
                   {
-                    JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member' 
+                    JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
                     &&
                   <button type="button" onClick={this.getMyAttendedEvents} id="memberEvents" className="list-group-item list-group-item-action">Your Events</button>
                   }
                   {
-                    (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' || JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin')
+                    JSON.parse(localStorage.getItem('token')) && (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner' || JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin')
                     &&
                   <button type="button" onClick={this.handletoggle} id="partnerEvents" className="list-group-item list-group-item-action">Create Event</button>
                   }
