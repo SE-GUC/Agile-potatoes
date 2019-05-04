@@ -29,6 +29,7 @@ import VacanciesContainer from './VacanciesContainer/VacanciesContainer'
 import PartnerForm from './CreatePartnerForm/CreatePartnerForm'
 import MemberForm from './CreateMemberForm/CreateMemberForm'
 import SignUp from './SignUp/SignUp'
+
 class App extends Component {
 
   constructor(props) {
@@ -63,11 +64,11 @@ class App extends Component {
                 (<Route exact path="/profile/:profId" component={AdminProfile} />) : (
                   (this.state.loggedIn && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner') ?
                     (<Route exact path="/profile/:profId" component={PartnerProfile} />) : (
-                      this.state.loggedIn && <Route exact path="/profile" component={MemberProfile} />)
+                      this.state.loggedIn && <Route exact path="/profile/:profId" component={MemberProfile} />)
                 )
             }
 
-            <Route exact path="/profile/:profId" component={MemberProfile} />)
+            {/* <Route exact path="/profile/:profId" component={PartnerProfileNew} />) */}
 
             <Route exact path="/signupmember" component={MemberForm} />
             <Route exact path="/signuppartner" component={PartnerForm} />

@@ -126,15 +126,15 @@ class MemberProfile extends Component {
               <div className='toto'>
                 {this.state.userProfile.reviews &&
                   this.state.userProfile.reviews.map(review => {
-                  return (
-                    <div key={review.date} className="eventCardy">
-                      <div className="card-body">
-                        <h5 className="card-title">{review.text}</h5>
-                        <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
+                    return (
+                      <div key={review.date} className="eventCardy">
+                        <div className="card-body">
+                          <h5 className="card-title">{review.text}</h5>
+                          <span className="card-text"><small className="text-muted">{new Date(review.date).toLocaleDateString()}</small></span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </SkyLight>
           </div>
