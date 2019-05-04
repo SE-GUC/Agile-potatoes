@@ -254,7 +254,6 @@ router.post('/create', function (req, res) {
         var avlblty = req.body.availibility
         //var tsks = req.body.tasks;
         //var prjs = req.body.projects
-
         const result = Joi.validate(req.body, schemas.memberSchema);
         if (result.error) return res.status(400).send({ error: result.error.details[0].message });
         bcrypt.hash(pwd, 10, function (err, hashedPwd) {

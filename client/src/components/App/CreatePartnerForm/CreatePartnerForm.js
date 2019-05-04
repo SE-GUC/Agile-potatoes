@@ -68,9 +68,9 @@ class CreatePartnerForm extends Component {
                             Username:<br />
                             <input type="text" id="d1" name="username" className="mytext" onChange={this.onChange} /><br />
                             Password:<br />
-                            <input type="text" id="d2" name="password" className="mytext" onChange={this.onChange} /><br />
+                            <input type="password" id="d2" name="password" className="mytext" onChange={this.onChange} /><br />
                             Confrim Password:<br />
-                            <input type="text" id="d3" name="confirmpassword" className="mytext" onChange={this.onChange} /><br />
+                            <input type="password" id="d3" name="confirmpassword" className="mytext" onChange={this.onChange} /><br />
                             Full Name:<br />
                             <input type="text" id="d4" name="name" className="mytext" onChange={this.onChange} /><br />
                             Email:<br />

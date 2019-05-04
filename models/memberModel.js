@@ -21,7 +21,7 @@ const MemberSchema = new Schema({
         lowercase: true,
         trim: true
     }],
-    masterClasses: [String],
+    masterclasses: [String],
     certificates: [String],
     membershipState: {
         type: String,

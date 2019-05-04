@@ -12,7 +12,7 @@ export class Navbar extends Component {
 
     logout = () => {
         this.props.changeLoggedInFlag(false)
-
+        localStorage.setItem('token', null);
     }
     render() {
         return (
@@ -25,16 +25,14 @@ export class Navbar extends Component {
                     <NavLink to="/vacancies" className="link-button col-sm-3"><p className="text-center">Vacancies</p></NavLink>
                     <NavLink to="/events" className="link-button col-sm-3"><p className="text-center">Events</p></NavLink>
                     <NavLink to="/" className="link-button col-sm-3"><p className="text-center">Certificates</p></NavLink>
-                    {/* <NavLink to="/partnerprofile" className="link-button col-sm-3"><p className="text-center">Partner Profile</p></NavLink>
-            <NavLink to="/memberprofile" className="link-button col-sm-3"><p className="text-center">Member Profile</p></NavLink>
-            <NavLink to="/adminprofile" className="link-button col-sm-3"><p className="text-center">Admin Profile</p></NavLink> */}
+
                 </div>
 
                 {   //REMOVE the !
                     this.props.loggedIn ?
                         (<div className="right-nav col-sm-4 row">
                             <NavLink to="/notifications" className="link-button offset-sm-2 col-sm-3"><p className="text-center">Notifications</p></NavLink>
-                            <NavLink to="/profile" className="link-button col-sm-3"><p className="text-center">My Profile</p></NavLink>
+                            <NavLink to="/profile" className="link-button col-sm-3"><p className="text-center">Profile</p></NavLink>
                             <NavLink to="/" onClick={this.logout} className="link-button col-sm-3"><p className="text-center">Log Out <i className="fas fa-sign-out-alt"></i></p></NavLink>
                         </div>
                         ) : (
