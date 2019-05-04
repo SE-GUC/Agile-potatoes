@@ -10,15 +10,7 @@ class VacanciesContainer extends Component {
   }
 
   componentWillMount = async () => {
-    try {
-      let allVacancies = await axios.get(`http://localhost:3001/api/vacancy/getAllVacancies`);
-      this.setState({
-        toggle:0,
-        vacancies: allVacancies.data
-      });
-    } catch (error) {
-      console.log('GOT ERROR fetching vacancies')
-    }
+    await this.getAllVacancies();
   }
   getAllVacancies =async ()=>{
     try{
@@ -147,27 +139,27 @@ class VacanciesContainer extends Component {
             <div className="list-group">
               <button type="button" onClick={this.getAllVacancies} id="allVacancies" className="list-group-item list-group-item-action">All Vacancies</button>
               {
-                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
+                JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
                 &&
                 <button type="button" onClick={this.getRecommendedVacancies} id="recommendedVacancies" className="list-group-item list-group-item-action">Recommended Vacancies</button>
               }
               {
-                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
+                JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Member'
                 &&
                 <button type="button" onClick={this.getMyPastVacancies} id="aWDFDGhvmbhjgfdstghjcv," className="list-group-item list-group-item-action">Your past Vacancies</button>
               }
               {
-                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner'
+                JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner'
                 &&
                 <button type="button" onClick={this.getPartnerVacancies} id="partnerVacancies" className="list-group-item list-group-item-action">All your Vacancies</button>
               }
               {
-                JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin'
+                JSON.parse(localStorage.getItem('token')) && JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Admin'
                 &&
                 <button type="button" onClick={this.getPendingVacanciesAdmin} id="partnerVacancies" className="list-group-item list-group-item-action">Vacancies that need approval</button>
               }
               {
-                (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner')
+                JSON.parse(localStorage.getItem('token')) && (JSON.parse(localStorage.getItem('token')).data.userData.userType === 'Partner')
                 &&
                 <button type="button" onClick={this.handletoggle} id="partnerVacancies" className="list-group-item list-group-item-action">Create Vacancy</button>
               }

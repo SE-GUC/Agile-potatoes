@@ -2,15 +2,15 @@ import React, { Component } from "react";
 import "./EventPost.css";
 import axios from "axios";
 import SkyLight from "react-skylight";
-import { Link } from 'react-router-dom';
+import { Link,Redirect } from 'react-router-dom';
 
 
 
 class EventPost extends Component {
   constructor(props) {
     super(props);
-    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
-    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
+    this.userData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.userData:null;
+    this.authData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.authData:null;
     this.state = {
       postID: this.props.match.params.id,
       loaded: false,
@@ -48,6 +48,9 @@ class EventPost extends Component {
   }
 
   async componentDidMount() {
+    if (!this.userData){
+      return this.props.history.push('/login')
+    }
     await axios.get(`http://localhost:3001/api/event/Post/${this.state.postID}`)
       .then(res => {
         this.setState({
@@ -320,7 +323,7 @@ class EventPost extends Component {
               <div className="event-post-header">
                 <p className="text-muted">
                   <i className="fas fa-calendar-day" />{" "}
-                  {this.state.eventData.eventDate}
+                  {new Date(this.state.eventData.eventDate).toLocaleString()}
                 </p>
                 <h2>{this.state.eventData.name}</h2>
                 <p><span className="text-muted">Organized by </span>{this.state.eventData.partner ?<Link to={`/otherPartnerProfile/${this.state.eventData.partner._id}`}> {(this.state.eventData.partner.name)}</Link> : ("LirtnenHub")}</p>

@@ -9,9 +9,9 @@ class VacancyPost extends Component {
     /*  
       props should have the user data
     */
-    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
+    this.userData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.userData:null;
     console.log(this.userData);
-    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
+    this.authData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.authData:null;
     this.state = {
       postID: this.props.match.params.id,
       loaded: false,
@@ -30,6 +30,9 @@ class VacancyPost extends Component {
   }
 
   async componentDidMount() {
+    if (!this.userData) {
+      return this.props.history.push('/login')
+    }
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
     let hired = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/hired`);
     this.setState({
@@ -413,7 +416,7 @@ class VacancyPost extends Component {
               <div className="vacancy-post-header">
                 <p className="text-muted">
                   <i className="fas fa-calendar-day" />{" "}
-                  {this.state.vacancyData.postDate}
+                  {new Date(this.state.vacancyData.postDate).toLocaleDateString()}
                 </p>
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
