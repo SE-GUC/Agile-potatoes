@@ -96,7 +96,7 @@ router.get('/:id',verifyToken, function (req, res, next) {
 })
 //})
 //get password of a partner/member/admin
-router.get('/:id/GetPassword', function (req, res) {
+router.get('/:id/GetPassword',verifyToken, function (req, res) {
     var userID = req.params.id
     Admin.findById(userID, function (err, adminPass) {
         if (err) return res.send(err)
@@ -195,11 +195,15 @@ router.put('/:id', verifyToken, function (req, res) {
                 if (pwd && oldPassword === partner.password) {
                     partner.password = pwd;
                 }
-                else
-                    console.log("You provided an wrong old password");
-                res.send(partner);
+                else{
+
+                    console.log(partner.password)
+                    res.send("You have entered the wrong password.");
+                }
+               
                 partner.save();
-                console.log("Updated partner profile successfully");
+                res.send("Updated partner profile successfully");
+               
             });
         }
     }
@@ -382,7 +386,6 @@ router.put('/:id/update', verifyToken, function (req, res) {
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
                 if (availibilityU) doc.availibility = availibilityU;
-                res.send(doc);
 
                 doc.save(function (err) {
                     return res.status(200).send('profile updated');

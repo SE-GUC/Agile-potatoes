@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./EventPost.css";
 import axios from "axios";
 import SkyLight from "react-skylight";
-import { Link,Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 

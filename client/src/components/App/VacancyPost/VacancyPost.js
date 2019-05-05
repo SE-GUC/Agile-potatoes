@@ -9,9 +9,9 @@ class VacancyPost extends Component {
     /*  
       props should have the user data
     */
-    this.userData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.userData:null;
+    this.userData = JSON.parse(localStorage.getItem('token')) ? JSON.parse(localStorage.getItem('token')).data.userData : null;
     console.log(this.userData);
-    this.authData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.authData:null;
+    this.authData = JSON.parse(localStorage.getItem('token')) ? JSON.parse(localStorage.getItem('token')).data.authData : null;
     this.state = {
       postID: this.props.match.params.id,
       loaded: false,
@@ -203,7 +203,7 @@ class VacancyPost extends Component {
           Authorization: 'Bearer ' + this.authData
         }
       })
-      .then(()=>{
+      .then(() => {
         this.setState({ feedback: '' });
         window.alert('added feedback succesfully');
       })
@@ -224,7 +224,7 @@ class VacancyPost extends Component {
           Authorization: 'Bearer ' + this.authData
         }
       })
-      .then(()=>{
+      .then(() => {
         this.setState({ feedback: '' });
         window.alert('added feedback succesfully');
       })
@@ -332,7 +332,7 @@ class VacancyPost extends Component {
   }
 
   render() {
-    
+
     if (!this.state.loaded) return null;
     if (this.state.Edit)
       return (
@@ -408,7 +408,7 @@ class VacancyPost extends Component {
           </div>
         </div>
       );
-    else{
+    else {
       return (
         <div>
           <div className="vacancy-post offset-sm-2 col-sm-8 row ">
@@ -465,13 +465,13 @@ class VacancyPost extends Component {
                 (this.state.vacancyData.status === 'Closed')
                 &&
                 <div>
-                <span className="text-muted"> Submit your feedback on this Partner </span>
-                <div className="input-group mb-3">
-                  <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
-                  <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
+                  <span className="text-muted"> Submit your feedback on this Partner </span>
+                  <div className="input-group mb-3">
+                    <input type="text" className="form-control" name="feedback" onChange={this.handleChange} />
+                    <div className="input-group-append">
+                      <button className="btn btn-primary" type="button" onClick={this.submitFeedbackMember}>Submit Feedback</button>
+                    </div>
                   </div>
-                </div>
                 </div>
               }
 
@@ -578,20 +578,33 @@ class VacancyPost extends Component {
             </div>
           </div>
         </div>
-      )};
+      )
+    };
   }
 }
 
 
 function ApplicantItem(props) {
   return (
-    //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
-    <div className="input-group mb-3">
-      <div className="input-group-append">
-        <Link to={`/otherMemberProfile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
-        <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
+    <div className="container" >
+      <div className="row">
+        <div className="hired-boy-name"><h6><Link to={`/otherMemberProfile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
+      </div>
+      <div className="row" >
+        <div className="input-group mb-3 hired-boy-form">
+          <div className="input-group-append">
+            <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
+          </div>
+        </div>
       </div>
     </div>
+    //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
+    // <div className="input-group mb-3">
+    //   <div className="input-group-append">
+    //     <Link to={`/otherMemberProfile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
+    //     <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
+    //   </div>
+    // </div>
   )
 }
 
@@ -603,11 +616,11 @@ function HiredSubmitFeedbackForm(props) {
       </div>
       <div className="row" >
         <div className="input-group mb-3 hired-boy-form">
-        <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
-        <div className="input-group-append">
-          <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+          <input type="text" className="form-control" onChange={props.onChange} name="feedback" />
+          <div className="input-group-append">
+            <button className="btn btn-primary" type="button" onClick={() => props.submitFeedbackPartner(props)}>Add Feedback!</button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   )
