@@ -262,7 +262,7 @@ class VacancyPost extends Component {
 
   onClickApprove = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "status": "Approved"
+      "status": "Open"
     }, {
         headers: {
           Authorization: 'Bearer ' + this.authData
@@ -271,7 +271,7 @@ class VacancyPost extends Component {
         this.setState({
           vacancyData: {
             ...this.state.vacancyData,
-            status: 'Approved'
+            status: 'Open'
           }
         })
       })
