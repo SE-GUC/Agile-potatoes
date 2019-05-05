@@ -95,7 +95,7 @@ router.post('/CreateVacancy', verifyToken, async (req, res) => {
             location: location,
             salary: salary,
             dailyHours: dailyHours,
-            cit: city,
+            city: city,
             partner: userId,
             status: 'Submitted'
         });
@@ -426,7 +426,7 @@ router.put('/:id/', verifyToken, function (req, res) {  //submitting edited vaca
     var name = req.body.name;
 
     var userType = req.userType;
-    var userID = req.userID;
+    var userID = req.userId;
 
     if (userType == 'Partner') {
         Vacancy.findById(vacId).exec(function (err, vacancy) {
