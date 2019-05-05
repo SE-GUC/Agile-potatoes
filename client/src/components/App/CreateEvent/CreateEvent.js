@@ -5,17 +5,18 @@ class CreateEvent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        userType:undefined,
-        description :undefined,
-        name :undefined,
-        price : undefined,
-        location :undefined,
-        city :undefined,
-        eventDate :undefined,
-        places :undefined,
-        eventType :undefined,
-        speakers :undefined,
-        topics:undefined,
+        description :"",
+        name :"",
+        price : 0,
+        location :"",
+        city :"",
+        eventDate :"",
+        places :0,
+        eventType :"",
+        speaker :"",
+        topic:"",
+        speakers :[],
+        topics:[],
        
       }
    
@@ -24,7 +25,6 @@ class CreateEvent extends Component {
 
   handleChange = change => {
     this.setState({
-         userType: String(document.getElementById("a1").value),
          description :String(document.getElementById("a2").value),
          name: String(document.getElementById("a3").value) ,
          price : Number(document.getElementById("a4").value) ,
@@ -33,8 +33,8 @@ class CreateEvent extends Component {
          eventDate :Date(document.getElementById("a7").value) ,
          places :Number(document.getElementById("a8").value) ,
          eventType :String(document.getElementById("a9").value),
-         speakers :String(document.getElementById("a10").value) ,
-         topics:String(document.getElementById("a11").value) ,
+         speaker:String(document.getElementById("a10").value) ,
+         topic:String(document.getElementById("a11").value) ,
         });
   }
 
@@ -45,24 +45,39 @@ class CreateEvent extends Component {
   
   create = async ()=>
     {
+      await this.setState({
+       
+        speaker: this.state.speakers.concat(this.state.speaker),
+        topic:this.state.topics.concat(this.state.topic) ,
+       });
         try{
-            
-          let response =   await axios.post(`http://localhost:3001/api/event/5cb06d10dcd7922b68b5d5b3/CreateEvent`, {
-                    'userType':this.state.userType+'', 
-                    'description' :this.state.description+'',
+          let tokenData = JSON.parse(localStorage.getItem('token')).data;
+          let profId = tokenData.userData.userId;
+          let response =   await axios.post(`http://localhost:3001/api/event/${profId}/CreateEvent`, {
+                   'description' :this.state.description+'',
                     'name': this.state.name+'',
                     'price' : this.state.price,
                     'location' :this.state.location+'',
                     'city' :this.state.city+'',
                     'eventDate' :this.state.eventDate+'',
-                    'places' :this.state.places,
+                    'remainingPlaces' :this.state.places,
                     'eventType' :this.state.eventType+'',
-                    'speakers' :this.state.speakers+'',
-                    'topics':this.state.topics+'',
+                    'speakers' :this.state.speakers,
+                    'topics':this.state.topics,
                     
-                })
-                console.log(response)
-}
+                },{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                document.getElementById("a2").value = null;
+                document.getElementById("a3").value = null;
+                document.getElementById("a4").value = null;
+                document.getElementById("a5").value = null;
+                document.getElementById("a6").value = null;
+                document.getElementById("a7").value = null;
+                document.getElementById("a8").value = null;
+                document.getElementById("a9").value = null;
+                document.getElementById("a10").value = null;
+                document.getElementById("a11").value = null;
+                window.alert(response.data)
+              }
         catch(err)
         {
             console.log(err)
@@ -88,8 +103,7 @@ let func;
           <div className="card-body">
       <form onSubmit={this.handleSubmit}>
       <label>
-        UserType:
-        <input id = "a1" type="text" name="usertype" onChange={this.handleChange} /><br/>
+       
         Event Description:
         <input id = "a2" type="text" name="descriprion" onChange={this.handleChange} /><br/>
         Event Name:

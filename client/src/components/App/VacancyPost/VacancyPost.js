@@ -9,9 +9,9 @@ class VacancyPost extends Component {
     /*  
       props should have the user data
     */
-    this.userData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.userData:null;
+    this.userData = JSON.parse(localStorage.getItem('token')).data.userData;
     console.log(this.userData);
-    this.authData = JSON.parse(localStorage.getItem('token')) ?JSON.parse(localStorage.getItem('token')).data.authData:null;
+    this.authData = JSON.parse(localStorage.getItem('token')).data.authData;
     this.state = {
       postID: this.props.match.params.id,
       loaded: false,
@@ -30,9 +30,6 @@ class VacancyPost extends Component {
   }
 
   async componentDidMount() {
-    if (!this.userData) {
-      return this.props.history.push('/login')
-    }
     let vacancy = await axios.get(`http://localhost:3001/api/vacancy/Post/${this.state.postID}`);
     let hired = await axios.get(`http://localhost:3001/api/vacancy/${this.state.postID}/hired`);
     this.setState({
@@ -262,7 +259,7 @@ class VacancyPost extends Component {
 
   onClickApprove = (e) => {
     axios.put(`http://localhost:3001/api/vacancy/${this.state.postID}/status`, {
-      "status": "Approved"
+      "status": "Open"
     }, {
         headers: {
           Authorization: 'Bearer ' + this.authData
@@ -271,7 +268,7 @@ class VacancyPost extends Component {
         this.setState({
           vacancyData: {
             ...this.state.vacancyData,
-            status: 'Approved'
+            status: 'Open'
           }
         })
       })
@@ -416,12 +413,12 @@ class VacancyPost extends Component {
               <div className="vacancy-post-header">
                 <p className="text-muted">
                   <i className="fas fa-calendar-day" />{" "}
-                  {new Date(this.state.vacancyData.postDate).toLocaleDateString()}
+                  {this.state.vacancyData.postDate}
                 </p>
                 <h2>{this.state.vacancyData.name}</h2>
                 <p>
                   <span className="text-muted">Posted by </span>
-                  <Link to={`/otherPartnerProfile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
+                  <Link to={`/profile/${this.state.vacancyData.partner._id}`}>{this.state.vacancyData.partner.name}</Link>
                 </p>
                 <p className="text-muted">
                   <i className="fas fa-map-marker-alt" />{" "}
@@ -588,7 +585,7 @@ function ApplicantItem(props) {
     //<Link to={props.url}><h3>{props.fname} {props.lname}</h3></Link>
     <div className="input-group mb-3">
       <div className="input-group-append">
-        <Link to={`/otherMemberProfile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
+        <Link to={`/profile/${props._id}`}><h6>{props.fname} {props.lname}</h6></Link>
         <button className="btn btn-danger" type="button" onClick={() => props.onClickHire(props)}>Hire!</button>
       </div>
     </div>
@@ -599,7 +596,7 @@ function HiredSubmitFeedbackForm(props) {
   return (
     <div className="container" >
       <div className="row">
-        <div className="hired-boy-name"><h6><Link to={`/otherMemberProfile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
+        <div className="hired-boy-name"><h6><Link to={`/profile/${props._id}`}>{props.fname} {props.lname}</Link></h6></div>
       </div>
       <div className="row" >
         <div className="input-group mb-3 hired-boy-form">

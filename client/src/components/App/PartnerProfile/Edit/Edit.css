@@ -22,10 +22,11 @@
 
 .edprofileCard {
     width: 18rem;
-    background-color: aquamarine;
+    background-color: white;
     margin-left: 0px;
     margin-bottom: 0px;
-    height:100;
+    margin-bottom: 100px;
+    height:300px;
     position: relative;
 }
 

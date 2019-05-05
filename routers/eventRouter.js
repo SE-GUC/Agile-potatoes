@@ -17,27 +17,24 @@ router.use(bodyParser.urlencoded({ extended: true })) //handle url encoded data
 
 
 // Story 3, 4: creating events	
-router.post(`/:id/CreateEvent`, function (req, res) {
-	var userType = req.body.userType; //should come from session
+router.post('/:id/CreateEvent', verifyToken, function (req, res) {
+	var userType = req.userType; //should come from session
 	var userId = req.params.id;    //should come from session
 	var description = req.body.description;
 	var name = req.body.name;
 	var price = req.body.price;
 	var location = req.body.location;
 	var city = req.body.city;
-	//wtf??
-	// let eventDate = moment();
-	// eventDate = moment(req.body.eventDate + '');
-	// eventDate.day(eventDate.day() + 1)
-	// var eventDate = req.body.eventDate;
-	// var remainingPlaces = req.body.places;
-	var eventDate = req.body.eventDate
+	var eventDate = req.body.eventDate;
 	var remainingPlaces = req.body.remainingPlaces;
-	var eventType = req.body.eventtype;
+	var eventType = req.body.eventType;
 	var speakers = req.body.speakers;
 	var topics = req.body.topics;
+	
 
 	const result = Joi.validate(req.body, schemas.eventSchema)
+	console.log(result.error)
+	console.log(result)
 	if (result.error) return res.status(400).send({ error: result.error.details[0].message });
 
 	if (userType == 'Admin') {
@@ -47,7 +44,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			price: price,
 			location: location,
 			city: city,
-			eventDate: Date(eventDate),
+			eventDate: new Date(eventDate),
 			eventStatus: 'Approved',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
@@ -57,7 +54,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 		});
 		event.save(function (err, eve) {
 			if (err) return res.status(400).send(err);
-			else res.send('created event for admin successfully');
+			else res.send('Created event successfully');
 		})
 		event.url = '/api/event/Post/' + event._id
 		Admin.findById(userId).exec(function (err, admin) {
@@ -72,7 +69,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 			description: description,
 			price: price,
 			location: location,
-			eventDate: Date(eventDate),
+			eventDate: new Date(eventDate),
 			eventStatus: 'Submitted',
 			remainingPlaces: remainingPlaces,
 			eventType: eventType,
@@ -82,7 +79,7 @@ router.post(`/:id/CreateEvent`, function (req, res) {
 		});
 		event.save(function (err, eve) {
 			if (err) return res.send(err);
-			else res.send('created event for partner successfully');
+			else res.send('Created event successfully');
 		})
 		event.url = '/api/event/Post' + event._id
 		Partner.findById(userId).exec(function (err, partner) {

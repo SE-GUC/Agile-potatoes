@@ -1,416 +1,225 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
 import axios from 'axios'
-class Edit extends Component{
-    constructor(props){
+import './Edit.css'
+const bycrypt = require('bcryptjs')
+
+class AdminProfile extends Component {
+    constructor(props) {
         super(props);
-        this.state={
-            oldPass:undefined,
-            newPass:undefined,
-            confPass:undefined,
-            fname:"",
-            lname:"",
-            address:"",
-            skill:"",
-            skillsList:[],
-            interest:"",
-            interestsList:[],
-            cond:""
-        } 
-    }
-    handleChange = ()=> {
-        if(document.getElementById("c2"))
-        {
-            this.setState({
-             oldPass :String(document.getElementById("c2").value),
-             newPass:String(document.getElementById("c3").value) ,
-             confPass :String(document.getElementById("c4").value),
-            });
-        }
-        else
-        {
-            if(document.getElementById("c5"))
-            {
-                this.setState({
-                fname:String(document.getElementById("c5").value),
-                });
-            }
-            else
-            {
-                if(document.getElementById("c6"))
-                {
-                    this.setState({
-                    lname:String(document.getElementById("c6").value),
-                  
-                    });
-                }
-                else
-                {
-                    if(document.getElementById("c7"))
-                    {
-                            this.setState({
-                            address:String(document.getElementById("c7").value),
-                          
-                           });
-                    }
-                    else
-                    {
-                        if(document.getElementById("c8"))
-                        {
-                            this.setState({
-                            skill:String(document.getElementById("c8").value),
-                           
-                            });
-                        }
-                        else
-                        {
-                            if(document.getElementById("c9"))
-                            {
-                                this.setState({
-                                interest:String(document.getElementById("c9").value),
-                               
-                                });
-                            }
-                        }
-                    }
-                }       
-            }
-        }
-        }
-    handleButtonChange1 = ()=> {
-        this.setState({
-            cond:"button1",
-                
-                    });
-                }
-    handleButtonChange2 = ()=> {
-        this.setState({
-            cond:"button2",
-                                
-        });
-        }
-    handleButtonChange3 = ()=> {
-        this.setState({
-            cond:"button3",
-                   
-        });
-    }
-    handleButtonChange4 = ()=> {
-        this.setState({
-             cond:"button4",
-                   
-         });
-        }
-     handleButtonChange5 = ()=> {
-         this.setState({
-            cond:"button5",
-                       
-        });
-         }
-    handleButtonChange6 = ()=> {
-        this.setState({
-             cond:"button6",
-                       
-        });
+
+        this.state = {
+            oldPass: '',
+            newPass: '',
+            confPass: '',
+            firstname: '',
+            lastname: '',
+            cond: ""
+        };
+
     }
 
-    
-      
+    increment = async () => {
 
-      handleChangeSkill = ()=> {
-        this.setState({
-            skillsList:this.state.skillsList.concat(this.state.skill)
-            });
-            console.log(this.state.skill)
-            console.log(this.state.skillsList)
-      }
-    
-      handleChangeInterest = ()=> {
-        this.setState({
-             interestsList:this.state.interestsList.concat(this.state.interest)
-            });
-           console.log(this.state.interest)
-           console.log(this.state.interestsList)
-      }
-      handleSubmit = eve => {
-        eve.preventDefault();
-    
-      }
+       await this.setState({
+            oldPass: this.state.oldPass + '',
+            newPass: this.state.newPass + '',
+            confPass: this.state.confPass + ''
 
-    update=async()=>
-    {
-        
-        if(this.state.oldPass)
-       { 
-        console.log("ENTERED")
-           let old = await axios.get('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/GetPassword')
-          
-           if(old.data == this.state.oldPass)
-            {
-                if(this.state.newPass == this.state.confPass)
-                    {
-                        if(this.state.newPass != this.state.oldPass)
-                        {
-                            try{
-                            let newPassword = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                                'userType':'Member',
-                                'userId':'5cb1c35d35ac5603c46764cd',
-                                'password':''+this.state.newPass})
-                            console.log(newPassword.data);
-                            }
-                            catch(err)
-                            {
-                                console.log("ERROR" + err)
-                            }
-                            document.getElementById("c2").value = ""
-                            document.getElementById("c3").value = ""
-                            document.getElementById("c4").value = ""
-                           
-                        }
-                        else
-                        {
-                            window.alert("The new password is the same as the old password.Please enter a different new password.")
-                        }
-                    }
-                    else
-                    {
-                        window.alert("The confirmed password did not match the new password.Please re-confirm your password!")
-                    }
-                    
-            }
-            else
-                    {
-                        window.alert("The old password is incorrect.Please re-enter your old password!")
-                    }
-        }
-       
-         if(this.state.fname )
-            {
-                try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                        'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'fname':''+this.state.fname})
-                    console.log(newprof.data);
-                    }
-                    catch(err)
-                    {
-                        console.log("ERROR" + err)
-                    }
-                    document.getElementById("c5").value = ""
-                   
-            }
-            if(this.state.lname )
-            {
-                try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                        'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'lname':''+this.state.lname})
-                    console.log(newprof.data);
-                    }
-                    catch(err)
-                    {
-                        console.log("ERROR" + err)
-                    }
-                    document.getElementById("c6").value = ""
-            }
+        })
 
-            if(this.state.address)
-            {
-                try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                        'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'address':''+this.state.address})
-                    console.log(newprof.data);
-                    }
-                    catch(err)
-                    {
-                        console.log("ERROR" + err)
-                    }
-                    document.getElementById("c7").value = ""
-            }
-            if(this.state.skillsList.length>0)
-            {
-                try{
-                    let newskill = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                        'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'skills':this.state.skillsList})
-                    console.log(newskill.data);
-                    }
-                    catch(err)
-                    {
-                        console.log("ERROR" + err)
-                    }
-                    document.getElementById("c8").value = ""
-            }
-            if(this.state.interestsList.length>0)
-            {
-                try{
-                    let newint = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                        'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'interests':this.state.interestsList})
-                    console.log(newint.data);
-                    }
-                    catch(err)
-                    {
-                        console.log("ERROR" + err)
-                    }
-                    document.getElementById("c9").value = ""
-            }
-        
-    }
+        let newPasword = this.state.newPass;
+        let oldPassword = this.state.oldPass;
+        let confirmedPassword = this.state.confPass;
 
-    render(){
-        let func ;
-        if(this.state.cond == "button1")
-        {
-           func= <div className="card profileCard">
-            <div className="card-body">
-            <form onSubmit={this.handleSubmit}>
-           <label>
-            Old Password:<br/>
-            <input id = "c2" type="text" name="oldPass" onChange={this.handleChange} /><br/>
-            New Password:<br/>
-            <input id = "c3" type="text" name="newPass" onChange={this.handleChange} /><br/>
-            Confirm New Password:<br/>
-            <input id = "c4" type="text" name="confPass" onChange={this.handleChange} /><br/> 
-            </label>
-            <br/>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-            </form>
-            </div>
-            </div>
-        }
-        if(this.state.cond == "button2")
-        {
-            func = 
-            <div className="card profileCard">
-            <div className="card-body">
-            <form>
-            <label>
-            First Name:<br/>
-            <input id = "c5" type="text" name="fname" onChange={this.handleChange} />
-            </label>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-            </form>
-            </div>
-            </div>
-        }
-
-        if(this.state.cond == "button3")
-        {
-           func =
-           <div className="card profileCard">
-            <div className="card-body">
-            <form>
-            <label> 
-            Last Name:<br/>
-            <input id = "c6" type="text" name="lname" onChange={this.handleChange} />
-            </label>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-            </form>
-        </div>
-        </div>
-        }
-        if(this.state.cond == "button4")
-        {
-            func =
-           <div className="card profileCard">
-            <div className="card-body">
-            <form>
-            <label>
-            Address:<br/>
-            <input id = "c7" type="text" name="address" onChange={this.handleChange} /><br/> 
-            </label>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-            </form>
-        </div>
-        </div>
-        }
-        if(this.state.cond == "button5")
-        {
-            func = 
-            <div className="card profileCard">
-            <div className="card-body">
-            <form>
-            <label>
-            Skill:<br/>
-            <input id = "c8" type="text" name="Skill" onChange= {this.handleChange}/><br/>
-            </label>
-            <br/>
-            <label>
-            <button onClick = {this.handleChangeSkill} type="submit"className="btn btn-primary">ADD SKILL</button><br/>
-            </label>
-           <br/>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-            </form>
+        let tokenData = JSON.parse(localStorage.getItem('token')).data;
+        let userid = tokenData.userData.userId;
+        let currentPass = await axios.get(`http://localhost:3001/api/profile/${userid}/GetPassword`,{ headers: { Authorization: 'Bearer ' + tokenData.authData } });
+        let flag = bycrypt.compare(oldPassword,currentPass.data,function(error,flag){
             
-        </div>
-        </div>
-        }
+        if(!flag)
+        {   document.getElementById("box1").value = ""
+           document.getElementById("box2").value = ""
+           document.getElementById("box3").value = ""
+           window.alert("Old Password is incorrect. Please enter your current password")
+          }
+       else
+           if (newPasword !== confirmedPassword)
+             {
+               document.getElementById("box1").value = ""
+               document.getElementById("box2").value = ""
+               document.getElementById("box3").value = ""
+               window.alert("Confirmed Password does not match New Password, Please try again");
+             } 
 
-        if(this.state.cond == "button6")
-        {
-            func=
-            <div className="card profileCard">
-            <div className="card-body">
-            <form>
-            <label>
-            Interest:<br/>
-            <input id = "c9" type="text" name="Interest" onChange= {this.handleChange}/><br/>
-            </label>
-            <br/>
-            <label>
-            <button onClick = {this.handleChangeInterest} type="submit"className="btn btn-primary">ADD INTEREST</button><br/>
-            </label>
-            <br/>
-            <label>
-            <button onClick = {this.update} type="submit" className="btn btn-primary">UPDATE</button><br/>
-            </label>
-        </form>
-        </div>
-        </div>
-        }
-
-        return(
-        <div className='card-group'>
-            <div className = 'container-fluid'>
-                <div className = 'row'>
+           else
+               if (oldPassword === newPasword)
+                  {
+                        document.getElementById("box1").value = ""
+                       document.getElementById("box2").value = ""
+                       document.getElementById("box3").value = ""
+                      window.alert("Old Password is the same as New Password, Please choose a different New Password")
+                    }
+               else {
                    
-                        <div className="list-group">
-                            <br/>
-                            <br/>
-                            <br/>
-                            <br/>
-                            <button onClick = {this.handleButtonChange1} type="submit" className="btn btn-primary">UPDATE PASSWORD</button><br/>
-                            <button onClick = {this.handleButtonChange2} type="submit"className="btn btn-primary">UPDATE FIRST NAME</button><br/>
-                            <button onClick = {this.handleButtonChange3} type="submit" className="btn btn-primary">UPDATE LAST NAME</button><br/>
-                            <button onClick = {this.handleButtonChange4} type="submit" className="btn btn-primary">UPDATE ADDRESS</button><br/>
-                            <button onClick = {this.handleButtonChange5} type="submit" className="btn btn-primary">UPDATE SKILLS</button><br/>
-                            <button onClick = {this.handleButtonChange6} type="submit" className="btn btn-primary">UPDATE INTERESTS</button><br/>
-            
+                   let tokenData = JSON.parse(localStorage.getItem('token')).data;
+                   console.log("NEW PASS" + newPasword)
+                   let hashedPass = new Promise((resolve,reject)=>{
+                       bycrypt.hash(newPasword,10,async function(err,hash){
+                           if(err) reject(err)
+                           else{
+                              await axios.put(`http://localhost:3001/api/profile/${userid}/password`, { 'userType': 'Admin', 'password': hash } ,{ headers: { Authorization: 'Bearer ' + tokenData.authData } } )
+                               .then(res => {
+                                   console.log(res);
+                                   console.log(res.data);
+                                   document.getElementById("box1").value = ""
+                                   document.getElementById("box2").value = ""
+                                   document.getElementById("box3").value = ""
+                                   window.alert("Password Updated Successfully!")
+                               })
+                           }
+                       })
+                   })
+               }
+        });
+
+
+    }
+
+
+    increment1 = async () => {
+        this.setState({
+            firstname: this.state.firstname + '',
+            lastname: this.state.lastname + ''
+
+        })
+
+        let updatedFN = this.state.firstname;
+        let updatedLN = this.state.lastname;
+
+        console.log(updatedFN)
+        console.log(updatedLN)
+
+        let tokenData = JSON.parse(localStorage.getItem('token')).data;
+        let userid = tokenData.userData.userId;
+        await axios.put(`http://localhost:3001/api/profile/${userid}/name`, { 'userType': 'Admin', 'fname': updatedFN, 'lname': updatedLN }, { headers: { Authorization: 'Bearer ' + tokenData.authData } })
+            .then(res => {
+                console.log(res);
+                console.log(res.data);
+                document.getElementById("box4").value = ""
+                document.getElementById("box5").value = ""
+                window.alert("Name Updated Successfully!")
+            })
+    }
+
+    handlerender = () => {
+
+        this.setState({ cond: "button1" })
+
+    }
+    handlerender1 = () => {
+
+        this.setState({ cond: "button2" })
+
+    }
+
+    handleChange(value1) {
+        this.setState({
+            oldPass: value1
+        });
+    }
+
+    handleChange1(value2) {
+        this.setState({
+            newPass: value2
+        });
+    }
+
+    handleChange2(value3) {
+        this.setState({
+            confPass: value3
+        });
+    }
+
+    handleChange3(value4) {
+        this.setState({
+            firstname: value4
+        });
+    }
+
+    handleChange4(value5) {
+        this.setState({
+            lastname: value5
+        });
+    }
+
+    render() {
+
+        let button;
+        if (this.state.cond === "button1") {
+
+
+            button = <div className="card profileCard">
+                <div className="card-body">
+                    <label>
+                        <p>Old Password: </p>
+                        <input id="box1" type="password" value1={this.state.oldPass} onChange={(event) => this.handleChange(event.target.value)} />
+                        <p>New Password: </p>
+                        <input id="box2" type="password" value2={this.state.newPass} onChange={(event) => this.handleChange1(event.target.value)} />
+                        <p>Confirm New Password: </p>
+                        <input id="box3" type="password" value3={this.state.confPass} onChange={(event) => this.handleChange2(event.target.value)} />
+                        <label>
+                            <button type="submit" onClick={() => this.increment()} className="btn btn-primary" >UPDATE PASSWORD </button>
+                        </label>
+                    </label>
+                    <br />
+
+                </div>
+            </div>
+
+
+
+
+        }
+        else {
+
+            if (this.state.cond === "button2") {
+
+                button = <div className="card profileCard">
+                    <div className="card-body">
+                        <label>
+                            <p>New First Name: </p>
+                            <input id="box4" type="text" value4={this.state.firstname} onChange={(event) => this.handleChange3(event.target.value)} />
+                            <p>New Last Name: </p>
+                            <input id="box5" type="text" value5={this.state.lastname} onChange={(event) => this.handleChange4(event.target.value)} />
+                            <button type="submit" onClick={() => this.increment1()} className="btn btn-primary" >UPDATE NAME </button>
+                        </label>
+                        <br />
+
+                    </div>
+                </div>
+
+            }
+        }
+        return (
+            <div className='card-group'>
+                <div className='container-fluid'>
+                    <div className='row'>
+                        <div className='side-bar col-sm-2 ' >
+                            <div className="list-group">
+
+                                <button onClick={this.handlerender} type="submit" >Change Password</button><br />
+                                <button onClick={this.handlerender1} type="submit">Change Name</button><br />
+                             
+                            </div>
                         </div>
-                
-    {/* <div className='profile-window col-sm-10'> */}
-       {func}
-              {/* </div>      */}
+                        <div className='profile-window col-sm-10'>
+                            {button}
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
-      </div>
         )
     }
 }
-export default Edit
+export default AdminProfile
