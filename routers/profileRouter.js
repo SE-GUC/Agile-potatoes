@@ -24,13 +24,14 @@ function createToken(userType, email, userID) {
 }
 
 //user story 12 returning user detatils to display his profile
+
 router.get('/:id',verifyToken, function (req, res, next) {
     var userType = req.userType; //should come from session
     var userId = req.userId; //should come from session
     var profId = req.params.id;
     if (profId == userId) {       //user viewing his profile
         if (userType == 'Admin') {
-            Admin.findById({ _id: profId }).populate('events', 'name').exec(function (err, adminDoc) {
+            Admin.findById({ _id: profId }, function (err, adminDoc) {
                 if (err) return next(err);
                 if (!adminDoc) {
                     console.log('admin not found')
@@ -41,7 +42,7 @@ router.get('/:id',verifyToken, function (req, res, next) {
             });
         }
         else if (userType == 'Partner') {
-            Partner.findById({ _id: profId }).populate('events', 'name').populate('vacancies', 'name').exec(function (err, partnerDoc) {
+            Partner.findById({ _id: profId }, function (err, partnerDoc) {
                 if (err) return next(err);
                 if (!partnerDoc) {
                     console.log('partner not found')
@@ -52,7 +53,7 @@ router.get('/:id',verifyToken, function (req, res, next) {
             });
         }
         else if (userType == 'Member') {
-            Member.findById({ _id: profId }).populate('events', 'name').populate('vacancies', 'name').exec(function (err, memberDoc) {
+            Member.findById({ _id: profId }, function (err, memberDoc) {
                 if (err) return next(err);
                 if (!memberDoc) {
                     console.log('member not found')
@@ -64,20 +65,20 @@ router.get('/:id',verifyToken, function (req, res, next) {
         }
     }
     else {                        //user viewing other's profile
-        Member.findById(profId, '-username -password -notifications -membershipExpiryDate').populate('events', 'name').populate('vacancies', 'name').exec(function (err, memberDoc) {
+        Member.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, memberDoc) {
             if (err) return next(err);
             console.log('is it sent after error?', res.headersSent)
             if (memberDoc) {
                 return res.send(memberDoc);
             }
             else {
-                Partner.findById(profId, '-username -password -notifications -membershipExpiryDate').populate('events', 'name').populate('vacancies', 'name').exec(function (err, partnerDoc) {
+                Partner.findById(profId, '-username -password -notifications -membershipExpiryDate', function (err, partnerDoc) {
                     if (err) return next(err);
                     if (partnerDoc) {
                         return res.send(partnerDoc);
                     }
                     else {
-                        Admin.findById(profId, 'fname lname events').populate('events', 'name').exec( function (err, adminDoc) {
+                        Admin.findById(profId, 'fname lname events', function (err, adminDoc) {
                             if (err) return next(err);
                             if (adminDoc) {
                                 return res.send(adminDoc);
@@ -96,7 +97,7 @@ router.get('/:id',verifyToken, function (req, res, next) {
 })
 //})
 //get password of a partner/member/admin
-router.get('/:id/GetPassword', function (req, res) {
+router.get('/:id/GetPassword',verifyToken, function (req, res) {
     var userID = req.params.id
     Admin.findById(userID, function (err, adminPass) {
         if (err) return res.send(err)
@@ -195,11 +196,15 @@ router.put('/:id', verifyToken, function (req, res) {
                 if (pwd && oldPassword === partner.password) {
                     partner.password = pwd;
                 }
-                else
-                    console.log("You provided an wrong old password");
-                res.send(partner);
+                else{
+
+                    console.log(partner.password)
+                    res.send("You have entered the wrong password.");
+                }
+               
                 partner.save();
-                console.log("Updated partner profile successfully");
+                res.send("Updated partner profile successfully");
+               
             });
         }
     }
@@ -382,8 +387,8 @@ router.put('/:id/update', verifyToken, function (req, res) {
                 if (interestsU) doc.interests = interestsU;
                 if (skillsU) doc.skills = skillsU;
                 if (availibilityU) doc.availibility = availibilityU;
-                res.send(doc);
-
+              
+              
                 doc.save(function (err) {
                     return res.status(200).send('profile updated');
                 });

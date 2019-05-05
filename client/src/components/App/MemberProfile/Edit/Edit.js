@@ -1,12 +1,13 @@
 import React,{Component} from 'react'
 import axios from 'axios'
+const bcrypt = require('bcryptjs');
 class Edit extends Component{
     constructor(props){
         super(props);
         this.state={
-            oldPass:undefined,
-            newPass:undefined,
-            confPass:undefined,
+            oldPass:"",
+            newPass:"",
+            confPass:"",
             fname:"",
             lname:"",
             address:"",
@@ -17,10 +18,10 @@ class Edit extends Component{
             cond:""
         } 
     }
-    handleChange = ()=> {
+    handleChange =async ()=> {
         if(document.getElementById("c2"))
         {
-            this.setState({
+           await this.setState({
              oldPass :String(document.getElementById("c2").value),
              newPass:String(document.getElementById("c3").value) ,
              confPass :String(document.getElementById("c4").value),
@@ -31,7 +32,7 @@ class Edit extends Component{
         {
             if(document.getElementById("c5"))
             {
-                this.setState({
+                await this.setState({
                 fname:String(document.getElementById("c5").value),
               
                 });
@@ -40,7 +41,7 @@ class Edit extends Component{
             {
                 if(document.getElementById("c6"))
                 {
-                    this.setState({
+                    await this.setState({
                     lname:String(document.getElementById("c6").value),
                   
                     });
@@ -49,7 +50,7 @@ class Edit extends Component{
                 {
                     if(document.getElementById("c7"))
                     {
-                            this.setState({
+                        await this.setState({
                             address:String(document.getElementById("c7").value),
                           
                            });
@@ -58,7 +59,7 @@ class Edit extends Component{
                     {
                         if(document.getElementById("c8"))
                         {
-                            this.setState({
+                            await this.setState({
                             skill:String(document.getElementById("c8").value),
                            
                             });
@@ -67,7 +68,7 @@ class Edit extends Component{
                         {
                             if(document.getElementById("c9"))
                             {
-                                this.setState({
+                                await this.setState({
                                 interest:String(document.getElementById("c9").value),
                                
                                 });
@@ -118,20 +119,48 @@ class Edit extends Component{
     
       
 
-      handleChangeSkill = ()=> {
-        this.setState({
+      handleChangeSkill = async ()=> {
+        let tokenData = JSON.parse(localStorage.getItem('token')).data;
+        let userid =tokenData.userData.userId;
+        await this.setState({
             skillsList:this.state.skillsList.concat(this.state.skill)
             });
             console.log(this.state.skill)
             console.log(this.state.skillsList)
+        try{
+            let oldSkills = await axios.get(`http://localhost:3001/api/profile/${userid}`,{ headers: { Authorization: 'Bearer ' + tokenData.authData }});
+           await this.setState({
+                skillsList: oldSkills.data.skills.concat(this.state.skillsList)
+            })
+            window.alert("Added a skill. When you are done adding your skill please click the UPDATE button!")
+
+
+        }catch(err){
+
+        }
+      
       }
     
-      handleChangeInterest = ()=> {
-        this.setState({
+      handleChangeInterest = async()=> {
+           let tokenData = JSON.parse(localStorage.getItem('token')).data;
+        let userid =tokenData.userData.userId;
+        await this.setState({
              interestsList:this.state.interestsList.concat(this.state.interest)
             });
+
            console.log(this.state.interest)
            console.log(this.state.interestsList)
+           try{
+            let oldInterests = await axios.get(`http://localhost:3001/api/profile/${userid}`,{ headers: { Authorization: 'Bearer ' + tokenData.authData }});
+           await this.setState({
+                interestsList: oldInterests.data.interests.concat(this.state.interestsList)
+            })
+            window.alert("Added an interest. When you are done adding your interestes please click the UPDATE button!")
+
+
+        }catch(err){
+
+        }
       }
       handleSubmit = eve => {
         eve.preventDefault();
@@ -140,32 +169,48 @@ class Edit extends Component{
 
     update=async()=>
     {
-        
-        if(this.state.oldPass)
+        let tokenData = JSON.parse(localStorage.getItem('token')).data;
+       let newPasss = this.state.newPass;
+       let oldpass = this.state.oldPass;
+       let confirmpass = this.state.confPass;
+        if(  document.getElementById("c2"))
        { 
-        console.log("ENTERED")
-           let old = await axios.get('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/GetPassword')
-          
-           if(old.data == this.state.oldPass)
+         console.log("ENTERED")
+        let userid =tokenData.userData.userId;
+           let old = await axios.get(`http://localhost:3001/api/profile/${userid}/GetPassword`,{ headers: { Authorization: 'Bearer ' + tokenData.authData }});
+           let flag = bcrypt.compare(this.state.oldPass, old.data,function(err,flag){
+            if(flag)
             {
-                if(this.state.newPass == this.state.confPass)
+                if(newPasss == confirmpass)
                     {
-                        if(this.state.newPass != this.state.oldPass)
+                        if(newPasss != oldpass)
                         {
-                            try{
-                            let newPassword = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
-                                'userType':'Member',
-                                'userId':'5cb1c35d35ac5603c46764cd',
-                                'password':''+this.state.newPass})
-                            console.log(newPassword.data);
-                            }
-                            catch(err)
-                            {
-                                console.log("ERROR" + err)
-                            }
-                            document.getElementById("c2").value = ""
-                            document.getElementById("c3").value = ""
-                            document.getElementById("c4").value = ""
+
+                        let hashedPassword= new Promise((resolve, reject) => {
+                            bcrypt.hash(newPasss, 10, async function(err, hash) {
+                              if (err) reject(err)
+                              else
+                              {
+                                try{
+                                
+                                    let newPassword = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
+                                        'userType':'Member',
+                                        'userId':+userid+'',
+                                        'password':''+hash},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                                    window.alert(newPassword.data)
+                                    }
+                                    catch(err)
+                                    {
+                                        console.log("ERROR" + err.message)
+                                    }
+                              }
+                            });
+                        })
+                           
+                           
+                            document.getElementById("c2").value = null
+                            document.getElementById("c3").value = null
+                            document.getElementById("c4").value = null
                            
                         }
                         else
@@ -183,84 +228,93 @@ class Edit extends Component{
                     {
                         window.alert("The old password is incorrect.Please re-enter your old password!")
                     }
+           });
+          
         }
        
-         if(this.state.fname )
+         if(  document.getElementById("c5") )
             {
+                let userid =tokenData.userData.userId;
                 try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
+                    let newprof = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
                         'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'fname':''+this.state.fname})
-                    console.log(newprof.data);
+                        'userId':userid+'',
+                        'fname':''+this.state.fname},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                   window.alert(newprof.data);
                     }
                     catch(err)
                     {
                         console.log("ERROR" + err)
                     }
-                    document.getElementById("c5").value = ""
+                    document.getElementById("c5").value = null
                    
             }
-            if(this.state.lname )
+            if(  document.getElementById("c6") )
             {
+                let userid =tokenData.userData.userId;
                 try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
+                    let newprof = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
                         'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'lname':''+this.state.lname})
-                    console.log(newprof.data);
+                        'userId':userid+'',
+                        'lname':''+this.state.lname},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                        window.alert(newprof.data);
                     }
                     catch(err)
                     {
-                        console.log("ERROR" + err)
+                        console.log("ERROR" + err.message)
                     }
-                    document.getElementById("c6").value = ""
+                    document.getElementById("c6").value = null
             }
 
-            if(this.state.address)
+            if(  document.getElementById("c7"))
             {
+                let userid =tokenData.userData.userId;
                 try{
-                    let newprof = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
+                    let newprof = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
                         'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'address':''+this.state.address})
-                    console.log(newprof.data);
+                        'userId':userid+'',
+                        'address':''+this.state.address},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                        window.alert(newprof.data);
                     }
                     catch(err)
                     {
                         console.log("ERROR" + err)
                     }
-                    document.getElementById("c7").value = ""
+                    document.getElementById("c7").value = null
             }
             if(this.state.skillsList.length>0)
             {
+                let userid =tokenData.userData.userId;
+              
+
                 try{
-                    let newskill = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
+                    let newskill = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
                         'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'skills':this.state.skillsList})
-                    console.log(newskill.data);
+                        'userId':userid+'',
+                        'skills':this.state.skillsList},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                        window.alert(newskill.data);
                     }
                     catch(err)
                     {
                         console.log("ERROR" + err)
                     }
-                    document.getElementById("c8").value = ""
+                    document.getElementById("c8").value = null
             }
             if(this.state.interestsList.length>0)
             {
+                let userid =tokenData.userData.userId;
                 try{
-                    let newint = await axios.put('http://localhost:3001/api/profile/5cb1c35d35ac5603c46764cd/update',{
+                    let newint = await axios.put(`http://localhost:3001/api/profile/${userid}/update`,{
                         'userType':'Member',
-                        'userId':'5cb1c35d35ac5603c46764cd',
-                        'interests':this.state.interestsList})
-                    console.log(newint.data);
+                        'userId':userid+'',
+                        'interests':this.state.interestsList},{ headers: { Authorization: 'Bearer ' + tokenData.authData }})
+                    window.alert(newint.data);
                     }
                     catch(err)
                     {
                         console.log("ERROR" + err)
                     }
-                    document.getElementById("c9").value = ""
+                    document.getElementById("c9").value = null
             }
         
     }
@@ -274,11 +328,11 @@ class Edit extends Component{
             <form onSubmit={this.handleSubmit}>
            <label>
             Old Password:<br/>
-            <input id = "c2" type="text" name="oldPass" onChange={this.handleChange} /><br/>
+            <input id = "c2" type="password" name="oldPass" onChange={this.handleChange} /><br/>
             New Password:<br/>
-            <input id = "c3" type="text" name="newPass" onChange={this.handleChange} /><br/>
+            <input id = "c3" type="password" name="newPass" onChange={this.handleChange} /><br/>
             Confirm New Password:<br/>
-            <input id = "c4" type="text" name="confPass" onChange={this.handleChange} /><br/> 
+            <input id = "c4" type="password" name="confPass" onChange={this.handleChange} /><br/> 
             </label>
             <br/>
             <label>
@@ -293,7 +347,7 @@ class Edit extends Component{
             func = 
             <div className="card profileCard">
             <div className="card-body">
-            <form>
+            <form onSubmit={this.handleSubmit}>
             <label>
             First Name:<br/>
             <input id = "c5" type="text" name="fname" onChange={this.handleChange} />
@@ -311,7 +365,7 @@ class Edit extends Component{
            func =
            <div className="card profileCard">
             <div className="card-body">
-            <form>
+            <form onSubmit={this.handleSubmit}>
             <label> 
             Last Name:<br/>
             <input id = "c6" type="text" name="lname" onChange={this.handleChange} />
@@ -328,7 +382,7 @@ class Edit extends Component{
             func =
            <div className="card profileCard">
             <div className="card-body">
-            <form>
+            <form onSubmit={this.handleSubmit}>
             <label>
             Address:<br/>
             <input id = "c7" type="text" name="address" onChange={this.handleChange} /><br/> 
@@ -345,7 +399,7 @@ class Edit extends Component{
             func = 
             <div className="card profileCard">
             <div className="card-body">
-            <form>
+            <form onSubmit={this.handleSubmit}>
             <label>
             Skill:<br/>
             <input id = "c8" type="text" name="Skill" onChange= {this.handleChange}/><br/>
@@ -369,7 +423,7 @@ class Edit extends Component{
             func=
             <div className="card profileCard">
             <div className="card-body">
-            <form>
+            <form onSubmit={this.handleSubmit}>
             <label>
             Interest:<br/>
             <input id = "c9" type="text" name="Interest" onChange= {this.handleChange}/><br/>
