@@ -514,7 +514,6 @@ router.get('/myPastVacancies', verifyToken, function(req, res){
 	}
 })
 
-
 ////////////// Story 22.1 : A partner can view his vacancy
 router.get('/:id/', function (req, res) {  //showing non approved vacancy to be updated and checking if its pending
     var userType = req.get('userType');  //should come from session
